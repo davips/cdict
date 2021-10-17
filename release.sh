@@ -16,7 +16,7 @@ echo
 echo "----------------- docs... -----------------------"
 read -p "press enter"
 rm docs -rf
-poetry run pdoc --html --force ldict -o docs
+poetry run pdoc --html --force cdict -o docs
 mv docs/cdict/* docs/
 rm docs/cdict -rf
 git add docs
