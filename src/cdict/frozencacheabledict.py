@@ -26,14 +26,6 @@ from functools import reduce
 from random import Random
 from typing import Dict, TypeVar, Union, Callable
 
-from ldict.core.base import AbstractLazyDict
-from ldict.core.rshift import handle_dict, lazify
-from ldict.customjson import CustomJSONEncoder
-from ldict.exception import WrongKeyType, ReadOnlyLdict
-from ldict.lazyval import LazyVal
-from ldict.parameter.functionspace import FunctionSpace
-from ldict.parameter.let import Let
-
 VT = TypeVar("VT")
 
 
@@ -138,4 +130,20 @@ class FrozenCacheableDict(AbstractLazyDict):
             data = self.data.copy()
             data.update(lazies)
             return self.clone(data)
+
+        if isinstance(other, list):
+            d = self
+            for cache in other:
+                d = cached(d, cache)
+            return d
         return NotImplemented
+
+    def __rxor__(self, other: Union[Dict, Callable]):
+        if isinstance(other, Dict) and not isinstance(other, Ldict):
+            return Ldict(other) >= self
+        return NotImplemented
+    def __xor__(self, other: Union[Dict, Callable]):
+        # from ldict import Empty
+        # if isinstance(other, FunctionSpace) and isinstance(other[0], Empty):
+        #     raise EmptyNextToGlobalCache("Cannot use ø after ^ due to Python precedence rules.")
+        return cached(self, GLOBAL["cache"]) >> other
