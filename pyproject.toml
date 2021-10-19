@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cdict"
-version = "0.211016.1"
+version = "0.211016.2"
 description = "Cacheable lazy dict with universally unique identifiers"
 authors = ["davips <dpsabc@gmail.com>"]
 license = "GPL"
