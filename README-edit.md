@@ -13,4 +13,4 @@
 # cdict
 A cacheable lazy dict with universally unique deterministic identifiers and transparent agnostic persistence.
 
-## [this package intended funcionality was transfered to a part of the package [idict](https://pypi.org/project/idict)]
+## [this package intended functionality was transferred as a part of the package [idict](https://pypi.org/project/idict)]
