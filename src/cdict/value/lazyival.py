@@ -22,6 +22,7 @@
 #
 import operator
 from functools import reduce
+from itertools import chain
 from typing import Union
 
 from hosh import Hosh
@@ -37,32 +38,32 @@ class LazyiVal(iVal):
     Threefold lazy: It is calculated only when needed, only once and it is cached.
 
     >>> cache = {}
-    >>> from cdict.value.ival import iVal
-    >>> deps = {"x": iVal(2)}
+    >>> from cdict.value.strictival import StrictiVal
+    >>> deps = {"x": StrictiVal(2)}
     >>> lvx = LazyiVal(lambda x: x**2, 0, 1, deps, [], cache=cache)
     >>> lvx
     →(x)
-    >>> deps = {"x": lvx, "y": iVal(3)}
+    >>> deps = {"x": lvx, "y": StrictiVal(3)}
     >>> result = []
     >>> f = lambda x,y: [x+y, y**2]
     >>> lvy = LazyiVal(f, 0, 2, deps, result, cache=cache)
     >>> lvz = LazyiVal(f, 1, 2, deps, result, cache=cache)
     >>> lvx, lvy, lvz
     (→(x), →(x→(x) y), →(x→(x) y))
-    >>> deps = {"z":lvz}
+    >>> deps = {"z": lvz}
     >>> f = lambda z: {"z":z**3, "w":z**5}
     >>> result = []
     >>> lvz2 = LazyiVal(f, 0, 2, deps, result, cache=cache)
     >>> lvw = LazyiVal(f, 1, 2, deps, result, cache=cache)
     >>> lvx, lvy, lvz2, lvw
     (→(x), →(x→(x) y), →(z→(x→(x) y)), →(z→(x→(x) y)))
-    >>> lvx.v, lvy.v, lvz2.v, lvw.v
+    >>> lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     >>> lvz2.id
     'hWbiHpbI2eCTvRg7AAOU8Inraf2k7pajWDj46aJA'
     >>> lvw.id
     'O1ZMWqMUI-2N6HISHWxNH7hFluQrhHkCQX79ckq9'
-    >>> lvz2.h + lvw.h == lvz.h * lvw.fh
+    >>> lvz2.hosh + lvw.hosh == lvz.hosh * lvw.fhosh
     True
     """
 
@@ -74,14 +75,14 @@ class LazyiVal(iVal):
         self.result = result
         self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
         self.cache = {} if cache is None else cache
-        self.hosh = (reduce(operator.mul, self.deps.values()) * self.fhosh).component(i, n)
+        self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh])).component(i, n)
 
     @property
     def value(self):
         if not self.result:
             deps = {}
             for field, ival in self.deps.items():
-                deps[field] = ival.v
+                deps[field] = ival.value
             result = self.f(**deps)
             if self.n == 1:
                 result = [result]

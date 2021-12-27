@@ -21,7 +21,6 @@
 #  time spent here.
 from json import JSONEncoder
 
-from cdict.value.lazyival import LazyiVal
 from cdict.value.strictival import StrictiVal
 
 
@@ -29,12 +28,21 @@ class CustomJSONEncoder(JSONEncoder):
     """
     >>> from cdict.idict_ import Idict
     >>> a = Idict(x=3)
-    >>> Idict(d=a, y=5)
+    >>> Idict(d=a, y=5).show(colored=False)
     {
         "d": {
-            "x": 3
+            "x": 3,
+            "_id": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
+            "_ids": {
+                "x": "KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr"
+            }
         },
-        "y": 5
+        "y": 5,
+        "_id": "YyAtuyiPhC7pHV-ADAoh1Lp30TM-08swr40vOmk1",
+        "_ids": {
+            "d": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
+            "y": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2"
+        }
     }
     >>> from pandas.core.frame import DataFrame, Series
     >>> df = DataFrame([[1,2],[3,4]])
@@ -43,30 +51,60 @@ class CustomJSONEncoder(JSONEncoder):
     0  1  2
     1  3  4
     >>> b = Idict(d=a, y=5, df=df, ell=...)
-    >>> b
+    >>> b.show(colored=False)
     {
         "d": {
-            "x": 3
+            "x": 3,
+            "_id": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
+            "_ids": {
+                "x": "KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr"
+            }
         },
         "y": 5,
-        "df": {0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}},
-        "ell": "..."
+        "df": "«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»",
+        "ell": "...",
+        "_id": "JV7NBHPiD--8kLP0FEYjCUSVB1mpBCnOWLlRDtNc",
+        "_ids": {
+            "d": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
+            "y": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
+            "df": "rSDr3h42zWns2dY1Ho.DI2klPxn5EQ6jzE77VXNn",
+            "ell": "P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6"
+        }
     }
     >>> from numpy import array
-    >>> Idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]]))
+    >>> Idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
     {
         "b": {
             "d": {
-                "x": 3
+                "x": 3,
+                "_id": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
+                "_ids": {
+                    "x": "KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr"
+                }
             },
             "y": 5,
-            "df": {0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}},
-            "ell": "..."
+            "df": "«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»",
+            "ell": "...",
+            "_id": "JV7NBHPiD--8kLP0FEYjCUSVB1mpBCnOWLlRDtNc",
+            "_ids": {
+                "d": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
+                "y": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
+                "df": "rSDr3h42zWns2dY1Ho.DI2klPxn5EQ6jzE77VXNn",
+                "ell": "P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6"
+            }
         },
         "z": 9,
-        "c": [1 2 3],
-        "d": {0: 1, 1: 2, 2: 3},
-        "dd": [[1 2] [3 4]]
+        "c": "«[1 2 3]»",
+        "d": "«{0: 1, 1: 2, 2: 3}»",
+        "dd": "«[[1 2] [3 4]]»",
+        "_id": "3S013nLjEgR-IIcO0B9oA.FYvrhlKdgkmPE1fjsy",
+        "_ids": {
+            "b": "JV7NBHPiD--8kLP0FEYjCUSVB1mpBCnOWLlRDtNc",
+            "z": "GuwIQCrendfKXZr5jGfrUwoP-8TWMhmLHYrja2yj",
+            "c": "QkfVsy7ITAmoIiOFgbYpsQodBSIYshhiUm3v2r8d",
+            "d": "5iU-DAFL3XTLno88g056s2G12RidCKkCgLCLIwB5",
+            "dd": "fVj30baMeet4PcN9ZY-8uMpFin89FY8h8MI4RkDd"
+        }
     }
     """
 
@@ -74,38 +112,20 @@ class CustomJSONEncoder(JSONEncoder):
 
     def default(self, obj):
         if obj is not None:
-
             if obj is Ellipsis:
                 return "..."
-            from cdict.frozenidict import FrozenIdict
-            if isinstance(obj, FrozenIdict):
-                return self.data
             if isinstance(obj, StrictiVal):
                 return obj.value
-            if isinstance(obj, LazyiVal):
-                return str(obj)
             # if isinstance(obj, FunctionType):
             #     return str(obj)
             if not isinstance(obj, (list, set, str, int, float, bytearray, bool)):
-                try:
-                    from pandas.core.frame import DataFrame, Series
-
-                    if isinstance(obj, (DataFrame, Series)):
-                        # «str()» is to avoid nested identation
-                        return truncate("«" + str(obj.to_dict()) + "»", self.width)
-                    from numpy import ndarray
-
-                    if isinstance(obj, ndarray):
-                        return truncate("«" + str(obj).replace("\n", "") + "»", self.width)
-                except ImportError:  # pragma: no cover
-                    print("Pandas or numpy may be missing.")
-                if hasattr(obj, "asdict"):
-                    return obj.asdict
-                elif hasattr(obj, "aslist"):
-                    return obj.aslist
-                else:
-                    return str(obj)
-        return JSONEncoder.default(self, obj)
+                if obj.__class__.__name__ in ["DataFrame", "Series"]:
+                    # «str()» is to avoid nested identation
+                    return truncate("«" + str(obj.to_dict()) + "»", self.width)
+                if obj.__class__.__name__ == "ndarray":
+                    return truncate("«" + str(obj).replace("\n", "") + "»", self.width)
+                return str(obj)
+        return JSONEncoder.default(self, obj)  # pragma: no cover
 
 
 # class CustomJSONDecoder(JSONDecoder):

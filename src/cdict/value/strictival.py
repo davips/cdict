@@ -32,7 +32,7 @@ class StrictiVal(iVal):
     """
     Identified value
 
-    >>> iVal(2)
+    >>> StrictiVal(2)
     2
     """
 

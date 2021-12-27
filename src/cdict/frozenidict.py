@@ -13,25 +13,35 @@ VT = TypeVar("VT")
 
 
 class FrozenIdict(UserDict, Dict[str, VT]):
+    """
+    >>> "x" in FrozenIdict(x=2)
+    True
+    """
+
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, **kwargs):
         from cdict.idict_ import Idict
-        data = _dictionary or {}
+        data: Dict[str, iVal] = _dictionary or {}
         data.update(kwargs)
         if "_id" in data.keys() or "_ids" in data.keys():  # pragma: no cover
             raise Exception("Cannot have a field named '_id'/'_ids': {data.keys()}")
-        self.data = {}
+        self.data: Dict[str, iVal] = {}
         self.hosh = ø
         self.ids = {}
         for k, v in data.items():
             if isinstance(v, iVal):
                 self.data[k] = v
             else:
-                self.data[k] = StrictiVal(v, v.hosh) if isinstance(v, Idict) else StrictiVal(v)
-            self.hosh *= self.data[k].hosh
+                self.data[k] = StrictiVal(v.frozen, v.hosh) if isinstance(v, Idict) else StrictiVal(v)
+            self.hosh += self.data[k].hosh * k.encode()
             self.ids[k] = self.data[k].hosh.id
         self.data["_id"] = self.id = self.hosh.id
         self.data["_ids"] = self.ids
+
+    def evaluate(self):
+        for k, ival in self.data.items():
+            if k not in ["_id", "_ids"]:
+                ival.evaluate()
 
     @cached_property
     def fields(self):
@@ -56,28 +66,28 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 data[k] = StrictiVal(v, ids[k])
         return FrozenIdict(data)
 
-    def evaluate(self):
-        for _, ival in self.entries():
-            ival.evaluate()
-
-    @property
+    @cached_property
     def asdict(self):
         dic = {k: v for k, v in self.entries()}
         dic["_id"] = self.id
         dic["_ids"] = self.ids.copy()
         return dic
 
-    @property
-    def astext(self):
+    def astext(self, colored=True):
         r"""Textual representation of a frozenidict object"""
-        dic = {k: v for k, v in self.items(evaluate=False)}
-        txt = json.dumps(dic, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
+        txt = json.dumps(self.data, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
 
         # Put colors after json, to avoid escaping ansi codes.
-        txt = txt.replace(dic["_id"], self.hosh.ansi)
-        for k, v in self.entries(evaluate=False):
-            txt = txt.replace(v.id, v.hosh.idc)
+        if colored:
+            txt = txt.replace(self.data["_id"], self.hosh.ansi)
+            for k, v in self.entries(evaluate=False):
+                txt = txt.replace(v.id, v.hosh.idc)
+
         return txt
+
+    def show(self, colored=True):
+        r"""Print textual representation of a frozenidict object"""
+        print(self.astext(colored))
 
     def items(self, evaluate=True):
         """Iterator over all items"""
@@ -102,4 +112,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         raise Exception(f"Cannot delete an entry ({key}) from a frozen dict.")
 
     def __repr__(self):
-        return repr(self.data)
+        return self.astext()
+
+    def __str__(self):
+        return json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
