@@ -1,1 +1,1 @@
-from cdict.cd import cd
+from cdict.idict_ import Idict as idict

@@ -27,10 +27,10 @@ from typing import Union
 from hosh import Hosh
 
 from cdict.identification import f2hosh
-from cdict.value.absival import AbsiVal
+from cdict.value.ival import iVal
 
 
-class LazyiVal(AbsiVal):
+class LazyiVal(iVal):
     """
     Identified lazy value
 
@@ -72,12 +72,12 @@ class LazyiVal(AbsiVal):
         self.n = n
         self.deps = {} if deps is None else deps
         self.result = result
-        self.fh = f2hosh(f) if fid is None else self.handle_id(fid)
+        self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
         self.cache = {} if cache is None else cache
-        self.h = (reduce(operator.mul, self.deps.values()) * self.fh).component(i, n)
+        self.hosh = (reduce(operator.mul, self.deps.values()) * self.fhosh).component(i, n)
 
     @property
-    def v(self):
+    def value(self):
         if not self.result:
             deps = {}
             for field, ival in self.deps.items():
@@ -97,5 +97,5 @@ class LazyiVal(AbsiVal):
 
     def __repr__(self):
         if not self.result:
-            return f"→({' '.join(k + ('' if dep.result else str(dep)) for k, dep in self.deps.items())})"
-        return repr(self.v)
+            return f"→({' '.join(k + ('' if dep.result else repr(dep)) for k, dep in self.deps.items())})"
+        return repr(self.value)

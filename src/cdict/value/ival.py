@@ -20,26 +20,39 @@
 #  part of this work is illegal and it is unethical regarding the effort and
 #  time spent here.
 #
-import pickle
-from typing import Union
+from functools import cached_property
+from typing import Any
 
 from hosh import Hosh
 
-from cdict.value.absival import AbsiVal
 
+class iVal:
+    value: Any
+    hosh: Hosh
+    result: Any
 
-class iVal(AbsiVal):
-    """
-    Identified value
+    def evaluate(self):
+        _ = self.value
 
-    >>> iVal(2)
-    2
-    """
+    @cached_property
+    def id(self):
+        return self.hosh.id
 
-    def __init__(self, v, id: Union[str, Hosh] = None):
-        self.v = v
-        self.h = Hosh(pickle.dumps(v, protocol=5)) if id is None else self.handle_id(id)
-        self.result = [v]
+    @staticmethod
+    def handle_id(id):
+        """
+        >>> iVal.handle_id("sduityv76453rjhgv7utfgsdfkhsdfsdfgi7tgsg").id
+        'sduityv76453rjhgv7utfgsdfkhsdfsdfgi7tgsg'
+        >>> from hosh import Hosh
+        >>> iVal.handle_id(Hosh.fromid("sduityv76453rjhgv7utfgsdfkhsdfsdfgi7tgsg")).id
+        'sduityv76453rjhgv7utfgsdfkhsdfsdfgi7tgsg'
+        """
+        if isinstance(id, str):
+            return Hosh.fromid(id)
+        elif isinstance(id, Hosh):
+            return id
+        else:  # pragma: no cover
+            raise Exception(f"Wrong id type: {type(id)}")
 
-    def __repr__(self):
-        return repr(self.v)
+    def __mul__(self, other):
+        return self.hosh * (other if isinstance(other, Hosh) else other.hosh)

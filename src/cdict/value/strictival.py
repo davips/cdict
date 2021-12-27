@@ -20,36 +20,26 @@
 #  part of this work is illegal and it is unethical regarding the effort and
 #  time spent here.
 #
-from functools import cached_property
-from typing import Any
+import pickle
+from typing import Union
 
 from hosh import Hosh
 
+from cdict.value.ival import iVal
 
-class AbsiVal:
-    v: Any
-    h: Hosh
-    result: Any
 
-    @cached_property
-    def id(self):
-        return self.h.id
+class StrictiVal(iVal):
+    """
+    Identified value
 
-    @staticmethod
-    def handle_id(id):
-        """
-        >>> AbsiVal.handle_id("sduityv76453rjhgv7utfgsdfkhsdfsdfgi7tgsg").id
-        'sduityv76453rjhgv7utfgsdfkhsdfsdfgi7tgsg'
-        >>> from hosh import Hosh
-        >>> AbsiVal.handle_id(Hosh.fromid("sduityv76453rjhgv7utfgsdfkhsdfsdfgi7tgsg")).id
-        'sduityv76453rjhgv7utfgsdfkhsdfsdfgi7tgsg'
-        """
-        if isinstance(id, str):
-            return Hosh.fromid(id)
-        elif isinstance(id, Hosh):
-            return id
-        else:  # pragma: no cover
-            raise Exception(f"Wrong id type: {type(id)}")
+    >>> iVal(2)
+    2
+    """
 
-    def __mul__(self, other):
-        return self.h * (other if isinstance(other, Hosh) else other.h)
+    def __init__(self, value, id: Union[str, Hosh] = None):
+        self.value = value
+        self.hosh = Hosh(pickle.dumps(value, protocol=5)) if id is None else self.handle_id(id)
+        self.result = [value]
+
+    def __repr__(self):
+        return repr(self.value)
