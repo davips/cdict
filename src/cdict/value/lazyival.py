@@ -75,7 +75,7 @@ class LazyiVal(iVal):
         self.result = result
         self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
         self.cache = {} if cache is None else cache
-        self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh])).component(i, n)
+        self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh]))[i:n]
 
     @property
     def value(self):
