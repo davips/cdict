@@ -4,16 +4,21 @@ from functools import cached_property
 from typing import Dict
 from typing import TypeVar
 
-from hosh import ø
-
-from cdict.value.customjson import CustomJSONEncoder
+from cdict.customjson import CustomJSONEncoder
+from cdict.let import Let
+from cdict.value import LazyiVal
 from cdict.value.strictival import iVal, StrictiVal
+from hosh import ø
 
 VT = TypeVar("VT")
 
 
 class FrozenIdict(UserDict, Dict[str, VT]):
     """
+    Frozen version of Idict
+
+    Nested idicts become frozen for consistent identities.
+
     >>> "x" in FrozenIdict(x=2)
     True
     """
@@ -104,6 +109,11 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     def copy(self):  # pragma: no cover
         raise Exception("A FrozenIdict doesn't need copies")
 
+    @property
+    def unfrozen(self):
+        from cdict.idict_ import Idict
+        return Idict(_frozen=self)
+
     def __setitem__(self, key: str, value):  # pragma: no cover
         print(value)
         raise Exception(f"Cannot set an entry ({key}) of a frozen dict.")
@@ -116,3 +126,25 @@ class FrozenIdict(UserDict, Dict[str, VT]):
 
     def __str__(self):
         return json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
+
+    def __getitem__(self, item):
+        return self.data[item].value
+
+    def __getattr__(self, item):
+        if item in self.data:
+            return self.data[item].value
+        return AttributeError
+
+    def __rshift__(self, other):
+        if isinstance(other, Let):
+            data = self.data.copy()
+            del data["_id"]
+            del data["_ids"]
+            n = len(other.output)
+            deps = {in_: data[in_] for in_ in other.input}
+            result = []
+            for i, out in enumerate(other.output):
+                data[out] = LazyiVal(other.f, i, n, deps, result)  # , fid=other.id, cache=)
+            return FrozenIdict(data)
+        return NotImplemented
+

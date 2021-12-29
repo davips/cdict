@@ -1,19 +1,68 @@
 from typing import Dict
 from typing import TypeVar
 
+from cdict.let import Let
+
 VT = TypeVar("VT")
 
 
 class Idict(Dict[str, VT]):
     """
-    >>> for k in Idict(x=2):
+    >>> from cdict import let
+    >>> d = Idict(x=2)
+    >>> d.show(colored=False)
+    {
+        "x": 2,
+        "_id": "v2D2UVaKRzSIbUr-4rxpRYs0y0ChtLz7qDkWlwJq",
+        "_ids": {
+            "x": "k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29"
+        }
+    }
+    >>> for k in d:
     ...     print(k)
     x
     _id
     _ids
-    >>> "x" in Idict(x=2)
+    >>> "x" in d
     True
+    >>> f = lambda x: x**2
+    >>> d >>= let(f, ":y")
+    >>> d.show(colored=False)
+    {
+        "x": 2,
+        "y": "→(x)",
+        "_id": "NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI",
+        "_ids": {
+            "x": "k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29",
+            "y": "ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg"
+        }
+    }
+    >>> d.y
+    4
+    >>> d.show(colored=False)
+    {
+        "x": 2,
+        "y": "4",
+        "_id": "NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI",
+        "_ids": {
+            "x": "k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29",
+            "y": "ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg"
+        }
+    }
     """
+
+    def __getitem__(self, item):
+        return self.frozen[item]
+
+    def __getattr__(self, item):
+        if item in self.frozen:
+            return self.frozen[item]
+        return AttributeError
+
+    def __rshift__(self, other):
+        if isinstance(other, Let):
+            return (self.frozen >> other).unfrozen
+        return NotImplemented
 
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
@@ -128,7 +177,7 @@ class Idict(Dict[str, VT]):
         {"x": 3, "y": 5, "z": 7, "_id": "uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i", "_ids": {"x": "ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh", "y": "5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0", "z": "eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf"}}
         """
         from cdict.frozenidict import FrozenIdict
-        return Idict(_frozen=FrozenIdict.fromdict(dictionary, ids))
+        return FrozenIdict.fromdict(dictionary, ids).unfrozen
 
     @property
     def asdict(self):
