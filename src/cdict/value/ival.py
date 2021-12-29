@@ -30,6 +30,11 @@ class iVal:
     value: Any
     hosh: Hosh
     result: Any
+    caches: Any
+
+    @property
+    def evaluated(self):
+        return self.result[self.id] is not None
 
     def evaluate(self):
         _ = self.value

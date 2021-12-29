@@ -26,7 +26,7 @@ class Idict(Dict[str, VT]):
     >>> "x" in d
     True
     >>> f = lambda x: x**2
-    >>> d >>= let(f, ":y")
+    >>> d >>= let(f, "->y")
     >>> d.show(colored=False)
     {
         "x": 2,
@@ -37,18 +37,10 @@ class Idict(Dict[str, VT]):
             "y": "ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg"
         }
     }
-    >>> d.y
-    4
-    >>> d.show(colored=False)
-    {
-        "x": 2,
-        "y": "4",
-        "_id": "NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI",
-        "_ids": {
-            "x": "k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29",
-            "y": "ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg"
-        }
-    }
+    >>> d.y, d["y"]
+    (4, 4)
+    >>> (d >> let(lambda w: w**2, "y:w->y")).y
+    16
     """
 
     def __getitem__(self, item):
@@ -72,7 +64,7 @@ class Idict(Dict[str, VT]):
     def evaluate(self):
         """
         >>> from cdict.value import LazyiVal
-        >>> d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, []))
+        >>> d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
         >>> d.show(colored=False)
         {
             "x": "→()",

@@ -22,13 +22,12 @@
 #
 import operator
 from functools import reduce
-from itertools import chain
-from typing import Union
-
-from hosh import Hosh
+from typing import Union, Iterable
 
 from cdict.identification import f2hosh
 from cdict.value.ival import iVal
+from hosh import Hosh
+from itertools import chain
 
 
 class LazyiVal(iVal):
@@ -40,21 +39,21 @@ class LazyiVal(iVal):
     >>> cache = {}
     >>> from cdict.value.strictival import StrictiVal
     >>> deps = {"x": StrictiVal(2)}
-    >>> lvx = LazyiVal(lambda x: x**2, 0, 1, deps, [], cache=cache)
+    >>> lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
     >>> lvx
     →(x)
     >>> deps = {"x": lvx, "y": StrictiVal(3)}
-    >>> result = []
+    >>> result = {}
     >>> f = lambda x,y: [x+y, y**2]
-    >>> lvy = LazyiVal(f, 0, 2, deps, result, cache=cache)
-    >>> lvz = LazyiVal(f, 1, 2, deps, result, cache=cache)
+    >>> lvy = LazyiVal(f, 0, 2, deps, result, caches=[cache])
+    >>> lvz = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     >>> lvx, lvy, lvz
     (→(x), →(x→(x) y), →(x→(x) y))
     >>> deps = {"z": lvz}
     >>> f = lambda z: {"z":z**3, "w":z**5}
-    >>> result = []
-    >>> lvz2 = LazyiVal(f, 0, 2, deps, result, cache=cache)
-    >>> lvw = LazyiVal(f, 1, 2, deps, result, cache=cache)
+    >>> result = {}
+    >>> lvz2 = LazyiVal(f, 0, 2, deps, result, caches=[cache])
+    >>> lvw = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     >>> lvx, lvy, lvz2, lvw
     (→(x), →(x→(x) y), →(z→(x→(x) y)), →(z→(x→(x) y)))
     >>> lvx.value, lvy.value, lvz2.value, lvw.value
@@ -67,36 +66,63 @@ class LazyiVal(iVal):
     True
     """
 
-    def __init__(self, f: callable, i: int, n: int, deps: dict, result: list, fid: Union[str, Hosh] = None, cache=None):
+    def __init__(self, f: callable, i: int, n: int, deps: dict, result: dict, fid: Union[str, Hosh] = None,
+                 caches=None):
+        if len(result) > i:  # pragma: no cover
+            raise Exception(f"Index {i} inconsistent with current expected result size {len(result)}.")
         self.f = f
         self.i = i
         self.n = n
         self.deps = {} if deps is None else deps
         self.result = result
         self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
-        self.cache = {} if cache is None else cache
+        self.caches = caches
         self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh]))[i:n]
+        self.result[self.id] = None
+
+    def withcaches(self, caches):
+        if self.caches is not None:  # pragma: no cover
+            raise Exception("Caches already set.")
+        return LazyiVal(self.f, self.i, self.n, self.deps, self.result, self.fhosh, caches)
 
     @property
     def value(self):
-        if not self.result:
-            deps = {}
+        if not self.evaluated:
+            # Fetch.
+            if self.caches is not None:
+                for cache in self.caches:
+                    if self.hosh.id in cache:
+                        return cache[self.hosh.id]
+
+            # Calculate.
+            argnames = []
+            kwargs = {}
             for field, ival in self.deps.items():
-                deps[field] = ival.value
-            result = self.f(**deps)
+                if isinstance(field, int):
+                    argnames.append(field)
+                else:
+                    kwargs[field] = ival.value
+            result = self.f(*(self.deps[name] for name in sorted(argnames)), **kwargs)
             if self.n == 1:
                 result = [result]
             elif isinstance(result, dict):
                 result = result.values()
             elif isinstance(result, list) and len(result) != self.n:  # pragma: no cover
                 raise Exception(f"Wrong result length: {len(result)} differs from {self.n}")
-            try:
-                self.result.extend(result)
-            except TypeError:  # pragma: no cover
+            if not isinstance(result, Iterable):  # pragma: no cover
                 raise Exception(f"Unsupported multi-valued result type: {type(result)}")
-        return self.result[self.i]
+            for id, res in zip(self.result, result):
+                self.result[id] = res
+
+            # Store.
+            if self.caches is not None:
+                for id, res in self.result.items():
+                    for cache in self.caches:
+                        cache[id] = res
+
+        return self.result[self.id]
 
     def __repr__(self):
-        if not self.result:
-            return f"→({' '.join(k + ('' if dep.result else repr(dep)) for k, dep in self.deps.items())})"
+        if not self.evaluated:
+            return f"→({' '.join(k + ('' if dep.evaluated else repr(dep)) for k, dep in self.deps.items())})"
         return repr(self.value)

@@ -1,7 +1,7 @@
 import json
 from collections import UserDict
 from functools import cached_property
-from typing import Dict
+from typing import Dict, Union
 from typing import TypeVar
 
 from cdict.customjson import CustomJSONEncoder
@@ -26,11 +26,11 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, **kwargs):
         from cdict.idict_ import Idict
-        data: Dict[str, iVal] = _dictionary or {}
+        data: Dict[str, Union[iVal, str, dict]] = _dictionary or {}
         data.update(kwargs)
         if "_id" in data.keys() or "_ids" in data.keys():  # pragma: no cover
             raise Exception("Cannot have a field named '_id'/'_ids': {data.keys()}")
-        self.data: Dict[str, iVal] = {}
+        self.data: Dict[str, Union[iVal, str, dict]] = {}
         self.hosh = ø
         self.ids = {}
         for k, v in data.items():
@@ -40,6 +40,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 self.data[k] = StrictiVal(v.frozen, v.hosh) if isinstance(v, Idict) else StrictiVal(v)
             self.hosh += self.data[k].hosh * k.encode()
             self.ids[k] = self.data[k].hosh.id
+        # noinspection PyTypeChecker
         self.data["_id"] = self.id = self.hosh.id
         self.data["_ids"] = self.ids
 
@@ -130,21 +131,51 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     def __getitem__(self, item):
         return self.data[item].value
 
-    def __getattr__(self, item):
+    def __getattr__(self, item):  # pragma: no cover
         if item in self.data:
             return self.data[item].value
         return AttributeError
 
     def __rshift__(self, other):
+        data = self.data.copy()
+        del data["_id"]
+        del data["_ids"]
+        if isinstance(other, list):
+            caches = []
+            for cache in other:
+                if isinstance(cache, list):
+                    if len(cache) == 0:  # pragma: no cover
+                        raise Exception("Missing content inside list for caching.")
+                    elif len(cache) > 1:  # pragma: no cover
+                        raise Exception(f"Cannot have more than one cache within a nested list: {cache} in {other}.")
+                    self.evaluate()
+                    cache = cache[0]
+                caches.append(cache)
+            nolazies = True
+            for k, ival in self.entries(evaluate=False):
+                if not ival.result:
+                    nolazies = False
+                    data[k] = ival.withcaches(caches)
+            # Eager saving when there are no lazies.
+            if nolazies:
+                pass  # TODO
+            return FrozenIdict(data)
+
         if isinstance(other, Let):
-            data = self.data.copy()
-            del data["_id"]
-            del data["_ids"]
             n = len(other.output)
-            deps = {in_: data[in_] for in_ in other.input}
-            result = []
-            for i, out in enumerate(other.output):
-                data[out] = LazyiVal(other.f, i, n, deps, result)  # , fid=other.id, cache=)
+            deps = {}
+            for fin_source, fin_target in other.input.items():
+                if fin_source in data:
+                    val = data[fin_source]
+                elif fin_source in other.input_space:  # TODO: rnd
+                    val = other.rnd.choice(other.input_space[fin_source])
+                elif fin_source in other.input_values:
+                    val = other.input_values[fin_source]
+                else:  # pragma: no cover
+                    raise Exception(f"Missing field '{fin_source}': {other.input}")
+                deps[fin_target] = val
+            shared_result = {}
+            for i, fout in enumerate(other.output):
+                data[fout] = LazyiVal(other.f, i, n, deps, shared_result, fid=other.id)
             return FrozenIdict(data)
         return NotImplemented
-
