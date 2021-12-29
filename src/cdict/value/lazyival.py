@@ -60,10 +60,10 @@ class LazyiVal(iVal):
     >>> lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     >>> lvz2.id
-    'hWbiHpbI2eCTvRg7AAOU8Inraf2k7pajWDj46aJA'
+    'aILoOUz5h.C9f1xG8XB09cdEI0XwRBcX-o8IwxS7'
     >>> lvw.id
-    'O1ZMWqMUI-2N6HISHWxNH7hFluQrhHkCQX79ckq9'
-    >>> lvz2.hosh + lvw.hosh == lvz.hosh * lvw.fhosh
+    'vG9pcVdnghFMbi26bsfiyI-C5BCzSoi-mfEgpOjz'
+    >>> lvz2.hosh * lvw.hosh == lvz.hosh * lvw.fhosh
     True
     """
 
