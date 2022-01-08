@@ -8,7 +8,7 @@ VT = TypeVar("VT")
 
 class Idict(Dict[str, VT]):
     """
-    >>> from cdict import let
+    >>> from cdict import let, idict
     >>> d = Idict(x=2)
     >>> d.show(colored=False)
     {
@@ -41,6 +41,27 @@ class Idict(Dict[str, VT]):
     (4, 4)
     >>> (d >> let(lambda w: w**2, "y:w->y")).y
     16
+    >>> (d >> let(lambda w: w**2, "y:w→y")).y   # <AltGr + i> = →
+    16
+    >>> d == {"x": 2, "y": 4}
+    True
+    >>> idict(x=3) == {"x": 3}
+    True
+    >>> idict(x=3) == {"x": 3, "_id": idict(x=3).id}
+    True
+    >>> idict(x=3) == idict(x=3)
+    True
+    >>> idict(x=3) != {"x": 4}
+    True
+    >>> idict(x=3) != idict(x=4)
+    True
+    >>> idict(x=3) != {"y": 3}
+    True
+    >>> idict(x=3) != {"x": 3, "_id": (~idict(x=3).hosh).id}
+    True
+    >>> idict(x=3) != idict(y=3)
+    True
+
     """
 
     def __getitem__(self, item):
@@ -229,3 +250,9 @@ class Idict(Dict[str, VT]):
 
     def __str__(self):
         return str(self.frozen)
+
+    def __eq__(self, other):
+        return self.frozen == other
+
+    def __ne__(self, other):
+        return not (self == other)

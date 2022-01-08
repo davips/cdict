@@ -179,3 +179,23 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 data[fout] = LazyiVal(other.f, i, n, deps, shared_result, fid=other.id)
             return FrozenIdict(data)
         return NotImplemented
+
+    def __eq__(self, other):
+        from cdict.idict_ import Idict
+        if isinstance(other, dict):
+            if "_id" in other:
+                return self.id == other["_id"]
+            if list(self.keys())[:-2] != list(other.keys()):
+                return False
+        if isinstance(other, (Idict, FrozenIdict)):
+            return self.hosh == other.hosh
+        if isinstance(other, dict):
+            self.evaluate()
+            data = self.asdict
+            del data["_id"]
+            del data["_ids"]
+            return data == other
+        raise TypeError(f"Cannot compare {type(self)} and {type(other)}")  # pragma: no cover
+
+    def __ne__(self, other):
+        return not (self == other)
