@@ -129,7 +129,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
 
     def __getitem__(self, item):
-        return self.data[item].value
+        return self.data[item] if item in ["_id", "_ids"] else self.data[item].value
 
     def __getattr__(self, item):  # pragma: no cover
         if item in self.data:
