@@ -27,7 +27,8 @@ from hosh import Hosh
 
 
 class Let:
-    def __init__(self, f: callable, in_out: str, /, _id: Union[str, Hosh] = None, _metadata=None, **kwargs):
+    def __init__(self, f: callable, in_out: str, id: Union[str, Hosh] = None, /, _metadata=None, **kwargs):
+        # REMINDER: 'id' is only positional arg, so if 'f' takes an 'id' argument, it's ok to provide both.
         if "->" not in in_out and "→" not in in_out:  # pragma: no cover
             raise Exception(f"Missing '->' in in_out schema ({in_out}).")
         instr, outstr = in_out.split("->") if "->" in in_out else in_out.split("→")
@@ -39,7 +40,7 @@ class Let:
         else:
             self._parse_instr(instr, kwargs)
         self.output = outstr.split(",")
-        self.id = _id
+        self.id = id
         self.metadata = _metadata
 
     def _parse_instr(self, instr, kwargs):

@@ -13,6 +13,14 @@ echo "----------------- tested -----------------------"
 echo; echo
 
 echo
+echo "----------------- gh workflow testing... -----------------------"
+read -p "press enter"
+act -j build
+echo "----------------- gh workflow -----------------------"
+echo; echo
+
+
+echo
 echo "----------------- docs... -----------------------"
 read -p "press enter"
 rm docs -rf
