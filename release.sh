@@ -17,6 +17,7 @@ echo "----------------- gh workflow testing... -----------------------"
 read -p "press enter"
 sudo systemctl enable docker
 sudo systemctl start docker
+coverage xml
 act -j build
 sudo systemctl stop docker
 sudo systemctl disable docker
