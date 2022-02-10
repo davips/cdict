@@ -153,12 +153,13 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 caches.append(cache)
             nolazies = True
             for k, ival in self.entries(evaluate=False):
-                if not ival.result:
+                if not ival.evaluated:
                     nolazies = False
                     data[k] = ival.withcaches(caches)
-            # Eager saving when there are no lazies.
-            if nolazies:
-                pass  # TODO
+            # Eager saving when there are no lazies.  TODO
+            # if nolazies:
+            #     for k, ival in self.entries():
+            #         data[k] = ival.withcaches(caches)
             return FrozenIdict(data)
 
         if isinstance(other, Let):
@@ -172,6 +173,8 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 elif fin_source in other.input_values:
                     val = other.input_values[fin_source]
                 else:  # pragma: no cover
+                    # TODO: partial application [put multiple references for same iPartial if multioutput]
+                    #   raise exc if missing right most argument
                     raise Exception(f"Missing field '{fin_source}': {other.input}")
                 deps[fin_target] = val
             shared_result = {}

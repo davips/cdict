@@ -19,48 +19,48 @@
 #  works or verbatim, obfuscated, compiled or rewritten versions of any
 #  part of this work is illegal and unethical regarding the effort and
 #  time spent here.
-from unittest import TestCase
+# from unittest import TestCase
+#
+# import pytest
+#
+# from ldict import empty
+# from ldict.core.inspection import extract_input, extract_dictstr, extract_returnstr
+# from ldict.core.rshift import list2progression
+# from ldict.exception import NoInputException, BadOutput, InconsistentLange, \
+#     MultipleDicts, NoReturnException
 
-import pytest
 
-from ldict import empty
-from ldict.core.inspection import extract_input, extract_dictstr, extract_returnstr
-from ldict.core.rshift import list2progression
-from ldict.exception import NoInputException, BadOutput, InconsistentLange, \
-    MultipleDicts, NoReturnException
-
-
-class Test(TestCase):
-    def test_input_fields(self):
-        with pytest.raises(NoInputException):
-            extract_input(lambda: 3)
-        f = lambda **kwargs: {"x": 3}
-        with pytest.raises(NoInputException):
-            extract_input(f)
-
-    def test_output_fields(self):
-        def f(x):
-            pass
-
-        with pytest.raises(NoReturnException):
-            extract_dictstr(extract_returnstr(f))
-
-        def f(x):
-            return {"x": 1}, {"y": 2}
-
-        with pytest.raises(MultipleDicts):
-            extract_dictstr(extract_returnstr(f))
-
-        def f(x):
-            return 0
-
-        with pytest.raises(BadOutput):
-            extract_dictstr(extract_returnstr(f))
-
-    def test_application(self):
-        with pytest.raises(BadOutput):
-            _ = empty >> {"x": 2} >> (lambda x: 0)
-
-    def test_list2progression(self):
-        with pytest.raises(InconsistentLange):
-            list2progression([1, 2, 5, ..., 9])
+# class Test(TestCase):
+#     def test_input_fields(self):
+#         with pytest.raises(NoInputException):
+#             extract_input(lambda: 3)
+#         f = lambda **kwargs: {"x": 3}
+#         with pytest.raises(NoInputException):
+#             extract_input(f)
+#
+#     def test_output_fields(self):
+#         def f(x):
+#             pass
+#
+#         with pytest.raises(NoReturnException):
+#             extract_dictstr(extract_returnstr(f))
+#
+#         def f(x):
+#             return {"x": 1}, {"y": 2}
+#
+#         with pytest.raises(MultipleDicts):
+#             extract_dictstr(extract_returnstr(f))
+#
+#         def f(x):
+#             return 0
+#
+#         with pytest.raises(BadOutput):
+#             extract_dictstr(extract_returnstr(f))
+#
+#     def test_application(self):
+#         with pytest.raises(BadOutput):
+#             _ = empty >> {"x": 2} >> (lambda x: 0)
+#
+#     def test_list2progression(self):
+#         with pytest.raises(InconsistentLange):
+#             list2progression([1, 2, 5, ..., 9])

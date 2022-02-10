@@ -1,1 +1,2 @@
+Finish basic caching
 Rename to hoshmap

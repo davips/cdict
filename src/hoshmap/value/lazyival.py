@@ -66,15 +66,15 @@ class LazyiVal(iVal):
     True
     """
 
-    def __init__(self, f: callable, i: int, n: int, deps: dict, result: dict, fid: Union[str, Hosh] = None,
+    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None,
                  caches=None):
-        if len(result) > i:  # pragma: no cover
-            raise Exception(f"Index {i} inconsistent with current expected result size {len(result)}.")
+        # if i >= len(result):  # pragma: no cover
+        #     raise Exception(f"Index {i} inconsistent with current expected result size {len(result)}.")
         self.f = f
         self.i = i
         self.n = n
         self.deps = {} if deps is None else deps
-        self.result = result
+        self.result = results
         self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
         self.caches = caches
         self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh]))[i:n]

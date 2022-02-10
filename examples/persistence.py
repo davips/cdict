@@ -3,13 +3,10 @@ import shelve
 from collections import namedtuple
 from pprint import pprint
 
-from ldict import ldict, Ø, setup, let
+from hoshmap import idict
 
-# The cache can be set globally.
-# It is as simple as a dict, or any dict-like implementation mapping str to serializable (pickable) content.
+# The cache is as simple as a dict, or any dict-like implementation mapping str to serializable (pickable) content.
 # Implementations can, e.g., store data on disk or in a remote computer.
-
-setup(cache={})
 
 
 def fun(x, y):
@@ -26,20 +23,20 @@ def fun(x, y):
 # The list may contain many different caches, e.g.: [RAM, local, remote].
 mycache = {}
 remote = {}
-d = Ø >> {"x": 3, "y": 2} >> fun >> [mycache, remote]
+d = idict() >> {"x": 3, "y": 2} >> fun >> [mycache, remote]
 print(d)
 print(d.z, d.id)
 # ...
 
 # The second request just retrieves the cached value.
-d = ldict(y=2, x=3) >> fun >> [remote]
+d = idict(y=2, x=3) >> fun >> [remote]
 print(d.z, d.id)
 # ...
 
 # The caching operator can appear in multiple places in the expression, if intermediate values are of interest.
 # The ø is used as ldict-inducer when needed.
-d = ldict(y=2, x=3) >> fun ^ Ø >> (lambda x: {"x": x ** 2}) >> Ø >> {"w": 5, "k": 5} >> Ø >> [mycache]
-print(d.z, d.id)
+# d = idict(y=2, x=3) >> fun ^ idict() >> (lambda x: {"x": x ** 2}) >> Ø >> {"w": 5, "k": 5} >> Ø >> [mycache]
+# print(d.z, d.id)
 # ...
 
 # Persisting to disk is easily done via Python shelve.
@@ -54,7 +51,7 @@ def measure_distance(a, b):
 
 
 with shelve.open("/tmp/my-cache-file.db") as db:
-    d = ldict(a=a, b=b) >> measure_distance >> [db]
+    d = idict(a=a, b=b) >> measure_distance >> [db]
     pprint(dict(db))  # Cache is initially empty.
     print(d.distance)
     pprint(dict(db))
@@ -66,12 +63,12 @@ with shelve.open("/tmp/my-cache-file.db") as db:
     copy = lambda source=None, target=None, **kwargs: {target: kwargs[source]}
     mean = lambda distance, other_distance: {"m": (distance + other_distance) / 2}
     e = (
-            ldict(a=a, b=b)
+            idict(a=a, b=b)
             >> measure_distance
             >> {"other_distance": d.distance}
             >> mean
-            ^ Ø
-            ^ let(source="m", target="m0")
+            # ^ Ø
+            # ^ let(source="m", target="m0")
             >> copy
             >> (lambda m: {"m": m ** 2})
     )

@@ -1,6 +1,7 @@
 from typing import Dict
 from typing import TypeVar
 
+from hoshmap.frozenidict import FrozenIdict
 from hoshmap.let import Let
 
 VT = TypeVar("VT")
@@ -70,11 +71,17 @@ class Idict(Dict[str, VT]):
     def __getattr__(self, item):
         if item in self.frozen:
             return self.frozen[item]
-        return AttributeError
+        return self.__getattribute__(item)
 
     def __rshift__(self, other):
-        if isinstance(other, Let):
+        if isinstance(other, (Let, list)):
             return (self.frozen >> other).unfrozen
+        if isinstance(other, (FrozenIdict, Idict)):
+            raise NotImplementedError
+        if isinstance(other, dict):
+            for k, v in other.items():
+                self[k] = v
+                raise NotImplementedError
         return NotImplemented
 
     # noinspection PyMissingConstructor
