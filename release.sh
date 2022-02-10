@@ -15,7 +15,11 @@ echo; echo
 echo
 echo "----------------- gh workflow testing... -----------------------"
 read -p "press enter"
+s systemctl enable docker
+s systemctl start docker
 act -j build
+s systemctl stop docker
+s systemctl disable docker
 echo "----------------- gh workflow -----------------------"
 echo; echo
 
@@ -24,9 +28,9 @@ echo
 echo "----------------- docs... -----------------------"
 read -p "press enter"
 rm docs -rf
-poetry run pdoc --html --force cdict -o docs
-mv docs/cdict/* docs/
-rm docs/cdict -rf
+poetry run pdoc --html --force hoshmap -o docs
+mv docs/hoshmap/* docs/
+rm docs/hoshmap -rf
 git add docs
 echo "----------------- docs done -----------------------"
 echo; echo

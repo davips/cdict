@@ -1,19 +1,19 @@
 #  Copyright (c) 2021. Davi Pereira dos Santos
-#  This file is part of the cdict project.
+#  This file is part of the hoshmap project.
 #  Please respect the license - more about this in the section (*) below.
 #
-#  cdict is free software: you can redistribute it and/or modify
+#  hoshmap is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  cdict is distributed in the hope that it will be useful,
+#  hoshmap is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with cdict.  If not, see <http://www.gnu.org/licenses/>.
+#  along with hoshmap.  If not, see <http://www.gnu.org/licenses/>.
 #
 #  (*) Removing authorship by any means, e.g. by distribution of derived
 #  works or verbatim, obfuscated, compiled or rewritten versions of any
@@ -24,8 +24,8 @@ import operator
 from functools import reduce
 from typing import Union, Iterable
 
-from cdict.identification import f2hosh
-from cdict.value.ival import iVal
+from hoshmap.identification import f2hosh
+from hoshmap.value.ival import iVal
 from hosh import Hosh
 from itertools import chain
 
@@ -37,7 +37,7 @@ class LazyiVal(iVal):
     Threefold lazy: It is calculated only when needed, only once and it is cached.
 
     >>> cache = {}
-    >>> from cdict.value.strictival import StrictiVal
+    >>> from hoshmap.value.strictival import StrictiVal
     >>> deps = {"x": StrictiVal(2)}
     >>> lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
     >>> lvx

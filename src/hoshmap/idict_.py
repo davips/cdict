@@ -1,14 +1,14 @@
 from typing import Dict
 from typing import TypeVar
 
-from cdict.let import Let
+from hoshmap.let import Let
 
 VT = TypeVar("VT")
 
 
 class Idict(Dict[str, VT]):
     """
-    >>> from cdict import let, idict
+    >>> from hoshmap import let, idict
     >>> d = Idict(x=2)
     >>> d.show(colored=False)
     {
@@ -79,12 +79,12 @@ class Idict(Dict[str, VT]):
 
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
-        from cdict.frozenidict import FrozenIdict
+        from hoshmap.frozenidict import FrozenIdict
         self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
     def evaluate(self):
         """
-        >>> from cdict.value import LazyiVal
+        >>> from hoshmap.value import LazyiVal
         >>> d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
         >>> d.show(colored=False)
         {
@@ -113,7 +113,7 @@ class Idict(Dict[str, VT]):
     @property
     def id(self):
         """
-        >>> from cdict import idict
+        >>> from hoshmap import idict
         >>> idict(x=3, y=5, _z=5).id
         'ojflr9QKaLmxzQivMEss9hWVZfHpvihkPAYYd1da'
         """
@@ -122,7 +122,7 @@ class Idict(Dict[str, VT]):
     @property
     def ids(self):
         """
-        >>> from cdict import idict
+        >>> from hoshmap import idict
         >>> idict(x=3, y=5, _z=5).ids
         {'x': 'KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr', 'y': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', '_z': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2'}
         """
@@ -133,7 +133,7 @@ class Idict(Dict[str, VT]):
         """
         List of keys which don't start with '_'
 
-        >>> from cdict import idict
+        >>> from hoshmap import idict
         >>> idict(x=3, y=5, _z=5).fields
         ['x', 'y']
         """
@@ -144,7 +144,7 @@ class Idict(Dict[str, VT]):
         """
         List of keys which don't start with '_'
 
-        >>> from cdict import idict
+        >>> from hoshmap import idict
         >>> idict(x=3, y=5, _z=5).metafields
         ['_z']
         """
@@ -155,8 +155,8 @@ class Idict(Dict[str, VT]):
 
         Ignore id entries.
 
-        >>> from cdict import idict
-        >>> from cdict.appearance import decolorize
+        >>> from hoshmap import idict
+        >>> from hoshmap.appearance import decolorize
         >>> for k, v in idict(x=1, y=2).entries():
         ...     print(k, v)
         x 1
@@ -169,8 +169,8 @@ class Idict(Dict[str, VT]):
 
         Include ids and other items starting with '_'.
 
-        >>> from cdict import idict
-        >>> from cdict.appearance import decolorize
+        >>> from hoshmap import idict
+        >>> from hoshmap.appearance import decolorize
         >>> for k, v in idict(x=1, y=2).items():
         ...     print(k, v)
         x 1
@@ -185,17 +185,17 @@ class Idict(Dict[str, VT]):
         """Build an idict from values and pre-defined ids
 
         >>> from hosh import Hosh
-        >>> from cdict.value import StrictiVal
+        >>> from hoshmap.value import StrictiVal
         >>> print(Idict.fromdict({"x": 3, "y": 5, "z": StrictiVal(7)}, ids={"x": Hosh(b"x"), "y": Hosh(b"y").id}))
         {"x": 3, "y": 5, "z": 7, "_id": "uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i", "_ids": {"x": "ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh", "y": "5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0", "z": "eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf"}}
         """
-        from cdict.frozenidict import FrozenIdict
+        from hoshmap.frozenidict import FrozenIdict
         return FrozenIdict.fromdict(dictionary, ids).unfrozen
 
     @property
     def asdict(self):
         """
-        >>> from cdict import idict
+        >>> from hoshmap import idict
         >>> idict(x=3, y=5).asdict
         {'x': 3, 'y': 5, '_id': 'r5A2Mh6vRRO5rxi5nfXv1myeguGSTmqHuHev38qM', '_ids': {'x': 'KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr', 'y': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2'}}
         """
@@ -203,7 +203,7 @@ class Idict(Dict[str, VT]):
 
     def astext(self, colored=True):
         r"""
-        >>> from cdict import idict
+        >>> from hoshmap import idict
         >>> repr(idict(x=3, y=5)) == idict(x=3, y=5).astext()
         True
         >>> print(repr(idict(x=3, y=5)))
@@ -223,8 +223,8 @@ class Idict(Dict[str, VT]):
         r"""
         Textual representation of an idict object
 
-        >>> from cdict import idict
-        >>> from cdict.appearance import decolorize
+        >>> from hoshmap import idict
+        >>> from hoshmap.appearance import decolorize
         >>> d = idict(x=1,y=2)
         >>> d.show(colored=False)
         {

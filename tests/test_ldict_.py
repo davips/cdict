@@ -116,7 +116,7 @@ class TestLdict(TestCase):
         a >>= {"y": 4}
         b = ldict(y=4, x=3)
         self.assertEqual(a, b)  # new value
-        self.assertEqual(a, a >> {"x": 3})  # should differ for idict/cdict
+        self.assertEqual(a, a >> {"x": 3})  # should differ for idict/c dict
         # with pytest.raises(OverwriteException):
 
     def test_setitem_overwrite_function(self):

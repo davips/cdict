@@ -4,10 +4,10 @@ from functools import cached_property
 from typing import Dict, Union
 from typing import TypeVar
 
-from cdict.customjson import CustomJSONEncoder
-from cdict.let import Let
-from cdict.value import LazyiVal
-from cdict.value.strictival import iVal, StrictiVal
+from hoshmap.customjson import CustomJSONEncoder
+from hoshmap.let import Let
+from hoshmap.value import LazyiVal
+from hoshmap.value.strictival import iVal, StrictiVal
 from hosh import ø
 
 VT = TypeVar("VT")
@@ -25,7 +25,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
 
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, **kwargs):
-        from cdict.idict_ import Idict
+        from hoshmap.idict_ import Idict
         data: Dict[str, Union[iVal, str, dict]] = _dictionary or {}
         data.update(kwargs)
         if "_id" in data.keys() or "_ids" in data.keys():  # pragma: no cover
@@ -112,7 +112,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
 
     @property
     def unfrozen(self):
-        from cdict.idict_ import Idict
+        from hoshmap.idict_ import Idict
         return Idict(_frozen=self)
 
     def __setitem__(self, key: str, value):  # pragma: no cover
@@ -181,7 +181,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return NotImplemented
 
     def __eq__(self, other):
-        from cdict.idict_ import Idict
+        from hoshmap.idict_ import Idict
         if isinstance(other, dict):
             if "_id" in other:
                 return self.id == other["_id"]

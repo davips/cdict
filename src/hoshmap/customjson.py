@@ -21,12 +21,14 @@
 #  time spent here.
 from json import JSONEncoder
 
-from cdict.value.strictival import StrictiVal
+import pandas
+
+from hoshmap.value.strictival import StrictiVal
 
 
 class CustomJSONEncoder(JSONEncoder):
     """
-    >>> from cdict.idict_ import Idict
+    >>> from hoshmap.idict_ import Idict
     >>> a = Idict(x=3)
     >>> Idict(d=a, y=5).show(colored=False)
     {
@@ -63,11 +65,11 @@ class CustomJSONEncoder(JSONEncoder):
         "y": 5,
         "df": "«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»",
         "ell": "...",
-        "_id": "JV7NBHPiD--8kLP0FEYjCUSVB1mpBCnOWLlRDtNc",
+        "_id": "GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5",
         "_ids": {
             "d": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
             "y": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
-            "df": "rSDr3h42zWns2dY1Ho.DI2klPxn5EQ6jzE77VXNn",
+            "df": "98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg",
             "ell": "P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6"
         }
     }
@@ -85,11 +87,11 @@ class CustomJSONEncoder(JSONEncoder):
             "y": 5,
             "df": "«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»",
             "ell": "...",
-            "_id": "JV7NBHPiD--8kLP0FEYjCUSVB1mpBCnOWLlRDtNc",
+            "_id": "GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5",
             "_ids": {
                 "d": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
                 "y": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
-                "df": "rSDr3h42zWns2dY1Ho.DI2klPxn5EQ6jzE77VXNn",
+                "df": "98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg",
                 "ell": "P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6"
             }
         },
@@ -97,9 +99,9 @@ class CustomJSONEncoder(JSONEncoder):
         "c": "«[1 2 3]»",
         "d": "«{0: 1, 1: 2, 2: 3}»",
         "dd": "«[[1 2] [3 4]]»",
-        "_id": "3S013nLjEgR-IIcO0B9oA.FYvrhlKdgkmPE1fjsy",
+        "_id": "SF4bb1aQyQmubmK4dZ6DPr-LWPGJ3ihmCcK.575r",
         "_ids": {
-            "b": "JV7NBHPiD--8kLP0FEYjCUSVB1mpBCnOWLlRDtNc",
+            "b": "GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5",
             "z": "GuwIQCrendfKXZr5jGfrUwoP-8TWMhmLHYrja2yj",
             "c": "QkfVsy7ITAmoIiOFgbYpsQodBSIYshhiUm3v2r8d",
             "d": "5iU-DAFL3XTLno88g056s2G12RidCKkCgLCLIwB5",

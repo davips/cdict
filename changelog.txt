@@ -1,3 +1,1 @@
-100% coverage
-Implement creation of Idict objects
-Implement full i-values
+Rename to hoshmap
