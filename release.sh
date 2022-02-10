@@ -15,11 +15,11 @@ echo; echo
 echo
 echo "----------------- gh workflow testing... -----------------------"
 read -p "press enter"
-s systemctl enable docker
-s systemctl start docker
+sudo systemctl enable docker
+sudo systemctl start docker
 act -j build
-s systemctl stop docker
-s systemctl disable docker
+sudo systemctl stop docker
+sudo systemctl disable docker
 echo "----------------- gh workflow -----------------------"
 echo; echo
 

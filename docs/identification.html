@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>hoshmap API documentation</title>
+<title>hoshmap.identification API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,54 +19,96 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Package <code>hoshmap</code></h1>
+<h1 class="title">Module <code>hoshmap.identification</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from hoshmap.idict_ import Idict as idict
-from hoshmap.let import Let as let
-Ø = idict()</code></pre>
+<pre><code class="python">#  Copyright (c) 2021. Davi Pereira dos Santos
+#  This file is part of the hoshmap project.
+#  Please respect the license - more about this in the section (*) below.
+#
+#  hoshmap is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  hoshmap is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with hoshmap.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+#
+#  (*) Removing authorship by any means, e.g. by distribution of derived
+#  works or verbatim, obfuscated, compiled or rewritten versions of any
+#  part of this work is illegal and unethical regarding the effort and
+#  time spent here.
+
+
+import dis
+import pickle
+from inspect import signature
+
+from hosh import Hosh
+
+
+def f2hosh(f: callable):
+    fields_and_params = signature(f).parameters.values()
+    fields_and_params = {v.name: None if v.default is v.empty else v.default for v in fields_and_params}
+    # if not fields_and_params:
+    #     raise NoInputException(f&#34;Missing function input parameters.&#34;)
+    # if &#34;_&#34; in fields_and_params:
+    #     return None
+
+    # Remove line numbers.
+    groups = [l for l in dis.Bytecode(f).dis().split(&#34;\n\n&#34;) if l]
+    clean_lines = [fields_and_params]
+    for group in groups:
+        lines = [segment for segment in group.split(&#34; &#34;) if segment][1:]
+        clean_lines.append(lines)
+
+    return Hosh(pickle.dumps(clean_lines, protocol=5))</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt><code class="name"><a title="hoshmap.appearance" href="appearance.html">hoshmap.appearance</a></code></dt>
+<dt id="hoshmap.identification.f2hosh"><code class="name flex">
+<span>def <span class="ident">f2hosh</span></span>(<span>f: <built-in function callable>)</span>
+</code></dt>
 <dd>
 <div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="hoshmap.customjson" href="customjson.html">hoshmap.customjson</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="hoshmap.frozenidict" href="frozenidict.html">hoshmap.frozenidict</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="hoshmap.identification" href="identification.html">hoshmap.identification</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="hoshmap.idict_" href="idict_.html">hoshmap.idict_</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="hoshmap.let" href="let.html">hoshmap.let</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="hoshmap.value" href="value/index.html">hoshmap.value</a></code></dt>
-<dd>
-<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def f2hosh(f: callable):
+    fields_and_params = signature(f).parameters.values()
+    fields_and_params = {v.name: None if v.default is v.empty else v.default for v in fields_and_params}
+    # if not fields_and_params:
+    #     raise NoInputException(f&#34;Missing function input parameters.&#34;)
+    # if &#34;_&#34; in fields_and_params:
+    #     return None
+
+    # Remove line numbers.
+    groups = [l for l in dis.Bytecode(f).dis().split(&#34;\n\n&#34;) if l]
+    clean_lines = [fields_and_params]
+    for group in groups:
+        lines = [segment for segment in group.split(&#34; &#34;) if segment][1:]
+        clean_lines.append(lines)
+
+    return Hosh(pickle.dumps(clean_lines, protocol=5))</code></pre>
+</details>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
 </section>
 <section>
 </section>
@@ -77,15 +119,14 @@ from hoshmap.let import Let as let
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="hoshmap.appearance" href="appearance.html">hoshmap.appearance</a></code></li>
-<li><code><a title="hoshmap.customjson" href="customjson.html">hoshmap.customjson</a></code></li>
-<li><code><a title="hoshmap.frozenidict" href="frozenidict.html">hoshmap.frozenidict</a></code></li>
-<li><code><a title="hoshmap.identification" href="identification.html">hoshmap.identification</a></code></li>
-<li><code><a title="hoshmap.idict_" href="idict_.html">hoshmap.idict_</a></code></li>
-<li><code><a title="hoshmap.let" href="let.html">hoshmap.let</a></code></li>
-<li><code><a title="hoshmap.value" href="value/index.html">hoshmap.value</a></code></li>
+<li><code><a title="hoshmap" href="index.html">hoshmap</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="hoshmap.identification.f2hosh" href="#hoshmap.identification.f2hosh">f2hosh</a></code></li>
 </ul>
 </li>
 </ul>
