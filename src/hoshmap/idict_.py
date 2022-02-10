@@ -10,7 +10,7 @@ VT = TypeVar("VT")
 class Idict(Dict[str, VT]):
     """
     >>> from hoshmap import let, idict
-    >>> d = Idict(x=2)
+    >>> d = idict(x=2)
     >>> d.show(colored=False)
     {
         "x": 2,
@@ -52,9 +52,13 @@ class Idict(Dict[str, VT]):
     True
     >>> idict(x=3) == idict(x=3)
     True
+    >>> idict(x=3).frozen == idict(x=3)
+    True
     >>> idict(x=3) != {"x": 4}
     True
     >>> idict(x=3) != idict(x=4)
+    True
+    >>> idict(x=3).frozen != idict(x=4)
     True
     >>> idict(x=3) != {"y": 3}
     True
@@ -62,8 +66,67 @@ class Idict(Dict[str, VT]):
     True
     >>> idict(x=3) != idict(y=3)
     True
-
+    >>> d.show(colored=False)
+    {
+        "x": 2,
+        "y": "4",
+        "_id": "NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI",
+        "_ids": {
+            "x": "k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29",
+            "y": "ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg"
+        }
+    }
+    >>> cache1 = {}
+    >>> cache2 = {}
+    >>> cache3 = {}
+    >>> def f(x, y):
+    ...     print("Evaluated!")
+    ...     return x * y
+    >>> d = idict(x=5, y=7) >> cache1 >> let(f, "x,y→z") >> [cache2]
+    >>> cache1, cache2
+    ({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
+    >>> d.show(colored=False)
+    {
+        "x": 5,
+        "y": 7,
+        "z": "→(x y)",
+        "_id": "zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos",
+        "_ids": {
+            "x": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
+            "y": "eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf",
+            "z": "6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq"
+        }
+    }
+    >>> cache1, cache2
+    ({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
+    >>> d.z
+    Evaluated!
+    35
+    >>> cache1, cache2, cache3
+    ({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq': 35}, {})
+    >>> e = idict(x=5, y=7) >> cache1 >> let(f, "x,y→z") >> [cache3, cache2]
+    >>> e.show(colored=False)
+    {
+        "x": 5,
+        "y": 7,
+        "z": "→(x y)",
+        "_id": "zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos",
+        "_ids": {
+            "x": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
+            "y": "eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf",
+            "z": "6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq"
+        }
+    }
+    >>> e.z
+    35
+    >>> cache3
+    {'6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq': 35}
     """
+
+    # noinspection PyMissingConstructor
+    def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
+        from hoshmap.frozenidict import FrozenIdict
+        self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
     def __getitem__(self, item):
         return self.frozen[item]
@@ -74,20 +137,13 @@ class Idict(Dict[str, VT]):
         return self.__getattribute__(item)
 
     def __rshift__(self, other):
-        if isinstance(other, (Let, list)):
-            return (self.frozen >> other).unfrozen
-        if isinstance(other, (FrozenIdict, Idict)):
-            raise NotImplementedError
-        if isinstance(other, dict):
+        if isinstance(other, (FrozenIdict, Idict)):  # TODO: merge
             for k, v in other.items():
                 self[k] = v
-                raise NotImplementedError
+            raise NotImplementedError
+        if isinstance(other, (Let, list, dict)):
+            return (self.frozen >> other).unfrozen
         return NotImplemented
-
-    # noinspection PyMissingConstructor
-    def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
-        from hoshmap.frozenidict import FrozenIdict
-        self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
     def evaluate(self):
         """

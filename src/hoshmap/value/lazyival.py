@@ -90,9 +90,14 @@ class LazyiVal(iVal):
         if not self.evaluated:
             # Fetch.
             if self.caches is not None:
+                outdated_caches = []
                 for cache in self.caches:
                     if self.hosh.id in cache:
-                        return cache[self.hosh.id]
+                        val = cache[self.hosh.id]
+                        for outdated_cache in outdated_caches:
+                            outdated_cache[self.hosh.id] = val
+                        return val
+                    outdated_caches.append(cache)
 
             # Calculate.
             argnames = []

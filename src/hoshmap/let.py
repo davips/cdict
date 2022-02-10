@@ -51,17 +51,17 @@ class Let:
         for i in instr.split(","):
             if ":" in i:
                 ii = i.split(":")
-                if len(ii) != 2:
+                if len(ii) != 2:  # pragma: no cover
                     raise Exception(f"Wrong number ({len(ii)}) of ':' chars: {ii}")
                 isource, itarget = ii
             else:
                 isource = itarget = i
-            if isource.startswith("~"):
+            if isource.startswith("~"):  # TODO: write test
                 isource = isource[1:]
                 if isource not in kwargs or isinstance(kwargs[isource], Iterable):
                     raise Exception(f"Sampleable input {isource} must provide an iterable default value.")
                 self.input_space[isource] = kwargs[isource]
-            elif isource in kwargs:
+            elif isource in kwargs:  # TODO: write test
                 self.input_values[isource] = kwargs[isource]
             self.input[isource] = itarget
 # TODO: add → mapping to output as well, so to accept exploding returned dicts

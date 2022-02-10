@@ -140,26 +140,23 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         data = self.data.copy()
         del data["_id"]
         del data["_ids"]
+        from hoshmap.idict_ import Idict
+        if isinstance(other, (FrozenIdict, Idict)):  # pragma: no cover
+            raise NotImplementedError
+        if not isinstance(other, list) and hasattr(other, "__setitem__") and hasattr(other, "__getitem__"):
+            other = [other]
         if isinstance(other, list):
-            caches = []
-            for cache in other:
-                if isinstance(cache, list):
-                    if len(cache) == 0:  # pragma: no cover
-                        raise Exception("Missing content inside list for caching.")
-                    elif len(cache) > 1:  # pragma: no cover
-                        raise Exception(f"Cannot have more than one cache within a nested list: {cache} in {other}.")
-                    self.evaluate()
-                    cache = cache[0]
-                caches.append(cache)
+            caches = other
             nolazies = True
             for k, ival in self.entries(evaluate=False):
                 if not ival.evaluated:
                     nolazies = False
                     data[k] = ival.withcaches(caches)
-            # Eager saving when there are no lazies.  TODO
-            # if nolazies:
-            #     for k, ival in self.entries():
-            #         data[k] = ival.withcaches(caches)
+            # Eager saving when there are no lazies.
+            if nolazies:
+                for cache in caches:
+                    for k, id in self.ids.items():
+                        cache[id] = self[k]
             return FrozenIdict(data)
 
         if isinstance(other, Let):
@@ -181,17 +178,14 @@ class FrozenIdict(UserDict, Dict[str, VT]):
             for i, fout in enumerate(other.output):
                 data[fout] = LazyiVal(other.f, i, n, deps, shared_result, fid=other.id)
             return FrozenIdict(data)
-        return NotImplemented
+        return NotImplemented  # pragma: no cover
 
     def __eq__(self, other):
-        from hoshmap.idict_ import Idict
         if isinstance(other, dict):
             if "_id" in other:
                 return self.id == other["_id"]
             if list(self.keys())[:-2] != list(other.keys()):
                 return False
-        if isinstance(other, (Idict, FrozenIdict)):
-            return self.hosh == other.hosh
         if isinstance(other, dict):
             self.evaluate()
             data = self.asdict
