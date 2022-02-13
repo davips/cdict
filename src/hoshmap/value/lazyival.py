@@ -123,6 +123,7 @@ class LazyiVal(iVal):
             # Store.
             if self.caches is not None:
                 from hoshmap import Idict, FrozenIdict
+
                 for id, res in self.result.items():
                     for cache in self.caches:
                         if isinstance(res, (Idict, FrozenIdict)):

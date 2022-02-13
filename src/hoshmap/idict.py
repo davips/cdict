@@ -8,6 +8,7 @@ VT = TypeVar("VT")
 
 # TODO: store idict id->header
 
+
 class Idict(Dict[str, VT]):
     """
     >>> from hoshmap import _

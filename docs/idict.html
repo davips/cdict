@@ -34,6 +34,8 @@ from hoshmap.let import Let
 
 VT = TypeVar(&#34;VT&#34;)
 
+# TODO: store idict id-&gt;header
+
 
 class Idict(Dict[str, VT]):
     &#34;&#34;&#34;
@@ -113,7 +115,7 @@ class Idict(Dict[str, VT]):
     ...     return x * y
     &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; [[cache1]] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache2]
     &gt;&gt;&gt; cache1, cache2
-    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}})
     &gt;&gt;&gt; d.show(colored=False)
     {
         &#34;x&#34;: 5,
@@ -127,12 +129,12 @@ class Idict(Dict[str, VT]):
         }
     }
     &gt;&gt;&gt; cache1, cache2
-    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}})
     &gt;&gt;&gt; d.z
     Evaluated!
     35
     &gt;&gt;&gt; cache1, cache2, cache3
-    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}, &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}, {})
     &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
@@ -149,7 +151,7 @@ class Idict(Dict[str, VT]):
     &gt;&gt;&gt; e.z
     35
     &gt;&gt;&gt; cache3
-    {&#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}
+    {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}, &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}
     &#34;&#34;&#34;
 
     # noinspection PyMissingConstructor
@@ -171,6 +173,10 @@ class Idict(Dict[str, VT]):
             return (self.frozen &gt;&gt; other).unfrozen
         return NotImplemented
 
+    @property
+    def evaluated(self):
+        return self.frozen.evaluated
+
     def evaluate(self):
         &#34;&#34;&#34;
         &gt;&gt;&gt; from hoshmap.value import LazyiVal
@@ -183,7 +189,16 @@ class Idict(Dict[str, VT]):
                 &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
-        &gt;&gt;&gt; d.evaluate().show(colored=False)
+        &gt;&gt;&gt; d.evaluate()
+        &gt;&gt;&gt; d.show(colored=False)
+        {
+            &#34;x&#34;: &#34;2&#34;,
+            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            &#34;_ids&#34;: {
+                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            }
+        }
+        &gt;&gt;&gt; d.evaluated.show(colored=False)
         {
             &#34;x&#34;: &#34;2&#34;,
             &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
@@ -193,7 +208,6 @@ class Idict(Dict[str, VT]):
         }
         &#34;&#34;&#34;
         self.frozen.evaluate()
-        return self
 
     @property
     def hosh(self):
@@ -445,7 +459,7 @@ True
 ...     return x * y
 &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; [[cache1]] &gt;&gt; (f, &quot;x y→z&quot;) &gt;&gt; [cache2]
 &gt;&gt;&gt; cache1, cache2
-({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
+({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}})
 &gt;&gt;&gt; d.show(colored=False)
 {
     &quot;x&quot;: 5,
@@ -459,12 +473,12 @@ True
     }
 }
 &gt;&gt;&gt; cache1, cache2
-({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
+({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}})
 &gt;&gt;&gt; d.z
 Evaluated!
 35
 &gt;&gt;&gt; cache1, cache2, cache3
-({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}, {})
+({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}, 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}, {})
 &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &quot;x y→z&quot;) &gt;&gt; [cache3, cache2]
 &gt;&gt;&gt; e.show(colored=False)
 {
@@ -481,7 +495,7 @@ Evaluated!
 &gt;&gt;&gt; e.z
 35
 &gt;&gt;&gt; cache3
-{'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}
+{'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}, 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}
 </code></pre></div>
 <details class="source">
 <summary>
@@ -565,7 +579,7 @@ Evaluated!
     ...     return x * y
     &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; [[cache1]] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache2]
     &gt;&gt;&gt; cache1, cache2
-    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}})
     &gt;&gt;&gt; d.show(colored=False)
     {
         &#34;x&#34;: 5,
@@ -579,12 +593,12 @@ Evaluated!
         }
     }
     &gt;&gt;&gt; cache1, cache2
-    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}})
     &gt;&gt;&gt; d.z
     Evaluated!
     35
     &gt;&gt;&gt; cache1, cache2, cache3
-    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}, &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}, {})
     &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
@@ -601,7 +615,7 @@ Evaluated!
     &gt;&gt;&gt; e.z
     35
     &gt;&gt;&gt; cache3
-    {&#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}
+    {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}, &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}
     &#34;&#34;&#34;
 
     # noinspection PyMissingConstructor
@@ -623,6 +637,10 @@ Evaluated!
             return (self.frozen &gt;&gt; other).unfrozen
         return NotImplemented
 
+    @property
+    def evaluated(self):
+        return self.frozen.evaluated
+
     def evaluate(self):
         &#34;&#34;&#34;
         &gt;&gt;&gt; from hoshmap.value import LazyiVal
@@ -635,7 +653,16 @@ Evaluated!
                 &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
-        &gt;&gt;&gt; d.evaluate().show(colored=False)
+        &gt;&gt;&gt; d.evaluate()
+        &gt;&gt;&gt; d.show(colored=False)
+        {
+            &#34;x&#34;: &#34;2&#34;,
+            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            &#34;_ids&#34;: {
+                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            }
+        }
+        &gt;&gt;&gt; d.evaluated.show(colored=False)
         {
             &#34;x&#34;: &#34;2&#34;,
             &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
@@ -645,7 +672,6 @@ Evaluated!
         }
         &#34;&#34;&#34;
         self.frozen.evaluate()
-        return self
 
     @property
     def hosh(self):
@@ -864,6 +890,18 @@ def asdict(self):
     return self.frozen.asdict</code></pre>
 </details>
 </dd>
+<dt id="hoshmap.idict.Idict.evaluated"><code class="name">var <span class="ident">evaluated</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def evaluated(self):
+    return self.frozen.evaluated</code></pre>
+</details>
+</dd>
 <dt id="hoshmap.idict.Idict.fields"><code class="name">var <span class="ident">fields</span></code></dt>
 <dd>
 <div class="desc"><p>List of keys which don't start with '_'</p>
@@ -1052,7 +1090,16 @@ y 2
         &quot;x&quot;: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
     }
 }
-&gt;&gt;&gt; d.evaluate().show(colored=False)
+&gt;&gt;&gt; d.evaluate()
+&gt;&gt;&gt; d.show(colored=False)
+{
+    &quot;x&quot;: &quot;2&quot;,
+    &quot;_id&quot;: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
+    &quot;_ids&quot;: {
+        &quot;x&quot;: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
+    }
+}
+&gt;&gt;&gt; d.evaluated.show(colored=False)
 {
     &quot;x&quot;: &quot;2&quot;,
     &quot;_id&quot;: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
@@ -1077,7 +1124,16 @@ y 2
             &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
         }
     }
-    &gt;&gt;&gt; d.evaluate().show(colored=False)
+    &gt;&gt;&gt; d.evaluate()
+    &gt;&gt;&gt; d.show(colored=False)
+    {
+        &#34;x&#34;: &#34;2&#34;,
+        &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+        &#34;_ids&#34;: {
+            &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+        }
+    }
+    &gt;&gt;&gt; d.evaluated.show(colored=False)
     {
         &#34;x&#34;: &#34;2&#34;,
         &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
@@ -1086,8 +1142,7 @@ y 2
         }
     }
     &#34;&#34;&#34;
-    self.frozen.evaluate()
-    return self</code></pre>
+    self.frozen.evaluate()</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.idict.Idict.items"><code class="name flex">
@@ -1195,6 +1250,7 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
 <li><code><a title="hoshmap.idict.Idict.astext" href="#hoshmap.idict.Idict.astext">astext</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.entries" href="#hoshmap.idict.Idict.entries">entries</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.evaluate" href="#hoshmap.idict.Idict.evaluate">evaluate</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.evaluated" href="#hoshmap.idict.Idict.evaluated">evaluated</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.fields" href="#hoshmap.idict.Idict.fields">fields</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.fromdict" href="#hoshmap.idict.Idict.fromdict">fromdict</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.hosh" href="#hoshmap.idict.Idict.hosh">hosh</a></code></li>

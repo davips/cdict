@@ -50,12 +50,13 @@
 #
 import operator
 from functools import reduce
-from typing import Union, Iterable
+from itertools import chain
+from typing import Iterable, Union
+
+from hosh import Hosh
 
 from hoshmap.identification import f2hosh
 from hoshmap.value.ival import iVal
-from hosh import Hosh
-from itertools import chain
 
 
 class LazyiVal(iVal):
@@ -94,9 +95,7 @@ class LazyiVal(iVal):
     True
     &#34;&#34;&#34;
 
-    def __init__(
-        self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None
-    ):
+    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
         self.f = f
@@ -110,13 +109,13 @@ class LazyiVal(iVal):
         self.result[self.id] = None
 
     def withcaches(self, caches):
-        if self.caches is not None:  # pragma: no cover
-            raise Exception(&#34;Caches already set.&#34;)
+        if self.caches is not None:
+            self.caches.append(caches)
         return LazyiVal(self.f, self.i, self.n, self.deps, self.result, self.fhosh, caches)
 
     @property
     def value(self):
-        if not self.evaluated:
+        if not self.isevaluated:
             # Fetch.
             if self.caches is not None:
                 outdated_caches = []
@@ -127,7 +126,7 @@ class LazyiVal(iVal):
                             outdated_cache[self.hosh.id] = val
                         self.result[self.id] = val
                         return val
-                    outdated_caches.append(cache)
+                    outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
 
             # Calculate.
             argnames = []
@@ -151,15 +150,20 @@ class LazyiVal(iVal):
 
             # Store.
             if self.caches is not None:
+                from hoshmap import Idict, FrozenIdict
+
                 for id, res in self.result.items():
                     for cache in self.caches:
-                        cache[id] = res
+                        if isinstance(res, (Idict, FrozenIdict)):
+                            res &gt;&gt; [[cache]]
+                        else:
+                            cache[id] = res  # TODO: pack (pickle+lz4)
 
         return self.result[self.id]
 
     def __repr__(self):
-        if not self.evaluated:
-            return f&#34;←({&#39; &#39;.join(k + (&#39;&#39; if dep.evaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
+        if not self.isevaluated:
+            return f&#34;←({&#39; &#39;.join(k + (&#39;&#39; if dep.isevaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
         return repr(self.value)</code></pre>
 </details>
 </section>
@@ -248,9 +252,7 @@ True
     True
     &#34;&#34;&#34;
 
-    def __init__(
-        self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None
-    ):
+    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
         self.f = f
@@ -264,13 +266,13 @@ True
         self.result[self.id] = None
 
     def withcaches(self, caches):
-        if self.caches is not None:  # pragma: no cover
-            raise Exception(&#34;Caches already set.&#34;)
+        if self.caches is not None:
+            self.caches.append(caches)
         return LazyiVal(self.f, self.i, self.n, self.deps, self.result, self.fhosh, caches)
 
     @property
     def value(self):
-        if not self.evaluated:
+        if not self.isevaluated:
             # Fetch.
             if self.caches is not None:
                 outdated_caches = []
@@ -281,7 +283,7 @@ True
                             outdated_cache[self.hosh.id] = val
                         self.result[self.id] = val
                         return val
-                    outdated_caches.append(cache)
+                    outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
 
             # Calculate.
             argnames = []
@@ -305,15 +307,20 @@ True
 
             # Store.
             if self.caches is not None:
+                from hoshmap import Idict, FrozenIdict
+
                 for id, res in self.result.items():
                     for cache in self.caches:
-                        cache[id] = res
+                        if isinstance(res, (Idict, FrozenIdict)):
+                            res &gt;&gt; [[cache]]
+                        else:
+                            cache[id] = res  # TODO: pack (pickle+lz4)
 
         return self.result[self.id]
 
     def __repr__(self):
-        if not self.evaluated:
-            return f&#34;←({&#39; &#39;.join(k + (&#39;&#39; if dep.evaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
+        if not self.isevaluated:
+            return f&#34;←({&#39; &#39;.join(k + (&#39;&#39; if dep.isevaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
         return repr(self.value)</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -346,7 +353,7 @@ True
 </summary>
 <pre><code class="python">@property
 def value(self):
-    if not self.evaluated:
+    if not self.isevaluated:
         # Fetch.
         if self.caches is not None:
             outdated_caches = []
@@ -357,7 +364,7 @@ def value(self):
                         outdated_cache[self.hosh.id] = val
                     self.result[self.id] = val
                     return val
-                outdated_caches.append(cache)
+                outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
 
         # Calculate.
         argnames = []
@@ -381,9 +388,14 @@ def value(self):
 
         # Store.
         if self.caches is not None:
+            from hoshmap import Idict, FrozenIdict
+
             for id, res in self.result.items():
                 for cache in self.caches:
-                    cache[id] = res
+                    if isinstance(res, (Idict, FrozenIdict)):
+                        res &gt;&gt; [[cache]]
+                    else:
+                        cache[id] = res  # TODO: pack (pickle+lz4)
 
     return self.result[self.id]</code></pre>
 </details>
@@ -401,8 +413,8 @@ def value(self):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def withcaches(self, caches):
-    if self.caches is not None:  # pragma: no cover
-        raise Exception(&#34;Caches already set.&#34;)
+    if self.caches is not None:
+        self.caches.append(caches)
     return LazyiVal(self.f, self.i, self.n, self.deps, self.result, self.fhosh, caches)</code></pre>
 </details>
 </dd>

@@ -39,6 +39,7 @@ class iVal:
     def evaluate(self):
         val = self.value
         from hoshmap import Idict, FrozenIdict
+
         if isinstance(val, (Idict, FrozenIdict)):
             val.evaluate()
 

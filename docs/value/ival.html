@@ -61,11 +61,15 @@ class iVal:
     caches: Any
 
     @property
-    def evaluated(self):
+    def isevaluated(self):
         return self.result[self.id] is not None
 
     def evaluate(self):
-        _ = self.value
+        val = self.value
+        from hoshmap import Idict, FrozenIdict
+
+        if isinstance(val, (Idict, FrozenIdict)):
+            val.evaluate()
 
     @cached_property
     def id(self):
@@ -119,11 +123,15 @@ class iVal:
     caches: Any
 
     @property
-    def evaluated(self):
+    def isevaluated(self):
         return self.result[self.id] is not None
 
     def evaluate(self):
-        _ = self.value
+        val = self.value
+        from hoshmap import Idict, FrozenIdict
+
+        if isinstance(val, (Idict, FrozenIdict)):
+            val.evaluate()
 
     @cached_property
     def id(self):
@@ -211,18 +219,6 @@ def handle_id(id):
 </dl>
 <h3>Instance variables</h3>
 <dl>
-<dt id="hoshmap.value.ival.iVal.evaluated"><code class="name">var <span class="ident">evaluated</span></code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def evaluated(self):
-    return self.result[self.id] is not None</code></pre>
-</details>
-</dd>
 <dt id="hoshmap.value.ival.iVal.id"><code class="name">var <span class="ident">id</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -262,6 +258,18 @@ def evaluated(self):
     return val</code></pre>
 </details>
 </dd>
+<dt id="hoshmap.value.ival.iVal.isevaluated"><code class="name">var <span class="ident">isevaluated</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def isevaluated(self):
+    return self.result[self.id] is not None</code></pre>
+</details>
+</dd>
 </dl>
 <h3>Methods</h3>
 <dl>
@@ -275,7 +283,11 @@ def evaluated(self):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def evaluate(self):
-    _ = self.value</code></pre>
+    val = self.value
+    from hoshmap import Idict, FrozenIdict
+
+    if isinstance(val, (Idict, FrozenIdict)):
+        val.evaluate()</code></pre>
 </details>
 </dd>
 </dl>
@@ -301,10 +313,10 @@ def evaluated(self):
 <ul class="two-column">
 <li><code><a title="hoshmap.value.ival.iVal.caches" href="#hoshmap.value.ival.iVal.caches">caches</a></code></li>
 <li><code><a title="hoshmap.value.ival.iVal.evaluate" href="#hoshmap.value.ival.iVal.evaluate">evaluate</a></code></li>
-<li><code><a title="hoshmap.value.ival.iVal.evaluated" href="#hoshmap.value.ival.iVal.evaluated">evaluated</a></code></li>
 <li><code><a title="hoshmap.value.ival.iVal.handle_id" href="#hoshmap.value.ival.iVal.handle_id">handle_id</a></code></li>
 <li><code><a title="hoshmap.value.ival.iVal.hosh" href="#hoshmap.value.ival.iVal.hosh">hosh</a></code></li>
 <li><code><a title="hoshmap.value.ival.iVal.id" href="#hoshmap.value.ival.iVal.id">id</a></code></li>
+<li><code><a title="hoshmap.value.ival.iVal.isevaluated" href="#hoshmap.value.ival.iVal.isevaluated">isevaluated</a></code></li>
 <li><code><a title="hoshmap.value.ival.iVal.result" href="#hoshmap.value.ival.iVal.result">result</a></code></li>
 <li><code><a title="hoshmap.value.ival.iVal.value" href="#hoshmap.value.ival.iVal.value">value</a></code></li>
 </ul>

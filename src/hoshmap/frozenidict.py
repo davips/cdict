@@ -22,6 +22,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     >>> "x" in FrozenIdict(x=2)
     True
     """
+
     _evaluated = None
 
     # noinspection PyMissingConstructor
