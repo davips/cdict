@@ -69,33 +69,34 @@ class LazyiVal(iVal):
     &gt;&gt;&gt; deps = {&#34;x&#34;: StrictiVal(2)}
     &gt;&gt;&gt; lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
     &gt;&gt;&gt; lvx
-    →(x)
+    ←(x)
     &gt;&gt;&gt; deps = {&#34;x&#34;: lvx, &#34;y&#34;: StrictiVal(3)}
     &gt;&gt;&gt; result = {}
     &gt;&gt;&gt; f = lambda x,y: [x+y, y**2]
     &gt;&gt;&gt; lvy = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvz = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvx, lvy, lvz
-    (→(x), →(x→(x) y), →(x→(x) y))
+    (←(x), ←(x←(x) y), ←(x←(x) y))
     &gt;&gt;&gt; deps = {&#34;z&#34;: lvz}
     &gt;&gt;&gt; f = lambda z: {&#34;z&#34;:z**3, &#34;w&#34;:z**5}
     &gt;&gt;&gt; result = {}
     &gt;&gt;&gt; lvz2 = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvw = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvx, lvy, lvz2, lvw
-    (→(x), →(x→(x) y), →(z→(x→(x) y)), →(z→(x→(x) y)))
+    (←(x), ←(x←(x) y), ←(z←(x←(x) y)), ←(z←(x←(x) y)))
     &gt;&gt;&gt; lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     &gt;&gt;&gt; lvz2.id
-    &#39;aILoOUz5h.C9f1xG8XB09cdEI0XwRBcX-o8IwxS7&#39;
+    &#39;WgrpQORjCn0iZsyxLPO6YZKKVJ-kJvYhFfwPKX34&#39;
     &gt;&gt;&gt; lvw.id
-    &#39;vG9pcVdnghFMbi26bsfiyI-C5BCzSoi-mfEgpOjz&#39;
+    &#39;PIEs62X24oKHoPgjaXgxKkl1wmBicYCmoTgr3CGL&#39;
     &gt;&gt;&gt; lvz2.hosh * lvw.hosh == lvz.hosh * lvw.fhosh
     True
     &#34;&#34;&#34;
 
-    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None,
-                 caches=None):
+    def __init__(
+        self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None
+    ):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
         self.f = f
@@ -124,6 +125,7 @@ class LazyiVal(iVal):
                         val = cache[self.hosh.id]
                         for outdated_cache in outdated_caches:
                             outdated_cache[self.hosh.id] = val
+                        self.result[self.id] = val
                         return val
                     outdated_caches.append(cache)
 
@@ -157,7 +159,7 @@ class LazyiVal(iVal):
 
     def __repr__(self):
         if not self.evaluated:
-            return f&#34;→({&#39; &#39;.join(k + (&#39;&#39; if dep.evaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
+            return f&#34;←({&#39; &#39;.join(k + (&#39;&#39; if dep.evaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
         return repr(self.value)</code></pre>
 </details>
 </section>
@@ -182,27 +184,27 @@ class LazyiVal(iVal):
 &gt;&gt;&gt; deps = {&quot;x&quot;: StrictiVal(2)}
 &gt;&gt;&gt; lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
 &gt;&gt;&gt; lvx
-→(x)
+←(x)
 &gt;&gt;&gt; deps = {&quot;x&quot;: lvx, &quot;y&quot;: StrictiVal(3)}
 &gt;&gt;&gt; result = {}
 &gt;&gt;&gt; f = lambda x,y: [x+y, y**2]
 &gt;&gt;&gt; lvy = LazyiVal(f, 0, 2, deps, result, caches=[cache])
 &gt;&gt;&gt; lvz = LazyiVal(f, 1, 2, deps, result, caches=[cache])
 &gt;&gt;&gt; lvx, lvy, lvz
-(→(x), →(x→(x) y), →(x→(x) y))
+(←(x), ←(x←(x) y), ←(x←(x) y))
 &gt;&gt;&gt; deps = {&quot;z&quot;: lvz}
 &gt;&gt;&gt; f = lambda z: {&quot;z&quot;:z**3, &quot;w&quot;:z**5}
 &gt;&gt;&gt; result = {}
 &gt;&gt;&gt; lvz2 = LazyiVal(f, 0, 2, deps, result, caches=[cache])
 &gt;&gt;&gt; lvw = LazyiVal(f, 1, 2, deps, result, caches=[cache])
 &gt;&gt;&gt; lvx, lvy, lvz2, lvw
-(→(x), →(x→(x) y), →(z→(x→(x) y)), →(z→(x→(x) y)))
+(←(x), ←(x←(x) y), ←(z←(x←(x) y)), ←(z←(x←(x) y)))
 &gt;&gt;&gt; lvx.value, lvy.value, lvz2.value, lvw.value
 (4, 7, 729, 59049)
 &gt;&gt;&gt; lvz2.id
-'aILoOUz5h.C9f1xG8XB09cdEI0XwRBcX-o8IwxS7'
+'WgrpQORjCn0iZsyxLPO6YZKKVJ-kJvYhFfwPKX34'
 &gt;&gt;&gt; lvw.id
-'vG9pcVdnghFMbi26bsfiyI-C5BCzSoi-mfEgpOjz'
+'PIEs62X24oKHoPgjaXgxKkl1wmBicYCmoTgr3CGL'
 &gt;&gt;&gt; lvz2.hosh * lvw.hosh == lvz.hosh * lvw.fhosh
 True
 </code></pre></div>
@@ -221,33 +223,34 @@ True
     &gt;&gt;&gt; deps = {&#34;x&#34;: StrictiVal(2)}
     &gt;&gt;&gt; lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
     &gt;&gt;&gt; lvx
-    →(x)
+    ←(x)
     &gt;&gt;&gt; deps = {&#34;x&#34;: lvx, &#34;y&#34;: StrictiVal(3)}
     &gt;&gt;&gt; result = {}
     &gt;&gt;&gt; f = lambda x,y: [x+y, y**2]
     &gt;&gt;&gt; lvy = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvz = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvx, lvy, lvz
-    (→(x), →(x→(x) y), →(x→(x) y))
+    (←(x), ←(x←(x) y), ←(x←(x) y))
     &gt;&gt;&gt; deps = {&#34;z&#34;: lvz}
     &gt;&gt;&gt; f = lambda z: {&#34;z&#34;:z**3, &#34;w&#34;:z**5}
     &gt;&gt;&gt; result = {}
     &gt;&gt;&gt; lvz2 = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvw = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvx, lvy, lvz2, lvw
-    (→(x), →(x→(x) y), →(z→(x→(x) y)), →(z→(x→(x) y)))
+    (←(x), ←(x←(x) y), ←(z←(x←(x) y)), ←(z←(x←(x) y)))
     &gt;&gt;&gt; lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     &gt;&gt;&gt; lvz2.id
-    &#39;aILoOUz5h.C9f1xG8XB09cdEI0XwRBcX-o8IwxS7&#39;
+    &#39;WgrpQORjCn0iZsyxLPO6YZKKVJ-kJvYhFfwPKX34&#39;
     &gt;&gt;&gt; lvw.id
-    &#39;vG9pcVdnghFMbi26bsfiyI-C5BCzSoi-mfEgpOjz&#39;
+    &#39;PIEs62X24oKHoPgjaXgxKkl1wmBicYCmoTgr3CGL&#39;
     &gt;&gt;&gt; lvz2.hosh * lvw.hosh == lvz.hosh * lvw.fhosh
     True
     &#34;&#34;&#34;
 
-    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None,
-                 caches=None):
+    def __init__(
+        self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None
+    ):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
         self.f = f
@@ -276,6 +279,7 @@ True
                         val = cache[self.hosh.id]
                         for outdated_cache in outdated_caches:
                             outdated_cache[self.hosh.id] = val
+                        self.result[self.id] = val
                         return val
                     outdated_caches.append(cache)
 
@@ -309,7 +313,7 @@ True
 
     def __repr__(self):
         if not self.evaluated:
-            return f&#34;→({&#39; &#39;.join(k + (&#39;&#39; if dep.evaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
+            return f&#34;←({&#39; &#39;.join(k + (&#39;&#39; if dep.evaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
         return repr(self.value)</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -351,6 +355,7 @@ def value(self):
                     val = cache[self.hosh.id]
                     for outdated_cache in outdated_caches:
                         outdated_cache[self.hosh.id] = val
+                    self.result[self.id] = val
                     return val
                 outdated_caches.append(cache)
 

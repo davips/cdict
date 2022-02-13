@@ -49,16 +49,14 @@
 #  time spent here.
 from json import JSONEncoder
 
-import pandas
-
 from hoshmap.value.strictival import StrictiVal
 
 
 class CustomJSONEncoder(JSONEncoder):
     &#34;&#34;&#34;
-    &gt;&gt;&gt; from hoshmap.idict_ import Idict
-    &gt;&gt;&gt; a = Idict(x=3)
-    &gt;&gt;&gt; Idict(d=a, y=5).show(colored=False)
+    &gt;&gt;&gt; from hoshmap import idict
+    &gt;&gt;&gt; a = idict(x=3)
+    &gt;&gt;&gt; idict(d=a, y=5).show(colored=False)
     {
         &#34;d&#34;: {
             &#34;x&#34;: 3,
@@ -80,7 +78,7 @@ class CustomJSONEncoder(JSONEncoder):
        0  1
     0  1  2
     1  3  4
-    &gt;&gt;&gt; b = Idict(d=a, y=5, df=df, ell=...)
+    &gt;&gt;&gt; b = idict(d=a, y=5, df=df, ell=...)
     &gt;&gt;&gt; b.show(colored=False)
     {
         &#34;d&#34;: {
@@ -102,7 +100,7 @@ class CustomJSONEncoder(JSONEncoder):
         }
     }
     &gt;&gt;&gt; from numpy import array
-    &gt;&gt;&gt; Idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
+    &gt;&gt;&gt; idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
     {
         &#34;b&#34;: {
             &#34;d&#34;: {
@@ -203,9 +201,9 @@ def truncate(txt, width):
 <span>(</span><span>*, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, sort_keys=False, indent=None, separators=None, default=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap.idict_ import Idict
-&gt;&gt;&gt; a = Idict(x=3)
-&gt;&gt;&gt; Idict(d=a, y=5).show(colored=False)
+<div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
+&gt;&gt;&gt; a = idict(x=3)
+&gt;&gt;&gt; idict(d=a, y=5).show(colored=False)
 {
     &quot;d&quot;: {
         &quot;x&quot;: 3,
@@ -227,7 +225,7 @@ def truncate(txt, width):
    0  1
 0  1  2
 1  3  4
-&gt;&gt;&gt; b = Idict(d=a, y=5, df=df, ell=...)
+&gt;&gt;&gt; b = idict(d=a, y=5, df=df, ell=...)
 &gt;&gt;&gt; b.show(colored=False)
 {
     &quot;d&quot;: {
@@ -249,7 +247,7 @@ def truncate(txt, width):
     }
 }
 &gt;&gt;&gt; from numpy import array
-&gt;&gt;&gt; Idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
+&gt;&gt;&gt; idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
 {
     &quot;b&quot;: {
         &quot;d&quot;: {
@@ -326,9 +324,9 @@ version of the object or raise a <code>TypeError</code>.</p></div>
 </summary>
 <pre><code class="python">class CustomJSONEncoder(JSONEncoder):
     &#34;&#34;&#34;
-    &gt;&gt;&gt; from hoshmap.idict_ import Idict
-    &gt;&gt;&gt; a = Idict(x=3)
-    &gt;&gt;&gt; Idict(d=a, y=5).show(colored=False)
+    &gt;&gt;&gt; from hoshmap import idict
+    &gt;&gt;&gt; a = idict(x=3)
+    &gt;&gt;&gt; idict(d=a, y=5).show(colored=False)
     {
         &#34;d&#34;: {
             &#34;x&#34;: 3,
@@ -350,7 +348,7 @@ version of the object or raise a <code>TypeError</code>.</p></div>
        0  1
     0  1  2
     1  3  4
-    &gt;&gt;&gt; b = Idict(d=a, y=5, df=df, ell=...)
+    &gt;&gt;&gt; b = idict(d=a, y=5, df=df, ell=...)
     &gt;&gt;&gt; b.show(colored=False)
     {
         &#34;d&#34;: {
@@ -372,7 +370,7 @@ version of the object or raise a <code>TypeError</code>.</p></div>
         }
     }
     &gt;&gt;&gt; from numpy import array
-    &gt;&gt;&gt; Idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
+    &gt;&gt;&gt; idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
     {
         &#34;b&#34;: {
             &#34;d&#34;: {

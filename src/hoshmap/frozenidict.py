@@ -26,6 +26,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, **kwargs):
         from hoshmap.idict import Idict
+
         data: Dict[str, Union[iVal, str, dict]] = _dictionary or {}
         data.update(kwargs)
         if "_id" in data.keys() or "_ids" in data.keys():  # pragma: no cover
@@ -113,6 +114,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     @property
     def unfrozen(self):
         from hoshmap.idict import Idict
+
         return Idict(_frozen=self)
 
     def __setitem__(self, key: str, value):  # pragma: no cover
@@ -143,6 +145,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         if isinstance(other, tuple):
             other = Let(*other)
         from hoshmap.idict import Idict
+
         if isinstance(other, Idict):  # merge
             other = self.frozen
         if isinstance(other, FrozenIdict):  # merge

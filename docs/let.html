@@ -56,7 +56,7 @@ from hosh import Hosh
 
 class Let:
     def __init__(self, f: callable, in_out: str, id: Union[str, Hosh] = None, /, _metadata=None, **kwargs):
-        # REMINDER: &#39;id&#39; is only positional arg, so if &#39;f&#39; takes an &#39;id&#39; argument, it&#39;s ok to provide both.
+        # REMINDER: &#39;id&#39; is only positional arg, so if &#39;f()&#39; takes an &#39;id&#39; argument, it&#39;s ok to provide both.
         in_out = in_out.replace(&#34;-&gt;&#34;, &#34;→&#34;)
         if &#34;→&#34; not in in_out:  # pragma: no cover
             raise Exception(f&#34;Missing &#39;→&#39; in in_out schema ({in_out}).&#34;)
@@ -64,19 +64,22 @@ class Let:
         if outstr == &#34;&#34;:  # pragma: no cover
             raise Exception(f&#34;Missing output field names after &#39;→&#39; in in_out schema ({in_out}).&#34;)
         self.f = f
+        self.input = {}
+        self.input_space = {}
+        self.input_values = {}
         if instr == &#34;&#34;:
-            self.input = {par.name: par.name for par in signature(f).parameters.values()}
+            for par in signature(f).parameters.values():
+                self.input[par.name] = par.name
+                if par.default is not par.empty:
+                    self.input_values[par.name] = par.default
         else:
             self._parse_instr(instr, kwargs)
-        self.output = outstr.split(&#34;,&#34;)
+        self.output = outstr.split(&#34; &#34;)
         self.id = id
         self.metadata = _metadata
 
     def _parse_instr(self, instr, kwargs):
-        self.input = {}
-        self.input_space = {}
-        self.input_values = {}
-        for i in instr.split(&#34;,&#34;):
+        for i in instr.split(&#34; &#34;):
             if &#34;:&#34; in i:
                 ii = i.split(&#34;:&#34;)
                 if len(ii) != 2:  # pragma: no cover
@@ -92,7 +95,9 @@ class Let:
             elif isource in kwargs:  # TODO: write test
                 self.input_values[isource] = kwargs[isource]
             self.input[isource] = itarget
-# TODO: add → mapping to output as well, so to accept exploding returned dicts</code></pre>
+
+
+# TODO: add : mapping to output as well, so to accept exploding returned dicts</code></pre>
 </details>
 </section>
 <section>
@@ -116,7 +121,7 @@ class Let:
 </summary>
 <pre><code class="python">class Let:
     def __init__(self, f: callable, in_out: str, id: Union[str, Hosh] = None, /, _metadata=None, **kwargs):
-        # REMINDER: &#39;id&#39; is only positional arg, so if &#39;f&#39; takes an &#39;id&#39; argument, it&#39;s ok to provide both.
+        # REMINDER: &#39;id&#39; is only positional arg, so if &#39;f()&#39; takes an &#39;id&#39; argument, it&#39;s ok to provide both.
         in_out = in_out.replace(&#34;-&gt;&#34;, &#34;→&#34;)
         if &#34;→&#34; not in in_out:  # pragma: no cover
             raise Exception(f&#34;Missing &#39;→&#39; in in_out schema ({in_out}).&#34;)
@@ -124,19 +129,22 @@ class Let:
         if outstr == &#34;&#34;:  # pragma: no cover
             raise Exception(f&#34;Missing output field names after &#39;→&#39; in in_out schema ({in_out}).&#34;)
         self.f = f
+        self.input = {}
+        self.input_space = {}
+        self.input_values = {}
         if instr == &#34;&#34;:
-            self.input = {par.name: par.name for par in signature(f).parameters.values()}
+            for par in signature(f).parameters.values():
+                self.input[par.name] = par.name
+                if par.default is not par.empty:
+                    self.input_values[par.name] = par.default
         else:
             self._parse_instr(instr, kwargs)
-        self.output = outstr.split(&#34;,&#34;)
+        self.output = outstr.split(&#34; &#34;)
         self.id = id
         self.metadata = _metadata
 
     def _parse_instr(self, instr, kwargs):
-        self.input = {}
-        self.input_space = {}
-        self.input_values = {}
-        for i in instr.split(&#34;,&#34;):
+        for i in instr.split(&#34; &#34;):
             if &#34;:&#34; in i:
                 ii = i.split(&#34;:&#34;)
                 if len(ii) != 2:  # pragma: no cover

@@ -66,8 +66,9 @@ class LazyiVal(iVal):
     True
     """
 
-    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None,
-                 caches=None):
+    def __init__(
+        self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None
+    ):
         # if i >= len(result):  # pragma: no cover
         #     raise Exception(f"Index {i} inconsistent with current expected result size {len(result)}.")
         self.f = f

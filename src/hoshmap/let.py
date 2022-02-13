@@ -67,4 +67,6 @@ class Let:
             elif isource in kwargs:  # TODO: write test
                 self.input_values[isource] = kwargs[isource]
             self.input[isource] = itarget
+
+
 # TODO: add : mapping to output as well, so to accept exploding returned dicts

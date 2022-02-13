@@ -88,7 +88,10 @@ class iVal:
             raise Exception(f&#34;Wrong id type: {type(id)}&#34;)
 
     def __mul__(self, other):
-        return self.hosh * (other if isinstance(other, Hosh) else other.hosh)</code></pre>
+        return self.hosh * (other if isinstance(other, Hosh) else other.hosh)
+
+    def __rmul__(self, other):
+        return (other if isinstance(other, Hosh) else other.hosh) * self.hosh</code></pre>
 </details>
 </section>
 <section>
@@ -143,7 +146,10 @@ class iVal:
             raise Exception(f&#34;Wrong id type: {type(id)}&#34;)
 
     def __mul__(self, other):
-        return self.hosh * (other if isinstance(other, Hosh) else other.hosh)</code></pre>
+        return self.hosh * (other if isinstance(other, Hosh) else other.hosh)
+
+    def __rmul__(self, other):
+        return (other if isinstance(other, Hosh) else other.hosh) * self.hosh</code></pre>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">

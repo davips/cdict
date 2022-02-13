@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>hoshmap.idict_ API documentation</title>
+<title>hoshmap.idict API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,7 +19,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>hoshmap.idict_</code></h1>
+<h1 class="title">Module <code>hoshmap.idict</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -37,8 +37,8 @@ VT = TypeVar(&#34;VT&#34;)
 
 class Idict(Dict[str, VT]):
     &#34;&#34;&#34;
-    &gt;&gt;&gt; from hoshmap import let, idict
-    &gt;&gt;&gt; d = idict(x=2)
+    &gt;&gt;&gt; from hoshmap import _
+    &gt;&gt;&gt; d = _ &gt;&gt; {&#34;x&#34;:2}
     &gt;&gt;&gt; d.show(colored=False)
     {
         &#34;x&#34;: 2,
@@ -55,27 +55,28 @@ class Idict(Dict[str, VT]):
     &gt;&gt;&gt; &#34;x&#34; in d
     True
     &gt;&gt;&gt; f = lambda x: x**2
-    &gt;&gt;&gt; d &gt;&gt;= let(f, &#34;-&gt;y&#34;)
+    &gt;&gt;&gt; d &gt;&gt;= f, &#34;-&gt;y&#34;
     &gt;&gt;&gt; d.show(colored=False)
     {
         &#34;x&#34;: 2,
-        &#34;y&#34;: &#34;→(x)&#34;,
-        &#34;_id&#34;: &#34;NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI&#34;,
+        &#34;y&#34;: &#34;←(x)&#34;,
+        &#34;_id&#34;: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
         &#34;_ids&#34;: {
             &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            &#34;y&#34;: &#34;ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg&#34;
+            &#34;y&#34;: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
         }
     }
     &gt;&gt;&gt; d.y, d[&#34;y&#34;]
     (4, 4)
-    &gt;&gt;&gt; (d &gt;&gt; let(lambda w: w**2, &#34;y:w-&gt;y&#34;)).y
+    &gt;&gt;&gt; (d &gt;&gt; (lambda w: w**2, &#34;y:w-&gt;y&#34;)).y
     16
-    &gt;&gt;&gt; (d &gt;&gt; let(lambda w: w**2, &#34;y:w→y&#34;)).y   # &lt;AltGr + i&gt; = →
+    &gt;&gt;&gt; (d &gt;&gt; (lambda w: w**2, &#34;y:w→y&#34;)).y   # &lt;AltGr + y&gt; = →
     16
     &gt;&gt;&gt; d == {&#34;x&#34;: 2, &#34;y&#34;: 4}
     True
-    &gt;&gt;&gt; idict(x=3) == {&#34;x&#34;: 3}
+    &gt;&gt;&gt; _ &gt;&gt; {&#34;x&#34;: 3} == {&#34;x&#34;: 3}
     True
+    &gt;&gt;&gt; from hoshmap import idict
     &gt;&gt;&gt; idict(x=3) == {&#34;x&#34;: 3, &#34;_id&#34;: idict(x=3).id}
     True
     &gt;&gt;&gt; idict(x=3) == idict(x=3)
@@ -98,10 +99,10 @@ class Idict(Dict[str, VT]):
     {
         &#34;x&#34;: 2,
         &#34;y&#34;: &#34;4&#34;,
-        &#34;_id&#34;: &#34;NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI&#34;,
+        &#34;_id&#34;: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
         &#34;_ids&#34;: {
             &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            &#34;y&#34;: &#34;ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg&#34;
+            &#34;y&#34;: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
         }
     }
     &gt;&gt;&gt; cache1 = {}
@@ -110,19 +111,19 @@ class Idict(Dict[str, VT]):
     &gt;&gt;&gt; def f(x, y):
     ...     print(&#34;Evaluated!&#34;)
     ...     return x * y
-    &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; cache1 &gt;&gt; let(f, &#34;x,y→z&#34;) &gt;&gt; [cache2]
+    &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; [[cache1]] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache2]
     &gt;&gt;&gt; cache1, cache2
     ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
     &gt;&gt;&gt; d.show(colored=False)
     {
         &#34;x&#34;: 5,
         &#34;y&#34;: 7,
-        &#34;z&#34;: &#34;→(x y)&#34;,
-        &#34;_id&#34;: &#34;zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos&#34;,
+        &#34;z&#34;: &#34;←(x y)&#34;,
+        &#34;_id&#34;: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
         &#34;_ids&#34;: {
             &#34;x&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             &#34;y&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            &#34;z&#34;: &#34;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&#34;
+            &#34;z&#34;: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
         }
     }
     &gt;&gt;&gt; cache1, cache2
@@ -131,29 +132,30 @@ class Idict(Dict[str, VT]):
     Evaluated!
     35
     &gt;&gt;&gt; cache1, cache2, cache3
-    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&#39;: 35}, {})
-    &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; cache1 &gt;&gt; let(f, &#34;x,y→z&#34;) &gt;&gt; [cache3, cache2]
+    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}, {})
+    &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
         &#34;x&#34;: 5,
         &#34;y&#34;: 7,
-        &#34;z&#34;: &#34;→(x y)&#34;,
-        &#34;_id&#34;: &#34;zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos&#34;,
+        &#34;z&#34;: &#34;←(x y)&#34;,
+        &#34;_id&#34;: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
         &#34;_ids&#34;: {
             &#34;x&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             &#34;y&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            &#34;z&#34;: &#34;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&#34;
+            &#34;z&#34;: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
         }
     }
     &gt;&gt;&gt; e.z
     35
     &gt;&gt;&gt; cache3
-    {&#39;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&#39;: 35}
+    {&#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}
     &#34;&#34;&#34;
 
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
         from hoshmap.frozenidict import FrozenIdict
+
         self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
     def __getitem__(self, item):
@@ -165,11 +167,7 @@ class Idict(Dict[str, VT]):
         return self.__getattribute__(item)
 
     def __rshift__(self, other):
-        if isinstance(other, (FrozenIdict, Idict)):  # TODO: merge
-            for k, v in other.items():
-                self[k] = v
-            raise NotImplementedError
-        if isinstance(other, (Let, list, dict)):
+        if isinstance(other, (Let, list, dict, tuple)):
             return (self.frozen &gt;&gt; other).unfrozen
         return NotImplemented
 
@@ -179,23 +177,23 @@ class Idict(Dict[str, VT]):
         &gt;&gt;&gt; d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
         &gt;&gt;&gt; d.show(colored=False)
         {
-            &#34;x&#34;: &#34;→()&#34;,
-            &#34;_id&#34;: &#34;Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM&#34;,
+            &#34;x&#34;: &#34;←()&#34;,
+            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
             &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv&#34;
+                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
-        &gt;&gt;&gt; d.evaluate()
-        &gt;&gt;&gt; d.show(colored=False)
+        &gt;&gt;&gt; d.evaluate().show(colored=False)
         {
             &#34;x&#34;: &#34;2&#34;,
-            &#34;_id&#34;: &#34;Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM&#34;,
+            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
             &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv&#34;
+                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
         &#34;&#34;&#34;
         self.frozen.evaluate()
+        return self
 
     @property
     def hosh(self):
@@ -281,6 +279,7 @@ class Idict(Dict[str, VT]):
         {&#34;x&#34;: 3, &#34;y&#34;: 5, &#34;z&#34;: 7, &#34;_id&#34;: &#34;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&#34;, &#34;_ids&#34;: {&#34;x&#34;: &#34;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&#34;, &#34;y&#34;: &#34;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&#34;, &#34;z&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;}}
         &#34;&#34;&#34;
         from hoshmap.frozenidict import FrozenIdict
+
         return FrozenIdict.fromdict(dictionary, ids).unfrozen
 
     @property
@@ -330,6 +329,10 @@ class Idict(Dict[str, VT]):
         &#34;&#34;&#34;
         return self.frozen.show(colored)
 
+    # @property
+    # def data(self):
+    #     return self.frozen.data
+
     def __iter__(self):
         return iter(self.frozen)
 
@@ -346,7 +349,10 @@ class Idict(Dict[str, VT]):
         return self.frozen == other
 
     def __ne__(self, other):
-        return not (self == other)</code></pre>
+        return not (self == other)
+
+    def __reduce__(self):
+        return self.__class__, (self.frozen.data.copy(),)</code></pre>
 </details>
 </section>
 <section>
@@ -358,13 +364,13 @@ class Idict(Dict[str, VT]):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="hoshmap.idict_.Idict"><code class="flex name class">
+<dt id="hoshmap.idict.Idict"><code class="flex name class">
 <span>class <span class="ident">Idict</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import let, idict
-&gt;&gt;&gt; d = idict(x=2)
+<div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import _
+&gt;&gt;&gt; d = _ &gt;&gt; {&quot;x&quot;:2}
 &gt;&gt;&gt; d.show(colored=False)
 {
     &quot;x&quot;: 2,
@@ -381,27 +387,28 @@ _ids
 &gt;&gt;&gt; &quot;x&quot; in d
 True
 &gt;&gt;&gt; f = lambda x: x**2
-&gt;&gt;&gt; d &gt;&gt;= let(f, &quot;-&gt;y&quot;)
+&gt;&gt;&gt; d &gt;&gt;= f, &quot;-&gt;y&quot;
 &gt;&gt;&gt; d.show(colored=False)
 {
     &quot;x&quot;: 2,
-    &quot;y&quot;: &quot;→(x)&quot;,
-    &quot;_id&quot;: &quot;NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI&quot;,
+    &quot;y&quot;: &quot;←(x)&quot;,
+    &quot;_id&quot;: &quot;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&quot;,
     &quot;_ids&quot;: {
         &quot;x&quot;: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
-        &quot;y&quot;: &quot;ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg&quot;
+        &quot;y&quot;: &quot;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&quot;
     }
 }
 &gt;&gt;&gt; d.y, d[&quot;y&quot;]
 (4, 4)
-&gt;&gt;&gt; (d &gt;&gt; let(lambda w: w**2, &quot;y:w-&gt;y&quot;)).y
+&gt;&gt;&gt; (d &gt;&gt; (lambda w: w**2, &quot;y:w-&gt;y&quot;)).y
 16
-&gt;&gt;&gt; (d &gt;&gt; let(lambda w: w**2, &quot;y:w→y&quot;)).y   # &lt;AltGr + i&gt; = →
+&gt;&gt;&gt; (d &gt;&gt; (lambda w: w**2, &quot;y:w→y&quot;)).y   # &lt;AltGr + y&gt; = →
 16
 &gt;&gt;&gt; d == {&quot;x&quot;: 2, &quot;y&quot;: 4}
 True
-&gt;&gt;&gt; idict(x=3) == {&quot;x&quot;: 3}
+&gt;&gt;&gt; _ &gt;&gt; {&quot;x&quot;: 3} == {&quot;x&quot;: 3}
 True
+&gt;&gt;&gt; from hoshmap import idict
 &gt;&gt;&gt; idict(x=3) == {&quot;x&quot;: 3, &quot;_id&quot;: idict(x=3).id}
 True
 &gt;&gt;&gt; idict(x=3) == idict(x=3)
@@ -424,10 +431,10 @@ True
 {
     &quot;x&quot;: 2,
     &quot;y&quot;: &quot;4&quot;,
-    &quot;_id&quot;: &quot;NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI&quot;,
+    &quot;_id&quot;: &quot;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&quot;,
     &quot;_ids&quot;: {
         &quot;x&quot;: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
-        &quot;y&quot;: &quot;ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg&quot;
+        &quot;y&quot;: &quot;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&quot;
     }
 }
 &gt;&gt;&gt; cache1 = {}
@@ -436,19 +443,19 @@ True
 &gt;&gt;&gt; def f(x, y):
 ...     print(&quot;Evaluated!&quot;)
 ...     return x * y
-&gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; cache1 &gt;&gt; let(f, &quot;x,y→z&quot;) &gt;&gt; [cache2]
+&gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; [[cache1]] &gt;&gt; (f, &quot;x y→z&quot;) &gt;&gt; [cache2]
 &gt;&gt;&gt; cache1, cache2
 ({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
 &gt;&gt;&gt; d.show(colored=False)
 {
     &quot;x&quot;: 5,
     &quot;y&quot;: 7,
-    &quot;z&quot;: &quot;→(x y)&quot;,
-    &quot;_id&quot;: &quot;zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos&quot;,
+    &quot;z&quot;: &quot;←(x y)&quot;,
+    &quot;_id&quot;: &quot;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&quot;,
     &quot;_ids&quot;: {
         &quot;x&quot;: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
         &quot;y&quot;: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
-        &quot;z&quot;: &quot;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&quot;
+        &quot;z&quot;: &quot;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&quot;
     }
 }
 &gt;&gt;&gt; cache1, cache2
@@ -457,24 +464,24 @@ True
 Evaluated!
 35
 &gt;&gt;&gt; cache1, cache2, cache3
-({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq': 35}, {})
-&gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; cache1 &gt;&gt; let(f, &quot;x,y→z&quot;) &gt;&gt; [cache3, cache2]
+({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}, {})
+&gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &quot;x y→z&quot;) &gt;&gt; [cache3, cache2]
 &gt;&gt;&gt; e.show(colored=False)
 {
     &quot;x&quot;: 5,
     &quot;y&quot;: 7,
-    &quot;z&quot;: &quot;→(x y)&quot;,
-    &quot;_id&quot;: &quot;zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos&quot;,
+    &quot;z&quot;: &quot;←(x y)&quot;,
+    &quot;_id&quot;: &quot;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&quot;,
     &quot;_ids&quot;: {
         &quot;x&quot;: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
         &quot;y&quot;: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
-        &quot;z&quot;: &quot;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&quot;
+        &quot;z&quot;: &quot;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&quot;
     }
 }
 &gt;&gt;&gt; e.z
 35
 &gt;&gt;&gt; cache3
-{'6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq': 35}
+{'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}
 </code></pre></div>
 <details class="source">
 <summary>
@@ -482,8 +489,8 @@ Evaluated!
 </summary>
 <pre><code class="python">class Idict(Dict[str, VT]):
     &#34;&#34;&#34;
-    &gt;&gt;&gt; from hoshmap import let, idict
-    &gt;&gt;&gt; d = idict(x=2)
+    &gt;&gt;&gt; from hoshmap import _
+    &gt;&gt;&gt; d = _ &gt;&gt; {&#34;x&#34;:2}
     &gt;&gt;&gt; d.show(colored=False)
     {
         &#34;x&#34;: 2,
@@ -500,27 +507,28 @@ Evaluated!
     &gt;&gt;&gt; &#34;x&#34; in d
     True
     &gt;&gt;&gt; f = lambda x: x**2
-    &gt;&gt;&gt; d &gt;&gt;= let(f, &#34;-&gt;y&#34;)
+    &gt;&gt;&gt; d &gt;&gt;= f, &#34;-&gt;y&#34;
     &gt;&gt;&gt; d.show(colored=False)
     {
         &#34;x&#34;: 2,
-        &#34;y&#34;: &#34;→(x)&#34;,
-        &#34;_id&#34;: &#34;NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI&#34;,
+        &#34;y&#34;: &#34;←(x)&#34;,
+        &#34;_id&#34;: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
         &#34;_ids&#34;: {
             &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            &#34;y&#34;: &#34;ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg&#34;
+            &#34;y&#34;: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
         }
     }
     &gt;&gt;&gt; d.y, d[&#34;y&#34;]
     (4, 4)
-    &gt;&gt;&gt; (d &gt;&gt; let(lambda w: w**2, &#34;y:w-&gt;y&#34;)).y
+    &gt;&gt;&gt; (d &gt;&gt; (lambda w: w**2, &#34;y:w-&gt;y&#34;)).y
     16
-    &gt;&gt;&gt; (d &gt;&gt; let(lambda w: w**2, &#34;y:w→y&#34;)).y   # &lt;AltGr + i&gt; = →
+    &gt;&gt;&gt; (d &gt;&gt; (lambda w: w**2, &#34;y:w→y&#34;)).y   # &lt;AltGr + y&gt; = →
     16
     &gt;&gt;&gt; d == {&#34;x&#34;: 2, &#34;y&#34;: 4}
     True
-    &gt;&gt;&gt; idict(x=3) == {&#34;x&#34;: 3}
+    &gt;&gt;&gt; _ &gt;&gt; {&#34;x&#34;: 3} == {&#34;x&#34;: 3}
     True
+    &gt;&gt;&gt; from hoshmap import idict
     &gt;&gt;&gt; idict(x=3) == {&#34;x&#34;: 3, &#34;_id&#34;: idict(x=3).id}
     True
     &gt;&gt;&gt; idict(x=3) == idict(x=3)
@@ -543,10 +551,10 @@ Evaluated!
     {
         &#34;x&#34;: 2,
         &#34;y&#34;: &#34;4&#34;,
-        &#34;_id&#34;: &#34;NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI&#34;,
+        &#34;_id&#34;: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
         &#34;_ids&#34;: {
             &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            &#34;y&#34;: &#34;ZQAcufZTGh7KY9OE.Ws4F8Euu1v0HN916miBBayg&#34;
+            &#34;y&#34;: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
         }
     }
     &gt;&gt;&gt; cache1 = {}
@@ -555,19 +563,19 @@ Evaluated!
     &gt;&gt;&gt; def f(x, y):
     ...     print(&#34;Evaluated!&#34;)
     ...     return x * y
-    &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; cache1 &gt;&gt; let(f, &#34;x,y→z&#34;) &gt;&gt; [cache2]
+    &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; [[cache1]] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache2]
     &gt;&gt;&gt; cache1, cache2
     ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
     &gt;&gt;&gt; d.show(colored=False)
     {
         &#34;x&#34;: 5,
         &#34;y&#34;: 7,
-        &#34;z&#34;: &#34;→(x y)&#34;,
-        &#34;_id&#34;: &#34;zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos&#34;,
+        &#34;z&#34;: &#34;←(x y)&#34;,
+        &#34;_id&#34;: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
         &#34;_ids&#34;: {
             &#34;x&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             &#34;y&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            &#34;z&#34;: &#34;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&#34;
+            &#34;z&#34;: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
         }
     }
     &gt;&gt;&gt; cache1, cache2
@@ -576,29 +584,30 @@ Evaluated!
     Evaluated!
     35
     &gt;&gt;&gt; cache1, cache2, cache3
-    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&#39;: 35}, {})
-    &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; cache1 &gt;&gt; let(f, &#34;x,y→z&#34;) &gt;&gt; [cache3, cache2]
+    ({&#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}, {})
+    &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
         &#34;x&#34;: 5,
         &#34;y&#34;: 7,
-        &#34;z&#34;: &#34;→(x y)&#34;,
-        &#34;_id&#34;: &#34;zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos&#34;,
+        &#34;z&#34;: &#34;←(x y)&#34;,
+        &#34;_id&#34;: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
         &#34;_ids&#34;: {
             &#34;x&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             &#34;y&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            &#34;z&#34;: &#34;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&#34;
+            &#34;z&#34;: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
         }
     }
     &gt;&gt;&gt; e.z
     35
     &gt;&gt;&gt; cache3
-    {&#39;6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq&#39;: 35}
+    {&#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}
     &#34;&#34;&#34;
 
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
         from hoshmap.frozenidict import FrozenIdict
+
         self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
     def __getitem__(self, item):
@@ -610,11 +619,7 @@ Evaluated!
         return self.__getattribute__(item)
 
     def __rshift__(self, other):
-        if isinstance(other, (FrozenIdict, Idict)):  # TODO: merge
-            for k, v in other.items():
-                self[k] = v
-            raise NotImplementedError
-        if isinstance(other, (Let, list, dict)):
+        if isinstance(other, (Let, list, dict, tuple)):
             return (self.frozen &gt;&gt; other).unfrozen
         return NotImplemented
 
@@ -624,23 +629,23 @@ Evaluated!
         &gt;&gt;&gt; d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
         &gt;&gt;&gt; d.show(colored=False)
         {
-            &#34;x&#34;: &#34;→()&#34;,
-            &#34;_id&#34;: &#34;Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM&#34;,
+            &#34;x&#34;: &#34;←()&#34;,
+            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
             &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv&#34;
+                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
-        &gt;&gt;&gt; d.evaluate()
-        &gt;&gt;&gt; d.show(colored=False)
+        &gt;&gt;&gt; d.evaluate().show(colored=False)
         {
             &#34;x&#34;: &#34;2&#34;,
-            &#34;_id&#34;: &#34;Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM&#34;,
+            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
             &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv&#34;
+                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
         &#34;&#34;&#34;
         self.frozen.evaluate()
+        return self
 
     @property
     def hosh(self):
@@ -726,6 +731,7 @@ Evaluated!
         {&#34;x&#34;: 3, &#34;y&#34;: 5, &#34;z&#34;: 7, &#34;_id&#34;: &#34;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&#34;, &#34;_ids&#34;: {&#34;x&#34;: &#34;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&#34;, &#34;y&#34;: &#34;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&#34;, &#34;z&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;}}
         &#34;&#34;&#34;
         from hoshmap.frozenidict import FrozenIdict
+
         return FrozenIdict.fromdict(dictionary, ids).unfrozen
 
     @property
@@ -775,6 +781,10 @@ Evaluated!
         &#34;&#34;&#34;
         return self.frozen.show(colored)
 
+    # @property
+    # def data(self):
+    #     return self.frozen.data
+
     def __iter__(self):
         return iter(self.frozen)
 
@@ -791,7 +801,10 @@ Evaluated!
         return self.frozen == other
 
     def __ne__(self, other):
-        return not (self == other)</code></pre>
+        return not (self == other)
+
+    def __reduce__(self):
+        return self.__class__, (self.frozen.data.copy(),)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -800,7 +813,7 @@ Evaluated!
 </ul>
 <h3>Static methods</h3>
 <dl>
-<dt id="hoshmap.idict_.Idict.fromdict"><code class="name flex">
+<dt id="hoshmap.idict.Idict.fromdict"><code class="name flex">
 <span>def <span class="ident">fromdict</span></span>(<span>dictionary, ids)</span>
 </code></dt>
 <dd>
@@ -824,13 +837,14 @@ def fromdict(dictionary, ids):
     {&#34;x&#34;: 3, &#34;y&#34;: 5, &#34;z&#34;: 7, &#34;_id&#34;: &#34;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&#34;, &#34;_ids&#34;: {&#34;x&#34;: &#34;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&#34;, &#34;y&#34;: &#34;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&#34;, &#34;z&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;}}
     &#34;&#34;&#34;
     from hoshmap.frozenidict import FrozenIdict
+
     return FrozenIdict.fromdict(dictionary, ids).unfrozen</code></pre>
 </details>
 </dd>
 </dl>
 <h3>Instance variables</h3>
 <dl>
-<dt id="hoshmap.idict_.Idict.asdict"><code class="name">var <span class="ident">asdict</span></code></dt>
+<dt id="hoshmap.idict.Idict.asdict"><code class="name">var <span class="ident">asdict</span></code></dt>
 <dd>
 <div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
 &gt;&gt;&gt; idict(x=3, y=5).asdict
@@ -850,7 +864,7 @@ def asdict(self):
     return self.frozen.asdict</code></pre>
 </details>
 </dd>
-<dt id="hoshmap.idict_.Idict.fields"><code class="name">var <span class="ident">fields</span></code></dt>
+<dt id="hoshmap.idict.Idict.fields"><code class="name">var <span class="ident">fields</span></code></dt>
 <dd>
 <div class="desc"><p>List of keys which don't start with '_'</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
@@ -873,7 +887,7 @@ def fields(self):
     return self.frozen.fields</code></pre>
 </details>
 </dd>
-<dt id="hoshmap.idict_.Idict.hosh"><code class="name">var <span class="ident">hosh</span></code></dt>
+<dt id="hoshmap.idict.Idict.hosh"><code class="name">var <span class="ident">hosh</span></code></dt>
 <dd>
 <div class="desc"></div>
 <details class="source">
@@ -885,7 +899,7 @@ def hosh(self):
     return self.frozen.hosh</code></pre>
 </details>
 </dd>
-<dt id="hoshmap.idict_.Idict.id"><code class="name">var <span class="ident">id</span></code></dt>
+<dt id="hoshmap.idict.Idict.id"><code class="name">var <span class="ident">id</span></code></dt>
 <dd>
 <div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
 &gt;&gt;&gt; idict(x=3, y=5, _z=5).id
@@ -905,7 +919,7 @@ def id(self):
     return self.hosh.id</code></pre>
 </details>
 </dd>
-<dt id="hoshmap.idict_.Idict.ids"><code class="name">var <span class="ident">ids</span></code></dt>
+<dt id="hoshmap.idict.Idict.ids"><code class="name">var <span class="ident">ids</span></code></dt>
 <dd>
 <div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
 &gt;&gt;&gt; idict(x=3, y=5, _z=5).ids
@@ -925,7 +939,7 @@ def ids(self):
     return self.frozen.ids</code></pre>
 </details>
 </dd>
-<dt id="hoshmap.idict_.Idict.metafields"><code class="name">var <span class="ident">metafields</span></code></dt>
+<dt id="hoshmap.idict.Idict.metafields"><code class="name">var <span class="ident">metafields</span></code></dt>
 <dd>
 <div class="desc"><p>List of keys which don't start with '_'</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
@@ -951,7 +965,7 @@ def metafields(self):
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="hoshmap.idict_.Idict.astext"><code class="name flex">
+<dt id="hoshmap.idict.Idict.astext"><code class="name flex">
 <span>def <span class="ident">astext</span></span>(<span>self, colored=True)</span>
 </code></dt>
 <dd>
@@ -992,7 +1006,7 @@ True
     return self.frozen.astext(colored)</code></pre>
 </details>
 </dd>
-<dt id="hoshmap.idict_.Idict.entries"><code class="name flex">
+<dt id="hoshmap.idict.Idict.entries"><code class="name flex">
 <span>def <span class="ident">entries</span></span>(<span>self, evaluate=True)</span>
 </code></dt>
 <dd>
@@ -1024,7 +1038,7 @@ y 2
     return self.frozen.entries(evaluate)</code></pre>
 </details>
 </dd>
-<dt id="hoshmap.idict_.Idict.evaluate"><code class="name flex">
+<dt id="hoshmap.idict.Idict.evaluate"><code class="name flex">
 <span>def <span class="ident">evaluate</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -1032,19 +1046,18 @@ y 2
 &gt;&gt;&gt; d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
 &gt;&gt;&gt; d.show(colored=False)
 {
-    &quot;x&quot;: &quot;→()&quot;,
-    &quot;_id&quot;: &quot;Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM&quot;,
+    &quot;x&quot;: &quot;←()&quot;,
+    &quot;_id&quot;: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
     &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv&quot;
+        &quot;x&quot;: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
     }
 }
-&gt;&gt;&gt; d.evaluate()
-&gt;&gt;&gt; d.show(colored=False)
+&gt;&gt;&gt; d.evaluate().show(colored=False)
 {
     &quot;x&quot;: &quot;2&quot;,
-    &quot;_id&quot;: &quot;Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM&quot;,
+    &quot;_id&quot;: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
     &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv&quot;
+        &quot;x&quot;: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
     }
 }
 </code></pre></div>
@@ -1058,26 +1071,26 @@ y 2
     &gt;&gt;&gt; d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: &#34;→()&#34;,
-        &#34;_id&#34;: &#34;Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM&#34;,
+        &#34;x&#34;: &#34;←()&#34;,
+        &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
         &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv&#34;
+            &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
         }
     }
-    &gt;&gt;&gt; d.evaluate()
-    &gt;&gt;&gt; d.show(colored=False)
+    &gt;&gt;&gt; d.evaluate().show(colored=False)
     {
         &#34;x&#34;: &#34;2&#34;,
-        &#34;_id&#34;: &#34;Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM&#34;,
+        &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
         &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv&#34;
+            &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
         }
     }
     &#34;&#34;&#34;
-    self.frozen.evaluate()</code></pre>
+    self.frozen.evaluate()
+    return self</code></pre>
 </details>
 </dd>
-<dt id="hoshmap.idict_.Idict.items"><code class="name flex">
+<dt id="hoshmap.idict.Idict.items"><code class="name flex">
 <span>def <span class="ident">items</span></span>(<span>self, evaluate=True)</span>
 </code></dt>
 <dd>
@@ -1113,7 +1126,7 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
     return self.frozen.items(evaluate)</code></pre>
 </details>
 </dd>
-<dt id="hoshmap.idict_.Idict.show"><code class="name flex">
+<dt id="hoshmap.idict.Idict.show"><code class="name flex">
 <span>def <span class="ident">show</span></span>(<span>self, colored=True)</span>
 </code></dt>
 <dd>
@@ -1176,20 +1189,20 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="hoshmap.idict_.Idict" href="#hoshmap.idict_.Idict">Idict</a></code></h4>
+<h4><code><a title="hoshmap.idict.Idict" href="#hoshmap.idict.Idict">Idict</a></code></h4>
 <ul class="two-column">
-<li><code><a title="hoshmap.idict_.Idict.asdict" href="#hoshmap.idict_.Idict.asdict">asdict</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.astext" href="#hoshmap.idict_.Idict.astext">astext</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.entries" href="#hoshmap.idict_.Idict.entries">entries</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.evaluate" href="#hoshmap.idict_.Idict.evaluate">evaluate</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.fields" href="#hoshmap.idict_.Idict.fields">fields</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.fromdict" href="#hoshmap.idict_.Idict.fromdict">fromdict</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.hosh" href="#hoshmap.idict_.Idict.hosh">hosh</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.id" href="#hoshmap.idict_.Idict.id">id</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.ids" href="#hoshmap.idict_.Idict.ids">ids</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.items" href="#hoshmap.idict_.Idict.items">items</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.metafields" href="#hoshmap.idict_.Idict.metafields">metafields</a></code></li>
-<li><code><a title="hoshmap.idict_.Idict.show" href="#hoshmap.idict_.Idict.show">show</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.asdict" href="#hoshmap.idict.Idict.asdict">asdict</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.astext" href="#hoshmap.idict.Idict.astext">astext</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.entries" href="#hoshmap.idict.Idict.entries">entries</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.evaluate" href="#hoshmap.idict.Idict.evaluate">evaluate</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.fields" href="#hoshmap.idict.Idict.fields">fields</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.fromdict" href="#hoshmap.idict.Idict.fromdict">fromdict</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.hosh" href="#hoshmap.idict.Idict.hosh">hosh</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.id" href="#hoshmap.idict.Idict.id">id</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.ids" href="#hoshmap.idict.Idict.ids">ids</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.items" href="#hoshmap.idict.Idict.items">items</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.metafields" href="#hoshmap.idict.Idict.metafields">metafields</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.show" href="#hoshmap.idict.Idict.show">show</a></code></li>
 </ul>
 </li>
 </ul>

@@ -127,6 +127,7 @@ class Idict(Dict[str, VT]):
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
         from hoshmap.frozenidict import FrozenIdict
+
         self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
     def __getitem__(self, item):
@@ -250,6 +251,7 @@ class Idict(Dict[str, VT]):
         {"x": 3, "y": 5, "z": 7, "_id": "uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i", "_ids": {"x": "ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh", "y": "5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0", "z": "eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf"}}
         """
         from hoshmap.frozenidict import FrozenIdict
+
         return FrozenIdict.fromdict(dictionary, ids).unfrozen
 
     @property
