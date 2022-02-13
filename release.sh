@@ -29,7 +29,7 @@ echo
 echo "----------------- docs/black... -----------------------"
 read -p "press enter"
 rm docs -rf
-poetry run black -l120 src/ tests/
+poetry run black -l128 src/ tests/
 poetry run pdoc --html --force hoshmap -o docs
 mv docs/hoshmap/* docs/
 rm docs/hoshmap -rf

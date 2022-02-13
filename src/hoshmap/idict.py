@@ -6,6 +6,7 @@ from hoshmap.let import Let
 
 VT = TypeVar("VT")
 
+# TODO: store idict id->header
 
 class Idict(Dict[str, VT]):
     """
@@ -85,7 +86,7 @@ class Idict(Dict[str, VT]):
     ...     return x * y
     >>> d = idict(x=5, y=7) >> [[cache1]] >> (f, "x y→z") >> [cache2]
     >>> cache1, cache2
-    ({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
+    ({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}})
     >>> d.show(colored=False)
     {
         "x": 5,
@@ -99,12 +100,12 @@ class Idict(Dict[str, VT]):
         }
     }
     >>> cache1, cache2
-    ({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
+    ({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}})
     >>> d.z
     Evaluated!
     35
     >>> cache1, cache2, cache3
-    ({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}, {})
+    ({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}, 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}, {})
     >>> e = idict(x=5, y=7) >> [cache1] >> (f, "x y→z") >> [cache3, cache2]
     >>> e.show(colored=False)
     {
@@ -121,7 +122,7 @@ class Idict(Dict[str, VT]):
     >>> e.z
     35
     >>> cache3
-    {'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}
+    {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}, 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}
     """
 
     # noinspection PyMissingConstructor

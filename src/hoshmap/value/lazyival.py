@@ -22,12 +22,13 @@
 #
 import operator
 from functools import reduce
-from typing import Union, Iterable
+from itertools import chain
+from typing import Iterable, Union
+
+from hosh import Hosh
 
 from hoshmap.identification import f2hosh
 from hoshmap.value.ival import iVal
-from hosh import Hosh
-from itertools import chain
 
 
 class LazyiVal(iVal):
@@ -66,9 +67,7 @@ class LazyiVal(iVal):
     True
     """
 
-    def __init__(
-        self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None
-    ):
+    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None):
         # if i >= len(result):  # pragma: no cover
         #     raise Exception(f"Index {i} inconsistent with current expected result size {len(result)}.")
         self.f = f
@@ -82,8 +81,8 @@ class LazyiVal(iVal):
         self.result[self.id] = None
 
     def withcaches(self, caches):
-        if self.caches is not None:  # pragma: no cover
-            raise Exception("Caches already set.")
+        if self.caches is not None:
+            self.caches.append(caches)
         return LazyiVal(self.f, self.i, self.n, self.deps, self.result, self.fhosh, caches)
 
     @property
@@ -99,7 +98,7 @@ class LazyiVal(iVal):
                             outdated_cache[self.hosh.id] = val
                         self.result[self.id] = val
                         return val
-                    outdated_caches.append(cache)
+                    outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
 
             # Calculate.
             argnames = []
@@ -123,9 +122,13 @@ class LazyiVal(iVal):
 
             # Store.
             if self.caches is not None:
+                from hoshmap import Idict, FrozenIdict
                 for id, res in self.result.items():
                     for cache in self.caches:
-                        cache[id] = res
+                        if isinstance(res, (Idict, FrozenIdict)):
+                            res >> [[cache]]
+                        else:
+                            cache[id] = res  # TODO: pack (pickle+lz4)
 
         return self.result[self.id]
 

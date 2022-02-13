@@ -157,17 +157,20 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         # if not isinstance(other, list) and hasattr(other, "__setitem__") and hasattr(other, "__getitem__"):
         #     other = [other]
         if isinstance(other, list):
-            caches = other
-            cache_stricts = False
-            if isinstance(caches[0], list):
-                caches = caches[0]
-                cache_stricts = True
+            caches = []
+            strict = []
+            for cache in other:
+                if isinstance(cache, list):
+                    cache = cache[0]
+                    strict.append(cache)
+                caches.append(cache)
+                cache[self.id] = {"_ids": self.ids}
             for k, ival in self.entries(evaluate=False):
-                if not ival.evaluated:
+                if ival.evaluated:
+                    for cache in strict:
+                        cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
+                else:
                     data[k] = ival.withcaches(caches)
-                elif cache_stricts:
-                    for cache in caches:
-                        cache[ival.id] = ival.value
             return FrozenIdict(data)
 
         if isinstance(other, Let):
