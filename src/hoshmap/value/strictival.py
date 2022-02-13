@@ -23,8 +23,9 @@
 import pickle
 from typing import Union
 
-from hoshmap.value.ival import iVal
 from hosh import Hosh
+
+from hoshmap.value.ival import iVal
 
 
 class StrictiVal(iVal):
@@ -38,13 +39,17 @@ class StrictiVal(iVal):
     def __init__(self, value, id: Union[str, Hosh] = None):
         self.value = value
         if id is None:
-            try:
-                self.hosh = Hosh(pickle.dumps(value, protocol=5))
-            except TypeError as e:
-                raise Exception(f"Cannot pickle: {e}")
+            if hasattr(value, "hosh"):
+                self.hosh = value.hosh
+            else:
+                try:
+                    self.hosh = Hosh(pickle.dumps(value, protocol=5))
+                except TypeError as e:
+                    raise Exception(f"Cannot pickle: {e}")
         else:
             self.hosh = self.handle_id(id)
         self.result = {self.hosh.id: value}
 
     def __repr__(self):
         return repr(self.value)
+

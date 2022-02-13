@@ -160,11 +160,11 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 if not ival.evaluated:
                     nolazies = False
                     data[k] = ival.withcaches(caches)
-            # Eager saving when there are no lazies.
-            if nolazies:
-                for cache in caches:
-                    for k, id in self.ids.items():
-                        cache[id] = self[k]
+            # # Eager saving when there are no lazies.
+            # if nolazies:
+            #     for cache in caches:
+            #         for k, id in self.ids.items():
+            #             cache[id] = self[k]
             return FrozenIdict(data)
 
         if isinstance(other, Let):
@@ -181,7 +181,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     # TODO: partial application [put multiple references for same iPartial if multioutput]
                     #   raise exc if missing right most argument
                     raise Exception(f"Missing field '{fin_source}': {other.input}")
-                deps[fin_target] = val
+                deps[fin_target] = val if isinstance(val, iVal) else StrictiVal(val)
             shared_result = {}
             for i, fout in enumerate(other.output):
                 data[fout] = LazyiVal(other.f, i, n, deps, shared_result, fid=other.id)

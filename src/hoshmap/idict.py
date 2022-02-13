@@ -83,7 +83,7 @@ class Idict(Dict[str, VT]):
     >>> def f(x, y):
     ...     print("Evaluated!")
     ...     return x * y
-    >>> d = idict(x=5, y=7) >> cache1 >> let(f, "x,y→z") >> [cache2]
+    >>> d = idict(x=5, y=7) >> [cache1] >> (f, "x y→z") >> [cache2]
     >>> cache1, cache2
     ({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
     >>> d.show(colored=False)
@@ -105,7 +105,7 @@ class Idict(Dict[str, VT]):
     35
     >>> cache1, cache2, cache3
     ({'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'6ovmlu2t2T2NFa5fF.FhmYeGryqzdT3jzdQZuGyq': 35}, {})
-    >>> e = idict(x=5, y=7) >> cache1 >> let(f, "x,y→z") >> [cache3, cache2]
+    >>> e = idict(x=5, y=7) >> [cache1] >> (f, "x y→z") >> [cache3, cache2]
     >>> e.show(colored=False)
     {
         "x": 5,
@@ -154,8 +154,7 @@ class Idict(Dict[str, VT]):
                 "x": "oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv"
             }
         }
-        >>> d.evaluate()
-        >>> d.show(colored=False)
+        >>> d.evaluate().show(colored=False)
         {
             "x": "2",
             "_id": "Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM",
@@ -165,6 +164,7 @@ class Idict(Dict[str, VT]):
         }
         """
         self.frozen.evaluate()
+        return self
 
     @property
     def hosh(self):

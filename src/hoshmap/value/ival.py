@@ -61,3 +61,6 @@ class iVal:
 
     def __mul__(self, other):
         return self.hosh * (other if isinstance(other, Hosh) else other.hosh)
+
+    def __rmul__(self, other):
+        return (other if isinstance(other, Hosh) else other.hosh) * self.hosh

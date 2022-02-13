@@ -96,6 +96,7 @@ class LazyiVal(iVal):
                         val = cache[self.hosh.id]
                         for outdated_cache in outdated_caches:
                             outdated_cache[self.hosh.id] = val
+                        self.result[self.id] = val
                         return val
                     outdated_caches.append(cache)
 

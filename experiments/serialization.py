@@ -22,6 +22,7 @@
 import dill as p
 from hoshmap import idict
 d = idict(x=5) >> (lambda x: x**2, "→y")
+d >>= {"d": d}
 d.show()
 du = p.dumps(d)
 print(len(du))

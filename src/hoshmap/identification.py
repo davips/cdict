@@ -21,10 +21,12 @@
 #  time spent here.
 
 
-import dis
 import pickle
 from inspect import signature
+from io import StringIO
 
+from decompyle3.main import decompile
+from decompyle3.semantics.parser_error import ParserError
 from hosh import Hosh
 
 
@@ -37,10 +39,23 @@ def f2hosh(f: callable):
     #     return None
 
     # Remove line numbers.
-    groups = [l for l in dis.Bytecode(f).dis().split("\n\n") if l]
-    clean_lines = [fields_and_params]
-    for group in groups:
-        lines = [segment for segment in group.split(" ") if segment][1:]
-        clean_lines.append(lines)
 
-    return Hosh(pickle.dumps(clean_lines, protocol=5))
+    # REMINDER: memory address makes this nondeterministic
+    # groups = [l for l in dis.Bytecode(f).dis().split("\n\n") if l]
+    # clean_lines = [fields_and_params]
+    # for group in groups:
+    #     lines = [segment for segment in group.split(" ") if segment][1:]
+    #     clean_lines.append(lines)
+
+    clean_lines = f2code(f)
+    return Hosh(pickle.dumps([fields_and_params, clean_lines], protocol=5))
+
+
+def f2code(f: callable):
+    out = StringIO()
+    try:
+        decompile(bytecode_version=(3, 8, 10), co=f.__code__, out=out)
+    except ParserError:
+        raise Exception("Could not extract function code.")
+    code = [line for line in out.getvalue().split("\n") if not line.startswith("#")]
+    return code
