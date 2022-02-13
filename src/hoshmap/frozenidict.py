@@ -155,16 +155,16 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         #     other = [other]
         if isinstance(other, list):
             caches = other
-            nolazies = True
+            cache_stricts = False
+            if isinstance(caches[0], list):
+                caches = caches[0]
+                cache_stricts = True
             for k, ival in self.entries(evaluate=False):
                 if not ival.evaluated:
-                    nolazies = False
                     data[k] = ival.withcaches(caches)
-            # # Eager saving when there are no lazies.
-            # if nolazies:
-            #     for cache in caches:
-            #         for k, id in self.ids.items():
-            #             cache[id] = self[k]
+                elif cache_stricts:
+                    for cache in caches:
+                        cache[ival.id] = ival.value
             return FrozenIdict(data)
 
         if isinstance(other, Let):
