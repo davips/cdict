@@ -28,7 +28,7 @@ from hosh import Hosh
 
 class Let:
     def __init__(self, f: callable, in_out: str, id: Union[str, Hosh] = None, /, _metadata=None, **kwargs):
-        # REMINDER: 'id' is only positional arg, so if 'f' takes an 'id' argument, it's ok to provide both.
+        # REMINDER: 'id' is only positional arg, so if 'f()' takes an 'id' argument, it's ok to provide both.
         in_out = in_out.replace("->", "→")
         if "→" not in in_out:  # pragma: no cover
             raise Exception(f"Missing '→' in in_out schema ({in_out}).")
@@ -40,7 +40,7 @@ class Let:
             self.input = {par.name: par.name for par in signature(f).parameters.values()}
         else:
             self._parse_instr(instr, kwargs)
-        self.output = outstr.split(",")
+        self.output = outstr.split(" ")
         self.id = id
         self.metadata = _metadata
 
@@ -48,7 +48,7 @@ class Let:
         self.input = {}
         self.input_space = {}
         self.input_values = {}
-        for i in instr.split(","):
+        for i in instr.split(" "):
             if ":" in i:
                 ii = i.split(":")
                 if len(ii) != 2:  # pragma: no cover

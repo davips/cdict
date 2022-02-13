@@ -1,3 +1,4 @@
-from hoshmap.idict_ import Idict as idict
+from hoshmap.idict import Idict
 from hoshmap.let import Let as let
-Ø = idict()
+idict = Idict
+_ = Ø = idict()

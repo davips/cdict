@@ -1,4 +1,1 @@
-Update outdated_caches and add Eager saving
-Accept dict directly as cache, without enclosing list
-Finish basic caching
-Rename to hoshmap
+Add tuple as alias to Let. and _ as alias to Ø

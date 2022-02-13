@@ -26,14 +26,15 @@ echo; echo
 
 
 echo
-echo "----------------- docs... -----------------------"
+echo "----------------- docs/black... -----------------------"
 read -p "press enter"
 rm docs -rf
+poetry run black -l120 src/ tests/
 poetry run pdoc --html --force hoshmap -o docs
 mv docs/hoshmap/* docs/
 rm docs/hoshmap -rf
 git add docs
-echo "----------------- docs done -----------------------"
+echo "----------------- docs/black done -----------------------"
 echo; echo
 
 echo "---------------- readme ----------------"
@@ -73,10 +74,9 @@ echo; echo
 
 echo "------------------- push ----------------------"
 read -p "press enter"
-git push
+git push origin main "v$(poetry version | cut -d' ' -f2)"
 echo "------------------- pushed ----------------------"
 echo; echo
 
 echo "------------------- publish ----------------------"
-read -p "press enter"
 poetry publish --build

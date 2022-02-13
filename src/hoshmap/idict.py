@@ -9,8 +9,8 @@ VT = TypeVar("VT")
 
 class Idict(Dict[str, VT]):
     """
-    >>> from hoshmap import let, idict
-    >>> d = idict(x=2)
+    >>> from hoshmap import _
+    >>> d = _ >> {"x":2}
     >>> d.show(colored=False)
     {
         "x": 2,
@@ -27,7 +27,7 @@ class Idict(Dict[str, VT]):
     >>> "x" in d
     True
     >>> f = lambda x: x**2
-    >>> d >>= let(f, "->y")
+    >>> d >>= f, "->y"
     >>> d.show(colored=False)
     {
         "x": 2,
@@ -40,14 +40,15 @@ class Idict(Dict[str, VT]):
     }
     >>> d.y, d["y"]
     (4, 4)
-    >>> (d >> let(lambda w: w**2, "y:w->y")).y
+    >>> (d >> (lambda w: w**2, "y:w->y")).y
     16
-    >>> (d >> let(lambda w: w**2, "y:w→y")).y   # <AltGr + i> = →
+    >>> (d >> (lambda w: w**2, "y:w→y")).y   # <AltGr + i> = →
     16
     >>> d == {"x": 2, "y": 4}
     True
-    >>> idict(x=3) == {"x": 3}
+    >>> _ >> {"x": 3} == {"x": 3}
     True
+    >>> from hoshmap import idict
     >>> idict(x=3) == {"x": 3, "_id": idict(x=3).id}
     True
     >>> idict(x=3) == idict(x=3)
@@ -137,11 +138,7 @@ class Idict(Dict[str, VT]):
         return self.__getattribute__(item)
 
     def __rshift__(self, other):
-        if isinstance(other, (FrozenIdict, Idict)):  # TODO: merge
-            for k, v in other.items():
-                self[k] = v
-            raise NotImplementedError
-        if isinstance(other, (Let, list, dict)):
+        if isinstance(other, (Let, list, dict, tuple)):
             return (self.frozen >> other).unfrozen
         return NotImplemented
 

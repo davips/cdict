@@ -21,16 +21,14 @@
 #  time spent here.
 from json import JSONEncoder
 
-import pandas
-
 from hoshmap.value.strictival import StrictiVal
 
 
 class CustomJSONEncoder(JSONEncoder):
     """
-    >>> from hoshmap.idict_ import Idict
-    >>> a = Idict(x=3)
-    >>> Idict(d=a, y=5).show(colored=False)
+    >>> from hoshmap import idict
+    >>> a = idict(x=3)
+    >>> idict(d=a, y=5).show(colored=False)
     {
         "d": {
             "x": 3,
@@ -52,7 +50,7 @@ class CustomJSONEncoder(JSONEncoder):
        0  1
     0  1  2
     1  3  4
-    >>> b = Idict(d=a, y=5, df=df, ell=...)
+    >>> b = idict(d=a, y=5, df=df, ell=...)
     >>> b.show(colored=False)
     {
         "d": {
@@ -74,7 +72,7 @@ class CustomJSONEncoder(JSONEncoder):
         }
     }
     >>> from numpy import array
-    >>> Idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
+    >>> idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
     {
         "b": {
             "d": {
