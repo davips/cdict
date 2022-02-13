@@ -31,7 +31,7 @@ class Idict(Dict[str, VT]):
     >>> d.show(colored=False)
     {
         "x": 2,
-        "y": "→(x)",
+        "y": "←(x)",
         "_id": "NOkh-OBQfEW1UKulSJzeNdyPytHPt6.lvfswBJaI",
         "_ids": {
             "x": "k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29",
@@ -42,7 +42,7 @@ class Idict(Dict[str, VT]):
     (4, 4)
     >>> (d >> (lambda w: w**2, "y:w->y")).y
     16
-    >>> (d >> (lambda w: w**2, "y:w→y")).y   # <AltGr + i> = →
+    >>> (d >> (lambda w: w**2, "y:w→y")).y   # <AltGr + y> = →
     16
     >>> d == {"x": 2, "y": 4}
     True
@@ -90,7 +90,7 @@ class Idict(Dict[str, VT]):
     {
         "x": 5,
         "y": 7,
-        "z": "→(x y)",
+        "z": "←(x y)",
         "_id": "zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos",
         "_ids": {
             "x": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
@@ -110,7 +110,7 @@ class Idict(Dict[str, VT]):
     {
         "x": 5,
         "y": 7,
-        "z": "→(x y)",
+        "z": "←(x y)",
         "_id": "zZ3C7vtvgO2qUffZNB5Nrt7aORrIiY.ZgKWyEMos",
         "_ids": {
             "x": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
@@ -148,7 +148,7 @@ class Idict(Dict[str, VT]):
         >>> d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
         >>> d.show(colored=False)
         {
-            "x": "→()",
+            "x": "←()",
             "_id": "Z9BHCaIxO5MXCxNFUjvaJI77y6C42LNh5HR4NrYM",
             "_ids": {
                 "x": "oWSx.fifu6Srwe-008ixC8XVfZGqGzMpwS3cBOhv"
@@ -299,6 +299,10 @@ class Idict(Dict[str, VT]):
         """
         return self.frozen.show(colored)
 
+    # @property
+    # def data(self):
+    #     return self.frozen.data
+
     def __iter__(self):
         return iter(self.frozen)
 
@@ -316,3 +320,6 @@ class Idict(Dict[str, VT]):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def __reduce__(self):
+        return self.__class__, (self.frozen.data.copy(),)

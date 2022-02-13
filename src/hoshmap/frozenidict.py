@@ -204,3 +204,6 @@ class FrozenIdict(UserDict, Dict[str, VT]):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def __reduce__(self):
+        return self.__class__, (self.data.copy(),)

@@ -126,6 +126,17 @@ python-versions = ">=3.7"
 toml = ["tomli"]
 
 [[package]]
+name = "dill"
+version = "0.3.4"
+description = "serialize all of python"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0.*"
+
+[package.extras]
+graph = ["objgraph (>=1.7.2)"]
+
+[[package]]
 name = "hosh"
 version = "1.211228.1"
 description = "Predictable Operable HaSH-based identifiers"
@@ -468,7 +479,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "5f8095619d31fc291b336730e66ec065f68508ce7a770d87a61ee6c11f7861fa"
+content-hash = "93ca351dad5024fa98c5619cd0c4f27ca06c065dcc01b6d8dd9a44c502e400fd"
 
 [metadata.files]
 ansi2html = [
@@ -574,6 +585,10 @@ coverage = [
     {file = "coverage-6.3.1-cp39-cp39-win_amd64.whl", hash = "sha256:9976fb0a5709988778ac9bc44f3d50fccd989987876dfd7716dee28beed0a9fa"},
     {file = "coverage-6.3.1-pp36.pp37.pp38-none-any.whl", hash = "sha256:463e52616ea687fd323888e86bf25e864a3cc6335a043fad6bbb037dbf49bbe2"},
     {file = "coverage-6.3.1.tar.gz", hash = "sha256:6c3f6158b02ac403868eea390930ae64e9a9a2a5bbfafefbb920d29258d9f2f8"},
+]
+dill = [
+    {file = "dill-0.3.4-py2.py3-none-any.whl", hash = "sha256:7e40e4a70304fd9ceab3535d36e58791d9c4a776b38ec7f7ec9afc8d3dca4d4f"},
+    {file = "dill-0.3.4.zip", hash = "sha256:9f9734205146b2b353ab3fec9af0070237b6ddae78452af83d2fca84d739e675"},
 ]
 hosh = [
     {file = "hosh-1.211228.1-py3-none-any.whl", hash = "sha256:b145cdbef0cb1e76d645de60c9747275bbc3a331d436d0d64cd63016dfd588a8"},
