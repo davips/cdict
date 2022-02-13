@@ -144,6 +144,10 @@ class Idict(Dict[str, VT]):
             return (self.frozen >> other).unfrozen
         return NotImplemented
 
+    @property
+    def evaluated(self):
+        return self.frozen.evaluated
+
     def evaluate(self):
         """
         >>> from hoshmap.value import LazyiVal
@@ -156,7 +160,16 @@ class Idict(Dict[str, VT]):
                 "x": "Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh"
             }
         }
-        >>> d.evaluate().show(colored=False)
+        >>> d.evaluate()
+        >>> d.show(colored=False)
+        {
+            "x": "2",
+            "_id": "c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz",
+            "_ids": {
+                "x": "Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh"
+            }
+        }
+        >>> d.evaluated.show(colored=False)
         {
             "x": "2",
             "_id": "c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz",
@@ -166,7 +179,6 @@ class Idict(Dict[str, VT]):
         }
         """
         self.frozen.evaluate()
-        return self
 
     @property
     def hosh(self):

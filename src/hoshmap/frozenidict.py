@@ -22,6 +22,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     >>> "x" in FrozenIdict(x=2)
     True
     """
+    _evaluated = None
 
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, **kwargs):
@@ -45,10 +46,17 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         self.data["_id"] = self.id = self.hosh.id
         self.data["_ids"] = self.ids
 
+    @property
+    def evaluated(self):
+        if self._evaluated is None:
+            self._evaluated = self.evaluate()
+        return self
+
     def evaluate(self):
         for k, ival in self.data.items():
             if k not in ["_id", "_ids"]:
                 ival.evaluate()
+        return self
 
     @cached_property
     def fields(self):
@@ -166,7 +174,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 caches.append(cache)
                 cache[self.id] = {"_ids": self.ids}
             for k, ival in self.entries(evaluate=False):
-                if ival.evaluated:
+                if ival.isevaluated:
                     for cache in strict:
                         cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
                 else:

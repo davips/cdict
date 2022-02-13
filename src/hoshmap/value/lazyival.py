@@ -87,7 +87,7 @@ class LazyiVal(iVal):
 
     @property
     def value(self):
-        if not self.evaluated:
+        if not self.isevaluated:
             # Fetch.
             if self.caches is not None:
                 outdated_caches = []
@@ -133,6 +133,6 @@ class LazyiVal(iVal):
         return self.result[self.id]
 
     def __repr__(self):
-        if not self.evaluated:
-            return f"←({' '.join(k + ('' if dep.evaluated else repr(dep)) for k, dep in self.deps.items())})"
+        if not self.isevaluated:
+            return f"←({' '.join(k + ('' if dep.isevaluated else repr(dep)) for k, dep in self.deps.items())})"
         return repr(self.value)

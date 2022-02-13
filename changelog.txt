@@ -1,6 +1,1 @@
-Add [[cache]] syntax to indicate caching of strict values
-Implemented default values for f
-Fix nondeterminism of 'dis', using 'decompyle3'
-Fix printed val when coming from cache
-Invert arrows → and ← to mean 'x' transformed in 'y', instead of  'y' depends on 'x'
-Add tuple as alias to Let. and _ as alias to Ø
+Add nested eval support

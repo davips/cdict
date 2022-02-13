@@ -33,11 +33,14 @@ class iVal:
     caches: Any
 
     @property
-    def evaluated(self):
+    def isevaluated(self):
         return self.result[self.id] is not None
 
     def evaluate(self):
-        _ = self.value
+        val = self.value
+        from hoshmap import Idict, FrozenIdict
+        if isinstance(val, (Idict, FrozenIdict)):
+            val.evaluate()
 
     @cached_property
     def id(self):
