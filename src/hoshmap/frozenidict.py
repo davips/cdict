@@ -4,9 +4,10 @@ from functools import cached_property
 from typing import Dict, Union
 from typing import TypeVar
 
-from hoshmap.customjson import CustomJSONEncoder
+from hoshmap.serialization.customjson import CustomJSONEncoder
 from hoshmap.let import Let
 from hoshmap.value import LazyiVal
+from hoshmap.value.dfival import DFiVal, explode_df
 from hoshmap.value.strictival import iVal, StrictiVal
 from hosh import ø
 
@@ -40,8 +41,14 @@ class FrozenIdict(UserDict, Dict[str, VT]):
             if isinstance(v, iVal):
                 self.data[k] = v
             else:
-                self.data[k] = StrictiVal(v.frozen, v.hosh) if isinstance(v, Idict) else StrictiVal(v)
-            self.hosh += self.data[k].hosh * k.encode()
+                if isinstance(v, Idict):
+                    self.data[k] = StrictiVal(v.frozen, v.hosh)
+                elif str(type(v)) == "<class 'pandas.core.frame.DataFrame'>":
+                    self.data[k], self.data[k + "_"] = explode_df(v)
+                else:
+                    self.data[k] = StrictiVal(v)
+            if isinstance(k,str) and not k.startswith("_"):
+                self.hosh += self.data[k].hosh * k.encode()
             self.ids[k] = self.data[k].hosh.id
         # noinspection PyTypeChecker
         self.data["_id"] = self.id = self.hosh.id
@@ -152,7 +159,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         del data["_id"]
         del data["_ids"]
         if isinstance(other, tuple):
-            other = Let(*other)
+            other = Let(other[0], other[1], *other[2:])
         from hoshmap.idict import Idict
 
         if isinstance(other, Idict):  # merge
@@ -196,7 +203,14 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     # TODO: partial application [put multiple references for same iPartial if multioutput]
                     #   raise exc if missing right most argument
                     raise Exception(f"Missing field '{fin_source}': {other.input}")
-                deps[fin_target] = val if isinstance(val, iVal) else StrictiVal(val)
+                if isinstance(val, iVal):
+                    # REMINDER: only here 'val' comes from a field (not from Let)
+                    deps[fin_target] = val
+                elif str(type(val)) == "<class 'pandas.core.frame.DataFrame'>":
+                    data[fin_target], data[fin_target + "_"] = explode_df(v)
+                    deps[fin_target] = data[fin_target]
+                else:
+                    deps[fin_target] = StrictiVal(val)
             shared_result = {}
             for i, fout in enumerate(other.output):
                 data[fout] = LazyiVal(other.f, i, n, deps, shared_result, fid=other.id)

@@ -48,7 +48,7 @@ class StrictiVal(iVal):
                     raise Exception(f"Cannot pickle: {e}")
         else:
             self.hosh = self.handle_id(id)
-        self.result = {self.hosh.id: value}
+        self.results = {self.hosh.id: value}
 
     def __repr__(self):
         return repr(self.value)

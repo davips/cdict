@@ -21,6 +21,7 @@
 #  time spent here.
 from json import JSONEncoder
 
+from hoshmap.value.ival import iVal
 from hoshmap.value.strictival import StrictiVal
 
 
@@ -62,12 +63,23 @@ class CustomJSONEncoder(JSONEncoder):
         },
         "y": 5,
         "df": "«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»",
+        "df_": {
+            "index": "«{0: 0, 1: 1}»",
+            "0": "«{0: 1, 1: 3}»",
+            "1": "«{0: 2, 1: 4}»",
+            "_id": "-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa",
+            "_ids": {
+                "index": "DQa5yWRkGo-9FLqmaST8pbElYdUEgqF8xPvip6-3",
+                "0": "8ianf2LAQlxK7ZFvdOX.avsuK4L9FjUiMC7sM2Lm",
+                "1": "IIffH-qkWUFB.-VFd0z6BBrIpfvNuc8GPxlQYgg3"
+            }
+        },
         "ell": "...",
-        "_id": "GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5",
+        "_id": "ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.",
         "_ids": {
             "d": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
             "y": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
-            "df": "98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg",
+            "df": "-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa",
             "ell": "P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6"
         }
     }
@@ -84,12 +96,23 @@ class CustomJSONEncoder(JSONEncoder):
             },
             "y": 5,
             "df": "«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»",
+            "df_": {
+                "index": "«{0: 0, 1: 1}»",
+                "0": "«{0: 1, 1: 3}»",
+                "1": "«{0: 2, 1: 4}»",
+                "_id": "-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa",
+                "_ids": {
+                    "index": "DQa5yWRkGo-9FLqmaST8pbElYdUEgqF8xPvip6-3",
+                    "0": "8ianf2LAQlxK7ZFvdOX.avsuK4L9FjUiMC7sM2Lm",
+                    "1": "IIffH-qkWUFB.-VFd0z6BBrIpfvNuc8GPxlQYgg3"
+                }
+            },
             "ell": "...",
-            "_id": "GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5",
+            "_id": "ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.",
             "_ids": {
                 "d": "fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J",
                 "y": "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
-                "df": "98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg",
+                "df": "-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa",
                 "ell": "P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6"
             }
         },
@@ -97,9 +120,9 @@ class CustomJSONEncoder(JSONEncoder):
         "c": "«[1 2 3]»",
         "d": "«{0: 1, 1: 2, 2: 3}»",
         "dd": "«[[1 2] [3 4]]»",
-        "_id": "SF4bb1aQyQmubmK4dZ6DPr-LWPGJ3ihmCcK.575r",
+        "_id": "pklpcC04mjnBVPnUHYQX2Xp64gBYV1lpCz6hTThl",
         "_ids": {
-            "b": "GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5",
+            "b": "ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.",
             "z": "GuwIQCrendfKXZr5jGfrUwoP-8TWMhmLHYrja2yj",
             "c": "QkfVsy7ITAmoIiOFgbYpsQodBSIYshhiUm3v2r8d",
             "d": "5iU-DAFL3XTLno88g056s2G12RidCKkCgLCLIwB5",
@@ -108,23 +131,24 @@ class CustomJSONEncoder(JSONEncoder):
     }
     """
 
-    width = None
+    width = 200
 
     def default(self, obj):
         if obj is not None:
             if obj is Ellipsis:
                 return "..."
-            if isinstance(obj, StrictiVal):
+            if isinstance(obj, iVal) and obj.isevaluated:
                 return obj.value
             # if isinstance(obj, FunctionType):
             #     return str(obj)
             if not isinstance(obj, (list, set, str, int, float, bytearray, bool)):
                 if obj.__class__.__name__ in ["DataFrame", "Series"]:
                     # «str()» is to avoid nested identation
-                    return truncate("«" + str(obj.to_dict()) + "»", self.width)
+                    return f"«{truncate(str(obj.to_dict()), self.width)}»"
                 if obj.__class__.__name__ == "ndarray":
-                    return truncate("«" + str(obj).replace("\n", "") + "»", self.width)
-                return str(obj)
+                    txt = str(obj).replace('\n', '')
+                    return f"«{truncate(txt, self.width)}»"
+                return truncate(str(obj).replace("\n", ""), self.width)
         return JSONEncoder.default(self, obj)  # pragma: no cover
 
 
@@ -139,5 +163,7 @@ class CustomJSONEncoder(JSONEncoder):
 #         return obj
 
 
-def truncate(txt, width):
-    return txt[:width] + "..." if width and len(txt) > width else txt
+def truncate(txt, width=200):
+    if len(txt) > width:
+        txt = (txt[:width] + " ...»") if txt.endswith("»") else " ..."
+    return txt

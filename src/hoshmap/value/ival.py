@@ -29,12 +29,12 @@ from hosh import Hosh
 class iVal:
     value: Any
     hosh: Hosh
-    result: Any
+    results: Any
     caches: Any
 
     @property
     def isevaluated(self):
-        return self.result[self.id] is not None
+        return self.results[self.id] is not None
 
     def evaluate(self):
         val = self.value

@@ -51,14 +51,15 @@ class Let:
         self.metadata = _metadata
 
     def _parse_instr(self, instr, kwargs):
-        for i in instr.split(" "):
-            if ":" in i:
-                ii = i.split(":")
-                if len(ii) != 2:  # pragma: no cover
-                    raise Exception(f"Wrong number ({len(ii)}) of ':' chars: {ii}")
-                isource, itarget = ii
+        for par in instr.split(" "):
+            if ":" in par:
+                split = par.split(":")
+                if len(split) != 2:  # pragma: no cover
+                    raise Exception(f"Wrong number ({len(split)}) of ':' chars: {split}")
+                isource = split[0]
+                itarget = par if ":*" in par else split[1]
             else:
-                isource = itarget = i
+                isource = itarget = par
             if isource.startswith("~"):  # TODO: write test
                 isource = isource[1:]
                 if isource not in kwargs or isinstance(kwargs[isource], Iterable):
@@ -67,6 +68,5 @@ class Let:
             elif isource in kwargs:  # TODO: write test
                 self.input_values[isource] = kwargs[isource]
             self.input[isource] = itarget
-
 
 # TODO: add : mapping to output as well, so to accept exploding returned dicts

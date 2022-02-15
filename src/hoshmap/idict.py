@@ -6,8 +6,9 @@ from hoshmap.let import Let
 
 VT = TypeVar("VT")
 
-# TODO: store idict id->header
-
+# TODO: store functions (with reversed id)
+# TODO:  DFiVal
+# TODO: make storing of idict id->header flexible for new metafields/metavalues
 
 class Idict(Dict[str, VT]):
     """
@@ -72,7 +73,7 @@ class Idict(Dict[str, VT]):
     >>> d.show(colored=False)
     {
         "x": 2,
-        "y": "4",
+        "y": 4,
         "_id": "FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI",
         "_ids": {
             "x": "k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29",
@@ -164,7 +165,7 @@ class Idict(Dict[str, VT]):
         >>> d.evaluate()
         >>> d.show(colored=False)
         {
-            "x": "2",
+            "x": 2,
             "_id": "c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz",
             "_ids": {
                 "x": "Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh"
@@ -172,7 +173,7 @@ class Idict(Dict[str, VT]):
         }
         >>> d.evaluated.show(colored=False)
         {
-            "x": "2",
+            "x": 2,
             "_id": "c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz",
             "_ids": {
                 "x": "Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh"
@@ -189,8 +190,8 @@ class Idict(Dict[str, VT]):
     def id(self):
         """
         >>> from hoshmap import idict
-        >>> idict(x=3, y=5, _z=5).id
-        'ojflr9QKaLmxzQivMEss9hWVZfHpvihkPAYYd1da'
+        >>> idict(x=3, y=5, _z=5).id == idict(x=3, y=5).id
+        True
         """
         return self.hosh.id
 
