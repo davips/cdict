@@ -97,19 +97,42 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         dic["_ids"] = self.ids.copy()
         return dic
 
+    @cached_property
+    def asdicts(self):
+        dic = {}
+        for k, v in self.entries():
+            dic[k] = v.asdicts if isinstance(v, FrozenIdict) else v
+        dic["_id"] = self.id
+        dic["_ids"] = self.ids.copy()
+        return dic
+
+    @cached_property
+    def asdicts_hoshes(self):
+        hoshes = set()
+        dic = {}
+        for k, ival in self.data.items():
+            if k not in ["_id", "_ids"]:
+                v = ival.value
+                hoshes.add(ival.hosh)
+                if isinstance(v, FrozenIdict):
+                    dic[k], subhoshes = v.asdicts_hoshes
+                    hoshes.update(subhoshes)
+                else:
+                    dic[k] = v
+        hoshes.add(self.hosh)
+        dic["_id"] = self.id
+        dic["_ids"] = self.ids.copy()
+        return dic, hoshes
+
     def astext(self, colored=True, key_quotes=False):
         r"""Textual representation of a frozenidict object"""
-        max = 0
-        for k in self.fields:
-            if len(k) > max:
-                max = len(k)
-        txt = json.dumps(self.data, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
+        dicts, hoshes = self.asdicts_hoshes
+        txt = json.dumps(dicts, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
 
         # Put colors after json, to avoid escaping ansi codes.
         if colored:
-            txt = txt.replace(f'"{self.data["_id"]}"', self.hosh.ansi)
-            for k, v in self.entries(evaluate=False):
-                txt = txt.replace(f'"{v.id}"', v.hosh.idc)
+            for h in hoshes:
+                txt = txt.replace(f'"{h.id}"', h.idc)
         txt = re.sub(r'(": )"(λ.+?)"(?=,\n)', '": \\2', txt)
         if not key_quotes:
             txt = re.sub(r'(?<!: )"([a-zA-Z0-9_ ]+?)"(?=: )', '\\1', txt)
@@ -160,7 +183,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     def __getattr__(self, item):  # pragma: no cover
         if item in self.data:
             return self.data[item].value
-        return AttributeError
+        return self.__getattribute__(item)
 
     def __rshift__(self, other):
         data = self.data.copy()

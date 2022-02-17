@@ -6,6 +6,7 @@ from hoshmap.let import Let
 
 VT = TypeVar("VT")
 
+
 # TODO: store functions (with reversed id)
 # TODO:  DFiVal
 # TODO: make storing of idict id->header flexible for new metafields/metavalues
@@ -278,6 +279,15 @@ class Idict(Dict[str, VT]):
         """
         return self.frozen.asdict
 
+    @property
+    def asdicts(self):
+        """
+        >>> from hoshmap import idict
+        >>> idict(x=3, y=5).asdict
+        {'x': 3, 'y': 5, '_id': 'r5A2Mh6vRRO5rxi5nfXv1myeguGSTmqHuHev38qM', '_ids': {'x': 'KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr', 'y': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2'}}
+        """
+        return self.frozen.asdicts
+
     def astext(self, colored=True, key_quotes=False):
         r"""
         >>> from hoshmap import idict
@@ -315,10 +325,6 @@ class Idict(Dict[str, VT]):
         }
         """
         return self.frozen.show(colored, key_quotes)
-
-    # @property
-    # def data(self):
-    #     return self.frozen.data
 
     def __iter__(self):
         return iter(self.frozen)

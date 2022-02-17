@@ -22,7 +22,6 @@
 from json import JSONEncoder
 
 from hoshmap.value.ival import iVal
-from hoshmap.value.strictival import StrictiVal
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -135,13 +134,23 @@ class CustomJSONEncoder(JSONEncoder):
 
     def default(self, obj):
         if obj is not None:
+            # from hoshmap import FrozenIdict, Idict
+            # if isinstance(obj, Idict):
+            #     return obj.frozen.asdicts
+            # if isinstance(obj, FrozenIdict):
+            #     return obj.asdicts
             if obj is Ellipsis:
                 return "..."
             if isinstance(obj, iVal) and obj.isevaluated:
+                # from hoshmap import FrozenIdict, Idict
+                # if isinstance(obj.value, Idict):
+                #     return obj.value.frozen.asdicts
+                # if isinstance(obj.value, FrozenIdict):
+                #     return obj.value.asdicts
                 return obj.value
             # if isinstance(obj, FunctionType):
             #     return str(obj)
-            if not isinstance(obj, (list, set, str, int, float, bytearray, bool)):
+            if not isinstance(obj, (dict, list, set, str, int, float, bytearray, bool)):
                 if obj.__class__.__name__ in ["DataFrame", "Series"]:
                     # «str()» is to avoid nested identation
                     return f"«{truncate(str(obj.to_dict()), self.width)}»"
