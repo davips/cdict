@@ -43,21 +43,21 @@ class LazyiVal(CacheableiVal):
     >>> deps = {"x": StrictiVal(2)}
     >>> lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
     >>> lvx
-    ←(x)
+    λ(x)
     >>> deps = {"x": lvx, "y": StrictiVal(3)}
     >>> result = {}
     >>> f = lambda x,y: [x+y, y**2]
     >>> lvy = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     >>> lvz = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     >>> lvx, lvy, lvz
-    (←(x), ←(x←(x) y), ←(x←(x) y))
+    (λ(x), λ(x=λ(x) y), λ(x=λ(x) y))
     >>> deps = {"z": lvz}
     >>> f = lambda z: {"z":z**3, "w":z**5}
     >>> result = {}
     >>> lvz2 = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     >>> lvw = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     >>> lvx, lvy, lvz2, lvw
-    (←(x), ←(x←(x) y), ←(z←(x←(x) y)), ←(z←(x←(x) y)))
+    (λ(x), λ(x=λ(x) y), λ(z=λ(x=λ(x) y)), λ(z=λ(x=λ(x) y)))
     >>> lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     >>> lvz2.id

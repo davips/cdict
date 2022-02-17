@@ -15,5 +15,6 @@ class CacheableiVal(iVal):
 
     def __repr__(self):
         if not self.isevaluated:
-            return f"←({' '.join(k + ('' if dep.isevaluated else repr(dep)) for k, dep in self.deps.items())})"
+            lst = (k + ('' if dep.isevaluated else f'={repr(dep)}') for k, dep in self.deps.items())
+            return f"λ({' '.join(lst)})"
         return repr(self.value)

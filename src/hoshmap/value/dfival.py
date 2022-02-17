@@ -69,14 +69,14 @@ def explode_df(df):
     >>> d = idict(df=df)
     >>> d.df_.show(colored=False)
     {
-        "index": "«{'a': 'a', 'b': 'b', 'c': 'c'}»",
-        "x": "«{'a': 1, 'b': 2, 'c': 3}»",
-        "y": "«{'a': 5, 'b': 6, 'c': 7}»",
-        "_id": "CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC",
-        "_ids": {
-            "index": "HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt",
-            "x": "3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j",
-            "y": "bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t"
+        index: "«{'a': 'a', 'b': 'b', 'c': 'c'}»",
+        x: "«{'a': 1, 'b': 2, 'c': 3}»",
+        y: "«{'a': 5, 'b': 6, 'c': 7}»",
+        _id: "CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC",
+        _ids: {
+            index: "HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt",
+            x: "3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j",
+            y: "bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t"
         }
     }
     >>> d.df

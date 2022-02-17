@@ -1,4 +1,5 @@
 import json
+import re
 from collections import UserDict
 from functools import cached_property
 from typing import Dict, Union
@@ -47,7 +48,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     self.data[k], self.data[k + "_"] = explode_df(v)
                 else:
                     self.data[k] = StrictiVal(v)
-            if isinstance(k,str) and not k.startswith("_"):
+            if isinstance(k, str) and not k.startswith("_"):
                 self.hosh += self.data[k].hosh * k.encode()
             self.ids[k] = self.data[k].hosh.id
         # noinspection PyTypeChecker
@@ -96,21 +97,27 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         dic["_ids"] = self.ids.copy()
         return dic
 
-    def astext(self, colored=True):
+    def astext(self, colored=True, key_quotes=False):
         r"""Textual representation of a frozenidict object"""
+        max = 0
+        for k in self.fields:
+            if len(k) > max:
+                max = len(k)
         txt = json.dumps(self.data, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
 
         # Put colors after json, to avoid escaping ansi codes.
         if colored:
-            txt = txt.replace(self.data["_id"], self.hosh.ansi)
+            txt = txt.replace(f'"{self.data["_id"]}"', self.hosh.ansi)
             for k, v in self.entries(evaluate=False):
-                txt = txt.replace(v.id, v.hosh.idc)
-
+                txt = txt.replace(f'"{v.id}"', v.hosh.idc)
+        txt = re.sub(r'(": )"(λ.+?)"(?=,\n)', '": \\2', txt)
+        if not key_quotes:
+            txt = re.sub(r'(?<!: )"([a-zA-Z0-9_ ]+?)"(?=: )', '\\1', txt)
         return txt
 
-    def show(self, colored=True):
+    def show(self, colored=True, key_quotes=False):
         r"""Print textual representation of a frozenidict object"""
-        print(self.astext(colored))
+        print(self.astext(colored, key_quotes))
 
     def items(self, evaluate=True):
         """Iterator over all items"""
@@ -144,7 +151,8 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return self.astext()
 
     def __str__(self):
-        return json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
+        js = json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
+        return re.sub(r'(?<!: )"(\S*?)"', '\\1', js)
 
     def __getitem__(self, item):
         return self.data[item] if item in ["_id", "_ids"] else self.data[item].value
