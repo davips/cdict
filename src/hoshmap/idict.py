@@ -134,6 +134,14 @@ class Idict(Dict[str, VT]):
 
         self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
+    def __setitem__(self, key, value):
+        self.frozen = self.frozen >> {key: value}
+
+    def __delitem__(self, key):
+        frozen = self.frozen.copy()
+        del frozen[key]
+        self.frozen = frozen
+
     def __getitem__(self, item):
         return self.frozen[item]
 
