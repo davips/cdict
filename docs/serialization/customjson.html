@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>hoshmap.customjson API documentation</title>
+<title>hoshmap.serialization.customjson API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,7 +19,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>hoshmap.customjson</code></h1>
+<h1 class="title">Module <code>hoshmap.serialization.customjson</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -49,7 +49,7 @@
 #  time spent here.
 from json import JSONEncoder
 
-from hoshmap.value.strictival import StrictiVal
+from hoshmap.value.ival import iVal
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -58,18 +58,18 @@ class CustomJSONEncoder(JSONEncoder):
     &gt;&gt;&gt; a = idict(x=3)
     &gt;&gt;&gt; idict(d=a, y=5).show(colored=False)
     {
-        &#34;d&#34;: {
-            &#34;x&#34;: 3,
-            &#34;_id&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
+        d: {
+            x: 3,
+            _id: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+            _ids: {
+                x: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
             }
         },
-        &#34;y&#34;: 5,
-        &#34;_id&#34;: &#34;YyAtuyiPhC7pHV-ADAoh1Lp30TM-08swr40vOmk1&#34;,
-        &#34;_ids&#34;: {
-            &#34;d&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-            &#34;y&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;
+        y: 5,
+        _id: &#34;YyAtuyiPhC7pHV-ADAoh1Lp30TM-08swr40vOmk1&#34;,
+        _ids: {
+            d: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+            y: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;
         }
     }
     &gt;&gt;&gt; from pandas.core.frame import DataFrame, Series
@@ -81,78 +81,111 @@ class CustomJSONEncoder(JSONEncoder):
     &gt;&gt;&gt; b = idict(d=a, y=5, df=df, ell=...)
     &gt;&gt;&gt; b.show(colored=False)
     {
-        &#34;d&#34;: {
-            &#34;x&#34;: 3,
-            &#34;_id&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
+        d: {
+            x: 3,
+            _id: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+            _ids: {
+                x: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
             }
         },
-        &#34;y&#34;: 5,
-        &#34;df&#34;: &#34;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&#34;,
-        &#34;ell&#34;: &#34;...&#34;,
-        &#34;_id&#34;: &#34;GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5&#34;,
-        &#34;_ids&#34;: {
-            &#34;d&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-            &#34;y&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
-            &#34;df&#34;: &#34;98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg&#34;,
-            &#34;ell&#34;: &#34;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&#34;
+        y: 5,
+        df: &#34;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&#34;,
+        df_: {
+            index: &#34;«{0: 0, 1: 1}»&#34;,
+            0: &#34;«{0: 1, 1: 3}»&#34;,
+            1: &#34;«{0: 2, 1: 4}»&#34;,
+            _id: &#34;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&#34;,
+            _ids: {
+                index: &#34;DQa5yWRkGo-9FLqmaST8pbElYdUEgqF8xPvip6-3&#34;,
+                0: &#34;8ianf2LAQlxK7ZFvdOX.avsuK4L9FjUiMC7sM2Lm&#34;,
+                1: &#34;IIffH-qkWUFB.-VFd0z6BBrIpfvNuc8GPxlQYgg3&#34;
+            }
+        },
+        ell: &#34;...&#34;,
+        _id: &#34;ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.&#34;,
+        _ids: {
+            d: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+            y: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+            df: &#34;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&#34;,
+            ell: &#34;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&#34;
         }
     }
     &gt;&gt;&gt; from numpy import array
     &gt;&gt;&gt; idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
     {
-        &#34;b&#34;: {
-            &#34;d&#34;: {
-                &#34;x&#34;: 3,
-                &#34;_id&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-                &#34;_ids&#34;: {
-                    &#34;x&#34;: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
+        b: {
+            d: {
+                x: 3,
+                _id: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+                _ids: {
+                    x: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
                 }
             },
-            &#34;y&#34;: 5,
-            &#34;df&#34;: &#34;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&#34;,
-            &#34;ell&#34;: &#34;...&#34;,
-            &#34;_id&#34;: &#34;GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5&#34;,
-            &#34;_ids&#34;: {
-                &#34;d&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-                &#34;y&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
-                &#34;df&#34;: &#34;98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg&#34;,
-                &#34;ell&#34;: &#34;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&#34;
+            y: 5,
+            df: &#34;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&#34;,
+            df_: {
+                index: &#34;«{0: 0, 1: 1}»&#34;,
+                0: &#34;«{0: 1, 1: 3}»&#34;,
+                1: &#34;«{0: 2, 1: 4}»&#34;,
+                _id: &#34;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&#34;,
+                _ids: {
+                    index: &#34;DQa5yWRkGo-9FLqmaST8pbElYdUEgqF8xPvip6-3&#34;,
+                    0: &#34;8ianf2LAQlxK7ZFvdOX.avsuK4L9FjUiMC7sM2Lm&#34;,
+                    1: &#34;IIffH-qkWUFB.-VFd0z6BBrIpfvNuc8GPxlQYgg3&#34;
+                }
+            },
+            ell: &#34;...&#34;,
+            _id: &#34;ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.&#34;,
+            _ids: {
+                d: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+                y: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+                df: &#34;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&#34;,
+                ell: &#34;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&#34;
             }
         },
-        &#34;z&#34;: 9,
-        &#34;c&#34;: &#34;«[1 2 3]»&#34;,
-        &#34;d&#34;: &#34;«{0: 1, 1: 2, 2: 3}»&#34;,
-        &#34;dd&#34;: &#34;«[[1 2] [3 4]]»&#34;,
-        &#34;_id&#34;: &#34;SF4bb1aQyQmubmK4dZ6DPr-LWPGJ3ihmCcK.575r&#34;,
-        &#34;_ids&#34;: {
-            &#34;b&#34;: &#34;GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5&#34;,
-            &#34;z&#34;: &#34;GuwIQCrendfKXZr5jGfrUwoP-8TWMhmLHYrja2yj&#34;,
-            &#34;c&#34;: &#34;QkfVsy7ITAmoIiOFgbYpsQodBSIYshhiUm3v2r8d&#34;,
-            &#34;d&#34;: &#34;5iU-DAFL3XTLno88g056s2G12RidCKkCgLCLIwB5&#34;,
-            &#34;dd&#34;: &#34;fVj30baMeet4PcN9ZY-8uMpFin89FY8h8MI4RkDd&#34;
+        z: 9,
+        c: &#34;«[1 2 3]»&#34;,
+        d: &#34;«{0: 1, 1: 2, 2: 3}»&#34;,
+        dd: &#34;«[[1 2] [3 4]]»&#34;,
+        _id: &#34;pklpcC04mjnBVPnUHYQX2Xp64gBYV1lpCz6hTThl&#34;,
+        _ids: {
+            b: &#34;ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.&#34;,
+            z: &#34;GuwIQCrendfKXZr5jGfrUwoP-8TWMhmLHYrja2yj&#34;,
+            c: &#34;QkfVsy7ITAmoIiOFgbYpsQodBSIYshhiUm3v2r8d&#34;,
+            d: &#34;5iU-DAFL3XTLno88g056s2G12RidCKkCgLCLIwB5&#34;,
+            dd: &#34;fVj30baMeet4PcN9ZY-8uMpFin89FY8h8MI4RkDd&#34;
         }
     }
     &#34;&#34;&#34;
 
-    width = None
+    width = 200
 
     def default(self, obj):
         if obj is not None:
+            # from hoshmap import FrozenIdict, Idict
+            # if isinstance(obj, Idict):
+            #     return obj.frozen.asdicts
+            # if isinstance(obj, FrozenIdict):
+            #     return obj.asdicts
             if obj is Ellipsis:
                 return &#34;...&#34;
-            if isinstance(obj, StrictiVal):
+            if isinstance(obj, iVal) and obj.isevaluated:
+                # from hoshmap import FrozenIdict, Idict
+                # if isinstance(obj.value, Idict):
+                #     return obj.value.frozen.asdicts
+                # if isinstance(obj.value, FrozenIdict):
+                #     return obj.value.asdicts
                 return obj.value
             # if isinstance(obj, FunctionType):
             #     return str(obj)
-            if not isinstance(obj, (list, set, str, int, float, bytearray, bool)):
+            if not isinstance(obj, (dict, list, set, str, int, float, bytearray, bool)):
                 if obj.__class__.__name__ in [&#34;DataFrame&#34;, &#34;Series&#34;]:
                     # «str()» is to avoid nested identation
-                    return truncate(&#34;«&#34; + str(obj.to_dict()) + &#34;»&#34;, self.width)
+                    return f&#34;«{truncate(str(obj.to_dict()), self.width)}»&#34;
                 if obj.__class__.__name__ == &#34;ndarray&#34;:
-                    return truncate(&#34;«&#34; + str(obj).replace(&#34;\n&#34;, &#34;&#34;) + &#34;»&#34;, self.width)
-                return str(obj)
+                    txt = str(obj).replace(&#34;\n&#34;, &#34;&#34;)
+                    return f&#34;«{truncate(txt, self.width)}»&#34;
+                return truncate(str(obj).replace(&#34;\n&#34;, &#34;&#34;), self.width)
         return JSONEncoder.default(self, obj)  # pragma: no cover
 
 
@@ -167,8 +200,10 @@ class CustomJSONEncoder(JSONEncoder):
 #         return obj
 
 
-def truncate(txt, width):
-    return txt[:width] + &#34;...&#34; if width and len(txt) &gt; width else txt</code></pre>
+def truncate(txt, width=200):
+    if len(txt) &gt; width:
+        txt = txt[:width] + (&#34; ...»&#34; if txt.endswith(&#34;»&#34;) else &#34; ...&#34;)
+    return txt</code></pre>
 </details>
 </section>
 <section>
@@ -178,8 +213,8 @@ def truncate(txt, width):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="hoshmap.customjson.truncate"><code class="name flex">
-<span>def <span class="ident">truncate</span></span>(<span>txt, width)</span>
+<dt id="hoshmap.serialization.customjson.truncate"><code class="name flex">
+<span>def <span class="ident">truncate</span></span>(<span>txt, width=200)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -187,8 +222,10 @@ def truncate(txt, width):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def truncate(txt, width):
-    return txt[:width] + &#34;...&#34; if width and len(txt) &gt; width else txt</code></pre>
+<pre><code class="python">def truncate(txt, width=200):
+    if len(txt) &gt; width:
+        txt = txt[:width] + (&#34; ...»&#34; if txt.endswith(&#34;»&#34;) else &#34; ...&#34;)
+    return txt</code></pre>
 </details>
 </dd>
 </dl>
@@ -196,7 +233,7 @@ def truncate(txt, width):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="hoshmap.customjson.CustomJSONEncoder"><code class="flex name class">
+<dt id="hoshmap.serialization.customjson.CustomJSONEncoder"><code class="flex name class">
 <span>class <span class="ident">CustomJSONEncoder</span></span>
 <span>(</span><span>*, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, sort_keys=False, indent=None, separators=None, default=None)</span>
 </code></dt>
@@ -205,18 +242,18 @@ def truncate(txt, width):
 &gt;&gt;&gt; a = idict(x=3)
 &gt;&gt;&gt; idict(d=a, y=5).show(colored=False)
 {
-    &quot;d&quot;: {
-        &quot;x&quot;: 3,
-        &quot;_id&quot;: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
-        &quot;_ids&quot;: {
-            &quot;x&quot;: &quot;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&quot;
+    d: {
+        x: 3,
+        _id: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
+        _ids: {
+            x: &quot;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&quot;
         }
     },
-    &quot;y&quot;: 5,
-    &quot;_id&quot;: &quot;YyAtuyiPhC7pHV-ADAoh1Lp30TM-08swr40vOmk1&quot;,
-    &quot;_ids&quot;: {
-        &quot;d&quot;: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
-        &quot;y&quot;: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;
+    y: 5,
+    _id: &quot;YyAtuyiPhC7pHV-ADAoh1Lp30TM-08swr40vOmk1&quot;,
+    _ids: {
+        d: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
+        y: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;
     }
 }
 &gt;&gt;&gt; from pandas.core.frame import DataFrame, Series
@@ -228,57 +265,79 @@ def truncate(txt, width):
 &gt;&gt;&gt; b = idict(d=a, y=5, df=df, ell=...)
 &gt;&gt;&gt; b.show(colored=False)
 {
-    &quot;d&quot;: {
-        &quot;x&quot;: 3,
-        &quot;_id&quot;: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
-        &quot;_ids&quot;: {
-            &quot;x&quot;: &quot;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&quot;
+    d: {
+        x: 3,
+        _id: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
+        _ids: {
+            x: &quot;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&quot;
         }
     },
-    &quot;y&quot;: 5,
-    &quot;df&quot;: &quot;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&quot;,
-    &quot;ell&quot;: &quot;...&quot;,
-    &quot;_id&quot;: &quot;GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5&quot;,
-    &quot;_ids&quot;: {
-        &quot;d&quot;: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
-        &quot;y&quot;: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
-        &quot;df&quot;: &quot;98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg&quot;,
-        &quot;ell&quot;: &quot;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&quot;
+    y: 5,
+    df: &quot;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&quot;,
+    df_: {
+        index: &quot;«{0: 0, 1: 1}»&quot;,
+        0: &quot;«{0: 1, 1: 3}»&quot;,
+        1: &quot;«{0: 2, 1: 4}»&quot;,
+        _id: &quot;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&quot;,
+        _ids: {
+            index: &quot;DQa5yWRkGo-9FLqmaST8pbElYdUEgqF8xPvip6-3&quot;,
+            0: &quot;8ianf2LAQlxK7ZFvdOX.avsuK4L9FjUiMC7sM2Lm&quot;,
+            1: &quot;IIffH-qkWUFB.-VFd0z6BBrIpfvNuc8GPxlQYgg3&quot;
+        }
+    },
+    ell: &quot;...&quot;,
+    _id: &quot;ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.&quot;,
+    _ids: {
+        d: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
+        y: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
+        df: &quot;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&quot;,
+        ell: &quot;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&quot;
     }
 }
 &gt;&gt;&gt; from numpy import array
 &gt;&gt;&gt; idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
 {
-    &quot;b&quot;: {
-        &quot;d&quot;: {
-            &quot;x&quot;: 3,
-            &quot;_id&quot;: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
-            &quot;_ids&quot;: {
-                &quot;x&quot;: &quot;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&quot;
+    b: {
+        d: {
+            x: 3,
+            _id: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
+            _ids: {
+                x: &quot;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&quot;
             }
         },
-        &quot;y&quot;: 5,
-        &quot;df&quot;: &quot;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&quot;,
-        &quot;ell&quot;: &quot;...&quot;,
-        &quot;_id&quot;: &quot;GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5&quot;,
-        &quot;_ids&quot;: {
-            &quot;d&quot;: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
-            &quot;y&quot;: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
-            &quot;df&quot;: &quot;98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg&quot;,
-            &quot;ell&quot;: &quot;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&quot;
+        y: 5,
+        df: &quot;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&quot;,
+        df_: {
+            index: &quot;«{0: 0, 1: 1}»&quot;,
+            0: &quot;«{0: 1, 1: 3}»&quot;,
+            1: &quot;«{0: 2, 1: 4}»&quot;,
+            _id: &quot;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&quot;,
+            _ids: {
+                index: &quot;DQa5yWRkGo-9FLqmaST8pbElYdUEgqF8xPvip6-3&quot;,
+                0: &quot;8ianf2LAQlxK7ZFvdOX.avsuK4L9FjUiMC7sM2Lm&quot;,
+                1: &quot;IIffH-qkWUFB.-VFd0z6BBrIpfvNuc8GPxlQYgg3&quot;
+            }
+        },
+        ell: &quot;...&quot;,
+        _id: &quot;ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.&quot;,
+        _ids: {
+            d: &quot;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&quot;,
+            y: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
+            df: &quot;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&quot;,
+            ell: &quot;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&quot;
         }
     },
-    &quot;z&quot;: 9,
-    &quot;c&quot;: &quot;«[1 2 3]»&quot;,
-    &quot;d&quot;: &quot;«{0: 1, 1: 2, 2: 3}»&quot;,
-    &quot;dd&quot;: &quot;«[[1 2] [3 4]]»&quot;,
-    &quot;_id&quot;: &quot;SF4bb1aQyQmubmK4dZ6DPr-LWPGJ3ihmCcK.575r&quot;,
-    &quot;_ids&quot;: {
-        &quot;b&quot;: &quot;GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5&quot;,
-        &quot;z&quot;: &quot;GuwIQCrendfKXZr5jGfrUwoP-8TWMhmLHYrja2yj&quot;,
-        &quot;c&quot;: &quot;QkfVsy7ITAmoIiOFgbYpsQodBSIYshhiUm3v2r8d&quot;,
-        &quot;d&quot;: &quot;5iU-DAFL3XTLno88g056s2G12RidCKkCgLCLIwB5&quot;,
-        &quot;dd&quot;: &quot;fVj30baMeet4PcN9ZY-8uMpFin89FY8h8MI4RkDd&quot;
+    z: 9,
+    c: &quot;«[1 2 3]»&quot;,
+    d: &quot;«{0: 1, 1: 2, 2: 3}»&quot;,
+    dd: &quot;«[[1 2] [3 4]]»&quot;,
+    _id: &quot;pklpcC04mjnBVPnUHYQX2Xp64gBYV1lpCz6hTThl&quot;,
+    _ids: {
+        b: &quot;ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.&quot;,
+        z: &quot;GuwIQCrendfKXZr5jGfrUwoP-8TWMhmLHYrja2yj&quot;,
+        c: &quot;QkfVsy7ITAmoIiOFgbYpsQodBSIYshhiUm3v2r8d&quot;,
+        d: &quot;5iU-DAFL3XTLno88g056s2G12RidCKkCgLCLIwB5&quot;,
+        dd: &quot;fVj30baMeet4PcN9ZY-8uMpFin89FY8h8MI4RkDd&quot;
     }
 }
 </code></pre>
@@ -328,18 +387,18 @@ version of the object or raise a <code>TypeError</code>.</p></div>
     &gt;&gt;&gt; a = idict(x=3)
     &gt;&gt;&gt; idict(d=a, y=5).show(colored=False)
     {
-        &#34;d&#34;: {
-            &#34;x&#34;: 3,
-            &#34;_id&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
+        d: {
+            x: 3,
+            _id: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+            _ids: {
+                x: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
             }
         },
-        &#34;y&#34;: 5,
-        &#34;_id&#34;: &#34;YyAtuyiPhC7pHV-ADAoh1Lp30TM-08swr40vOmk1&#34;,
-        &#34;_ids&#34;: {
-            &#34;d&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-            &#34;y&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;
+        y: 5,
+        _id: &#34;YyAtuyiPhC7pHV-ADAoh1Lp30TM-08swr40vOmk1&#34;,
+        _ids: {
+            d: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+            y: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;
         }
     }
     &gt;&gt;&gt; from pandas.core.frame import DataFrame, Series
@@ -351,78 +410,111 @@ version of the object or raise a <code>TypeError</code>.</p></div>
     &gt;&gt;&gt; b = idict(d=a, y=5, df=df, ell=...)
     &gt;&gt;&gt; b.show(colored=False)
     {
-        &#34;d&#34;: {
-            &#34;x&#34;: 3,
-            &#34;_id&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
+        d: {
+            x: 3,
+            _id: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+            _ids: {
+                x: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
             }
         },
-        &#34;y&#34;: 5,
-        &#34;df&#34;: &#34;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&#34;,
-        &#34;ell&#34;: &#34;...&#34;,
-        &#34;_id&#34;: &#34;GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5&#34;,
-        &#34;_ids&#34;: {
-            &#34;d&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-            &#34;y&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
-            &#34;df&#34;: &#34;98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg&#34;,
-            &#34;ell&#34;: &#34;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&#34;
+        y: 5,
+        df: &#34;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&#34;,
+        df_: {
+            index: &#34;«{0: 0, 1: 1}»&#34;,
+            0: &#34;«{0: 1, 1: 3}»&#34;,
+            1: &#34;«{0: 2, 1: 4}»&#34;,
+            _id: &#34;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&#34;,
+            _ids: {
+                index: &#34;DQa5yWRkGo-9FLqmaST8pbElYdUEgqF8xPvip6-3&#34;,
+                0: &#34;8ianf2LAQlxK7ZFvdOX.avsuK4L9FjUiMC7sM2Lm&#34;,
+                1: &#34;IIffH-qkWUFB.-VFd0z6BBrIpfvNuc8GPxlQYgg3&#34;
+            }
+        },
+        ell: &#34;...&#34;,
+        _id: &#34;ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.&#34;,
+        _ids: {
+            d: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+            y: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+            df: &#34;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&#34;,
+            ell: &#34;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&#34;
         }
     }
     &gt;&gt;&gt; from numpy import array
     &gt;&gt;&gt; idict(b=b, z=9, c=(c:=array([1,2,3])), d=Series(c), dd=array([[1, 2], [3, 4]])).show(colored=False)
     {
-        &#34;b&#34;: {
-            &#34;d&#34;: {
-                &#34;x&#34;: 3,
-                &#34;_id&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-                &#34;_ids&#34;: {
-                    &#34;x&#34;: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
+        b: {
+            d: {
+                x: 3,
+                _id: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+                _ids: {
+                    x: &#34;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#34;
                 }
             },
-            &#34;y&#34;: 5,
-            &#34;df&#34;: &#34;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&#34;,
-            &#34;ell&#34;: &#34;...&#34;,
-            &#34;_id&#34;: &#34;GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5&#34;,
-            &#34;_ids&#34;: {
-                &#34;d&#34;: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
-                &#34;y&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
-                &#34;df&#34;: &#34;98fLFCJRvNL7qSdJ7YBr0SKi2EJtZU7lP1d5MLqg&#34;,
-                &#34;ell&#34;: &#34;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&#34;
+            y: 5,
+            df: &#34;«{0: {0: 1, 1: 3}, 1: {0: 2, 1: 4}}»&#34;,
+            df_: {
+                index: &#34;«{0: 0, 1: 1}»&#34;,
+                0: &#34;«{0: 1, 1: 3}»&#34;,
+                1: &#34;«{0: 2, 1: 4}»&#34;,
+                _id: &#34;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&#34;,
+                _ids: {
+                    index: &#34;DQa5yWRkGo-9FLqmaST8pbElYdUEgqF8xPvip6-3&#34;,
+                    0: &#34;8ianf2LAQlxK7ZFvdOX.avsuK4L9FjUiMC7sM2Lm&#34;,
+                    1: &#34;IIffH-qkWUFB.-VFd0z6BBrIpfvNuc8GPxlQYgg3&#34;
+                }
+            },
+            ell: &#34;...&#34;,
+            _id: &#34;ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.&#34;,
+            _ids: {
+                d: &#34;fBb9FHVYpHC7vyM-B8UrXuN4oCcQ4Y7pnQ6oSK3J&#34;,
+                y: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+                df: &#34;-sMsdSKphlBlTCE4unv9NJF35IPIPEboPoBmxwDa&#34;,
+                ell: &#34;P1oPe-8hTjTdV6gKov4oIQnmTUXyD2fU6E7C8MS6&#34;
             }
         },
-        &#34;z&#34;: 9,
-        &#34;c&#34;: &#34;«[1 2 3]»&#34;,
-        &#34;d&#34;: &#34;«{0: 1, 1: 2, 2: 3}»&#34;,
-        &#34;dd&#34;: &#34;«[[1 2] [3 4]]»&#34;,
-        &#34;_id&#34;: &#34;SF4bb1aQyQmubmK4dZ6DPr-LWPGJ3ihmCcK.575r&#34;,
-        &#34;_ids&#34;: {
-            &#34;b&#34;: &#34;GPRbMrZltk0LmCIkKS55qtrdQFGNWGoQa9rPuhq5&#34;,
-            &#34;z&#34;: &#34;GuwIQCrendfKXZr5jGfrUwoP-8TWMhmLHYrja2yj&#34;,
-            &#34;c&#34;: &#34;QkfVsy7ITAmoIiOFgbYpsQodBSIYshhiUm3v2r8d&#34;,
-            &#34;d&#34;: &#34;5iU-DAFL3XTLno88g056s2G12RidCKkCgLCLIwB5&#34;,
-            &#34;dd&#34;: &#34;fVj30baMeet4PcN9ZY-8uMpFin89FY8h8MI4RkDd&#34;
+        z: 9,
+        c: &#34;«[1 2 3]»&#34;,
+        d: &#34;«{0: 1, 1: 2, 2: 3}»&#34;,
+        dd: &#34;«[[1 2] [3 4]]»&#34;,
+        _id: &#34;pklpcC04mjnBVPnUHYQX2Xp64gBYV1lpCz6hTThl&#34;,
+        _ids: {
+            b: &#34;ylziFtJ74K-m39S3rhlZfJ1yEADwIxsTaUi4g2D.&#34;,
+            z: &#34;GuwIQCrendfKXZr5jGfrUwoP-8TWMhmLHYrja2yj&#34;,
+            c: &#34;QkfVsy7ITAmoIiOFgbYpsQodBSIYshhiUm3v2r8d&#34;,
+            d: &#34;5iU-DAFL3XTLno88g056s2G12RidCKkCgLCLIwB5&#34;,
+            dd: &#34;fVj30baMeet4PcN9ZY-8uMpFin89FY8h8MI4RkDd&#34;
         }
     }
     &#34;&#34;&#34;
 
-    width = None
+    width = 200
 
     def default(self, obj):
         if obj is not None:
+            # from hoshmap import FrozenIdict, Idict
+            # if isinstance(obj, Idict):
+            #     return obj.frozen.asdicts
+            # if isinstance(obj, FrozenIdict):
+            #     return obj.asdicts
             if obj is Ellipsis:
                 return &#34;...&#34;
-            if isinstance(obj, StrictiVal):
+            if isinstance(obj, iVal) and obj.isevaluated:
+                # from hoshmap import FrozenIdict, Idict
+                # if isinstance(obj.value, Idict):
+                #     return obj.value.frozen.asdicts
+                # if isinstance(obj.value, FrozenIdict):
+                #     return obj.value.asdicts
                 return obj.value
             # if isinstance(obj, FunctionType):
             #     return str(obj)
-            if not isinstance(obj, (list, set, str, int, float, bytearray, bool)):
+            if not isinstance(obj, (dict, list, set, str, int, float, bytearray, bool)):
                 if obj.__class__.__name__ in [&#34;DataFrame&#34;, &#34;Series&#34;]:
                     # «str()» is to avoid nested identation
-                    return truncate(&#34;«&#34; + str(obj.to_dict()) + &#34;»&#34;, self.width)
+                    return f&#34;«{truncate(str(obj.to_dict()), self.width)}»&#34;
                 if obj.__class__.__name__ == &#34;ndarray&#34;:
-                    return truncate(&#34;«&#34; + str(obj).replace(&#34;\n&#34;, &#34;&#34;) + &#34;»&#34;, self.width)
-                return str(obj)
+                    txt = str(obj).replace(&#34;\n&#34;, &#34;&#34;)
+                    return f&#34;«{truncate(txt, self.width)}»&#34;
+                return truncate(str(obj).replace(&#34;\n&#34;, &#34;&#34;), self.width)
         return JSONEncoder.default(self, obj)  # pragma: no cover</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -431,14 +523,14 @@ version of the object or raise a <code>TypeError</code>.</p></div>
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="hoshmap.customjson.CustomJSONEncoder.width"><code class="name">var <span class="ident">width</span></code></dt>
+<dt id="hoshmap.serialization.customjson.CustomJSONEncoder.width"><code class="name">var <span class="ident">width</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="hoshmap.customjson.CustomJSONEncoder.default"><code class="name flex">
+<dt id="hoshmap.serialization.customjson.CustomJSONEncoder.default"><code class="name flex">
 <span>def <span class="ident">default</span></span>(<span>self, obj)</span>
 </code></dt>
 <dd>
@@ -463,19 +555,30 @@ implement default like this::</p>
 </summary>
 <pre><code class="python">def default(self, obj):
     if obj is not None:
+        # from hoshmap import FrozenIdict, Idict
+        # if isinstance(obj, Idict):
+        #     return obj.frozen.asdicts
+        # if isinstance(obj, FrozenIdict):
+        #     return obj.asdicts
         if obj is Ellipsis:
             return &#34;...&#34;
-        if isinstance(obj, StrictiVal):
+        if isinstance(obj, iVal) and obj.isevaluated:
+            # from hoshmap import FrozenIdict, Idict
+            # if isinstance(obj.value, Idict):
+            #     return obj.value.frozen.asdicts
+            # if isinstance(obj.value, FrozenIdict):
+            #     return obj.value.asdicts
             return obj.value
         # if isinstance(obj, FunctionType):
         #     return str(obj)
-        if not isinstance(obj, (list, set, str, int, float, bytearray, bool)):
+        if not isinstance(obj, (dict, list, set, str, int, float, bytearray, bool)):
             if obj.__class__.__name__ in [&#34;DataFrame&#34;, &#34;Series&#34;]:
                 # «str()» is to avoid nested identation
-                return truncate(&#34;«&#34; + str(obj.to_dict()) + &#34;»&#34;, self.width)
+                return f&#34;«{truncate(str(obj.to_dict()), self.width)}»&#34;
             if obj.__class__.__name__ == &#34;ndarray&#34;:
-                return truncate(&#34;«&#34; + str(obj).replace(&#34;\n&#34;, &#34;&#34;) + &#34;»&#34;, self.width)
-            return str(obj)
+                txt = str(obj).replace(&#34;\n&#34;, &#34;&#34;)
+                return f&#34;«{truncate(txt, self.width)}»&#34;
+            return truncate(str(obj).replace(&#34;\n&#34;, &#34;&#34;), self.width)
     return JSONEncoder.default(self, obj)  # pragma: no cover</code></pre>
 </details>
 </dd>
@@ -492,21 +595,21 @@ implement default like this::</p>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="hoshmap" href="index.html">hoshmap</a></code></li>
+<li><code><a title="hoshmap.serialization" href="index.html">hoshmap.serialization</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="hoshmap.customjson.truncate" href="#hoshmap.customjson.truncate">truncate</a></code></li>
+<li><code><a title="hoshmap.serialization.customjson.truncate" href="#hoshmap.serialization.customjson.truncate">truncate</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="hoshmap.customjson.CustomJSONEncoder" href="#hoshmap.customjson.CustomJSONEncoder">CustomJSONEncoder</a></code></h4>
+<h4><code><a title="hoshmap.serialization.customjson.CustomJSONEncoder" href="#hoshmap.serialization.customjson.CustomJSONEncoder">CustomJSONEncoder</a></code></h4>
 <ul class="">
-<li><code><a title="hoshmap.customjson.CustomJSONEncoder.default" href="#hoshmap.customjson.CustomJSONEncoder.default">default</a></code></li>
-<li><code><a title="hoshmap.customjson.CustomJSONEncoder.width" href="#hoshmap.customjson.CustomJSONEncoder.width">width</a></code></li>
+<li><code><a title="hoshmap.serialization.customjson.CustomJSONEncoder.default" href="#hoshmap.serialization.customjson.CustomJSONEncoder.default">default</a></code></li>
+<li><code><a title="hoshmap.serialization.customjson.CustomJSONEncoder.width" href="#hoshmap.serialization.customjson.CustomJSONEncoder.width">width</a></code></li>
 </ul>
 </li>
 </ul>

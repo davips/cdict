@@ -37,7 +37,7 @@ class DFiVal(CacheableiVal):
     def __init__(self, value, id: Union[str, Hosh] = None, caches=None):
         super().__init__(caches)
         self.value = value
-        self.deps={"TODO":"TODO"}  # TODO: put all series fields (strictsivals) here
+        self.deps = {"TODO": "TODO"}  # TODO: put all series fields (strictsivals) here
         if id is None:
             try:
                 self.hosh = Hosh(pickle.dumps(value, protocol=5))
@@ -86,6 +86,7 @@ def explode_df(df):
     c  3  7
     """
     from hoshmap import FrozenIdict
+
     dic = {"index": df.index.to_series()}
     for col in df:
         dic[col] = df[col]

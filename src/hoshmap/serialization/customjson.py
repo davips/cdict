@@ -155,7 +155,7 @@ class CustomJSONEncoder(JSONEncoder):
                     # «str()» is to avoid nested identation
                     return f"«{truncate(str(obj.to_dict()), self.width)}»"
                 if obj.__class__.__name__ == "ndarray":
-                    txt = str(obj).replace('\n', '')
+                    txt = str(obj).replace("\n", "")
                     return f"«{truncate(txt, self.width)}»"
                 return truncate(str(obj).replace("\n", ""), self.width)
         return JSONEncoder.default(self, obj)  # pragma: no cover

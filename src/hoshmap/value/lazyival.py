@@ -67,7 +67,18 @@ class LazyiVal(CacheableiVal):
     True
     """
 
-    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None, did=None, dids=None):
+    def __init__(
+        self,
+        f: callable,
+        i: int,
+        n: int,
+        deps: dict,
+        results: dict,
+        fid: Union[str, Hosh] = None,
+        caches=None,
+        did=None,
+        dids=None,
+    ):
         # if i >= len(result):  # pragma: no cover
         #     raise Exception(f"Index {i} inconsistent with current expected result size {len(result)}.")
         super().__init__(caches, did, dids)
@@ -97,6 +108,7 @@ class LazyiVal(CacheableiVal):
     def fetch(self):
         if self.caches is not None:
             from hoshmap import FrozenIdict
+
             outdated_caches = []
             for cache in self.caches:
                 if self.id in cache:
@@ -111,6 +123,7 @@ class LazyiVal(CacheableiVal):
 
     def calculate(self):
         from hoshmap import idict
+
         argidxs = []
         kwargs = {}
         iterable_sources = {}
@@ -184,6 +197,7 @@ class LazyiVal(CacheableiVal):
             outdated_cache[id] = val
         if isinstance(val, dict) and list(val.keys()) == ["_ids"]:
             from hoshmap import FrozenIdict
+
             ids = val["_ids"]
             data = {}
             for k, v in ids.items():

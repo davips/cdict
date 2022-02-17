@@ -55,11 +55,11 @@ from typing import Iterable, Union
 
 from hosh import Hosh
 
-from hoshmap.identification import f2hosh
-from hoshmap.value.ival import iVal
+from hoshmap.serialization.parsing import f2hosh
+from hoshmap.value.cacheableival import CacheableiVal
 
 
-class LazyiVal(iVal):
+class LazyiVal(CacheableiVal):
     &#34;&#34;&#34;
     Identified lazy value
 
@@ -70,21 +70,21 @@ class LazyiVal(iVal):
     &gt;&gt;&gt; deps = {&#34;x&#34;: StrictiVal(2)}
     &gt;&gt;&gt; lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
     &gt;&gt;&gt; lvx
-    ←(x)
+    λ(x)
     &gt;&gt;&gt; deps = {&#34;x&#34;: lvx, &#34;y&#34;: StrictiVal(3)}
     &gt;&gt;&gt; result = {}
     &gt;&gt;&gt; f = lambda x,y: [x+y, y**2]
     &gt;&gt;&gt; lvy = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvz = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvx, lvy, lvz
-    (←(x), ←(x←(x) y), ←(x←(x) y))
+    (λ(x), λ(x=λ(x) y), λ(x=λ(x) y))
     &gt;&gt;&gt; deps = {&#34;z&#34;: lvz}
     &gt;&gt;&gt; f = lambda z: {&#34;z&#34;:z**3, &#34;w&#34;:z**5}
     &gt;&gt;&gt; result = {}
     &gt;&gt;&gt; lvz2 = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvw = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvx, lvy, lvz2, lvw
-    (←(x), ←(x←(x) y), ←(z←(x←(x) y)), ←(z←(x←(x) y)))
+    (λ(x), λ(x=λ(x) y), λ(z=λ(x=λ(x) y)), λ(z=λ(x=λ(x) y)))
     &gt;&gt;&gt; lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     &gt;&gt;&gt; lvz2.id
@@ -95,76 +95,143 @@ class LazyiVal(iVal):
     True
     &#34;&#34;&#34;
 
-    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None):
+    def __init__(
+        self,
+        f: callable,
+        i: int,
+        n: int,
+        deps: dict,
+        results: dict,
+        fid: Union[str, Hosh] = None,
+        caches=None,
+        did=None,
+        dids=None,
+    ):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
+        super().__init__(caches, did, dids)
         self.f = f
         self.i = i
         self.n = n
         self.deps = {} if deps is None else deps
-        self.result = results
+        self.results = results
         self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
-        self.caches = caches
         self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh]))[i:n]
-        self.result[self.id] = None
+        self.results[self.id] = None
 
-    def withcaches(self, caches):
-        if self.caches is not None:
-            self.caches.append(caches)
-        return LazyiVal(self.f, self.i, self.n, self.deps, self.result, self.fhosh, caches)
+    def replace(self, **kwargs):
+        dic = dict(f=self.f, i=self.i, n=self.n, deps=self.deps, results=self.results, fid=self.fhosh, caches=self.caches)
+        dic.update(kwargs)
+        return LazyiVal(**dic)
 
     @property
     def value(self):
         if not self.isevaluated:
-            # Fetch.
-            if self.caches is not None:
-                outdated_caches = []
-                for cache in self.caches:
-                    if self.hosh.id in cache:
-                        val = cache[self.hosh.id]
-                        for outdated_cache in outdated_caches:
-                            outdated_cache[self.hosh.id] = val
-                        self.result[self.id] = val
-                        return val
-                    outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
+            if fetched := self.fetch():
+                return fetched
+            self.calculate()
+            self.store()
+        return self.results[self.id]
 
-            # Calculate.
-            argnames = []
-            kwargs = {}
-            for field, ival in self.deps.items():
-                if isinstance(field, int):
-                    argnames.append(field)
+    def fetch(self):
+        if self.caches is not None:
+            from hoshmap import FrozenIdict
+
+            outdated_caches = []
+            for cache in self.caches:
+                if self.id in cache:
+                    for outdated_cache in outdated_caches:
+                        outdated_cache[self.did] = {&#34;_ids&#34;: self.dids}
+                    val = self.traverse(self.id, cache, outdated_caches)
+                    # TODO: receber iVal de dentro do cache, nao value
+                    # TODO: passar cache pra ele quando for CacheableiVal
+                    self.results[self.id] = val
+                    return val
+                outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
+
+    def calculate(self):
+        from hoshmap import idict
+
+        argidxs = []
+        kwargs = {}
+        iterable_sources = {}
+        for field, ival in self.deps.items():
+            if isinstance(field, int):  # quando usa isso???
+                argidxs.append(field)
+            else:
+                if len(split := field.split(&#34;:*&#34;)) == 2:
+                    iterable_sources[split[1]] = iter(self.deps[field].value)
                 else:
                     kwargs[field] = ival.value
-            result = self.f(*(self.deps[name] for name in sorted(argnames)), **kwargs)
-            if self.n == 1:
-                result = [result]
-            elif isinstance(result, dict):
-                result = result.values()
-            elif isinstance(result, list) and len(result) != self.n:  # pragma: no cover
-                raise Exception(f&#34;Wrong result length: {len(result)} differs from {self.n}&#34;)
-            if not isinstance(result, Iterable):  # pragma: no cover
-                raise Exception(f&#34;Unsupported multi-valued result type: {type(result)}&#34;)
-            for id, res in zip(self.result, result):
-                self.result[id] = res
+        if iterable_sources:
+            result = []
+            loop = True
+            while loop:
+                i = None
+                try:
+                    for i, (target, it) in enumerate(iterable_sources.items()):
+                        kwargs[target] = next(it)
+                    r = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+                    if isinstance(r, idict):
+                        r = r.frozen
+                    result.append(r)
+                except StopIteration:
+                    if i not in [0, len(iterable_sources)]:
+                        raise ValueError(&#34;All iterable fields (e.g., &#39;xs:*x&#39;) should have the same length.&#34;)
+                    loop = False
+        else:
+            result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+            if isinstance(result, idict):
+                result = result.frozen
+        if self.n == 1:
+            result = [result]
+        elif isinstance(result, dict):
+            result = result.values()
+        elif isinstance(result, list) and len(result) != self.n:  # pragma: no cover
+            raise Exception(f&#34;Wrong result length: {len(result)} differs from {self.n}&#34;)
+        if not isinstance(result, Iterable):  # pragma: no cover
+            raise Exception(f&#34;Unsupported multi-valued result type: {type(result)}&#34;)
+        for id, res in zip(self.results, result):
+            self.results[id] = res
 
-            # Store.
-            if self.caches is not None:
-                from hoshmap import Idict, FrozenIdict
+    def store(self):
+        if self.caches is not None:
+            from hoshmap import FrozenIdict
 
-                for id, res in self.result.items():
-                    for cache in self.caches:
-                        if isinstance(res, (Idict, FrozenIdict)):
-                            res &gt;&gt; [[cache]]
-                        else:
-                            cache[id] = res  # TODO: pack (pickle+lz4)
+            for id, res in self.results.items():
+                for cache in self.caches:
+                    if self.did not in cache:
+                        cache[self.did] = {&#34;_ids&#34;: self.dids}
+                    if isinstance(res, FrozenIdict):
+                        # TODO:
+                        #  if res=cacheableival: add current cache to res.&#39;lazies*&#39;.caches caso não tenham
+                        #  [não faz sentido picklear caches, então...]
+                        #  busca no cache anterior do subdict pelo resultado já pronto (e grava no corrente?)
+                        #   senão:
+                        #       se cache corrente contém fid, armazena field como lazy
+                        #       senão, evaluate nesse field (p/ ser armazenado mais abaixo).
+                        #
+                        res.evaluate()  # &lt;-- retirar depois de feito TODOs acima
+                        if res.id not in cache:
+                            # REMINDER: entry id differs from internal did
+                            cache[id] = {&#34;_ids&#34;: res.ids}
+                        res &gt;&gt; [[cache]]
+                    elif id not in cache:
+                        cache[id] = res  # TODO: pack (pickle+lz4)
 
-        return self.result[self.id]
+    def traverse(self, id, cache, outdated_caches):
+        val = cache[id]
+        for outdated_cache in outdated_caches:
+            outdated_cache[id] = val
+        if isinstance(val, dict) and list(val.keys()) == [&#34;_ids&#34;]:
+            from hoshmap import FrozenIdict
 
-    def __repr__(self):
-        if not self.isevaluated:
-            return f&#34;←({&#39; &#39;.join(k + (&#39;&#39; if dep.isevaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
-        return repr(self.value)</code></pre>
+            ids = val[&#34;_ids&#34;]
+            data = {}
+            for k, v in ids.items():
+                data[k] = self.traverse(v, cache, outdated_caches)
+            return FrozenIdict.fromdict(data, ids)
+        return val</code></pre>
 </details>
 </section>
 <section>
@@ -178,7 +245,7 @@ class LazyiVal(iVal):
 <dl>
 <dt id="hoshmap.value.lazyival.LazyiVal"><code class="flex name class">
 <span>class <span class="ident">LazyiVal</span></span>
-<span>(</span><span>f: <built-in function callable>, i: int, n: int, deps: dict, results: dict, fid: Union[str, hosh.hosh_.Hosh] = None, caches=None)</span>
+<span>(</span><span>f: <built-in function callable>, i: int, n: int, deps: dict, results: dict, fid: Union[str, hosh.hosh_.Hosh] = None, caches=None, did=None, dids=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Identified lazy value</p>
@@ -188,21 +255,21 @@ class LazyiVal(iVal):
 &gt;&gt;&gt; deps = {&quot;x&quot;: StrictiVal(2)}
 &gt;&gt;&gt; lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
 &gt;&gt;&gt; lvx
-←(x)
+λ(x)
 &gt;&gt;&gt; deps = {&quot;x&quot;: lvx, &quot;y&quot;: StrictiVal(3)}
 &gt;&gt;&gt; result = {}
 &gt;&gt;&gt; f = lambda x,y: [x+y, y**2]
 &gt;&gt;&gt; lvy = LazyiVal(f, 0, 2, deps, result, caches=[cache])
 &gt;&gt;&gt; lvz = LazyiVal(f, 1, 2, deps, result, caches=[cache])
 &gt;&gt;&gt; lvx, lvy, lvz
-(←(x), ←(x←(x) y), ←(x←(x) y))
+(λ(x), λ(x=λ(x) y), λ(x=λ(x) y))
 &gt;&gt;&gt; deps = {&quot;z&quot;: lvz}
 &gt;&gt;&gt; f = lambda z: {&quot;z&quot;:z**3, &quot;w&quot;:z**5}
 &gt;&gt;&gt; result = {}
 &gt;&gt;&gt; lvz2 = LazyiVal(f, 0, 2, deps, result, caches=[cache])
 &gt;&gt;&gt; lvw = LazyiVal(f, 1, 2, deps, result, caches=[cache])
 &gt;&gt;&gt; lvx, lvy, lvz2, lvw
-(←(x), ←(x←(x) y), ←(z←(x←(x) y)), ←(z←(x←(x) y)))
+(λ(x), λ(x=λ(x) y), λ(z=λ(x=λ(x) y)), λ(z=λ(x=λ(x) y)))
 &gt;&gt;&gt; lvx.value, lvy.value, lvz2.value, lvw.value
 (4, 7, 729, 59049)
 &gt;&gt;&gt; lvz2.id
@@ -216,7 +283,7 @@ True
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class LazyiVal(iVal):
+<pre><code class="python">class LazyiVal(CacheableiVal):
     &#34;&#34;&#34;
     Identified lazy value
 
@@ -227,21 +294,21 @@ True
     &gt;&gt;&gt; deps = {&#34;x&#34;: StrictiVal(2)}
     &gt;&gt;&gt; lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
     &gt;&gt;&gt; lvx
-    ←(x)
+    λ(x)
     &gt;&gt;&gt; deps = {&#34;x&#34;: lvx, &#34;y&#34;: StrictiVal(3)}
     &gt;&gt;&gt; result = {}
     &gt;&gt;&gt; f = lambda x,y: [x+y, y**2]
     &gt;&gt;&gt; lvy = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvz = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvx, lvy, lvz
-    (←(x), ←(x←(x) y), ←(x←(x) y))
+    (λ(x), λ(x=λ(x) y), λ(x=λ(x) y))
     &gt;&gt;&gt; deps = {&#34;z&#34;: lvz}
     &gt;&gt;&gt; f = lambda z: {&#34;z&#34;:z**3, &#34;w&#34;:z**5}
     &gt;&gt;&gt; result = {}
     &gt;&gt;&gt; lvz2 = LazyiVal(f, 0, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvw = LazyiVal(f, 1, 2, deps, result, caches=[cache])
     &gt;&gt;&gt; lvx, lvy, lvz2, lvw
-    (←(x), ←(x←(x) y), ←(z←(x←(x) y)), ←(z←(x←(x) y)))
+    (λ(x), λ(x=λ(x) y), λ(z=λ(x=λ(x) y)), λ(z=λ(x=λ(x) y)))
     &gt;&gt;&gt; lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     &gt;&gt;&gt; lvz2.id
@@ -252,92 +319,152 @@ True
     True
     &#34;&#34;&#34;
 
-    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None):
+    def __init__(
+        self,
+        f: callable,
+        i: int,
+        n: int,
+        deps: dict,
+        results: dict,
+        fid: Union[str, Hosh] = None,
+        caches=None,
+        did=None,
+        dids=None,
+    ):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
+        super().__init__(caches, did, dids)
         self.f = f
         self.i = i
         self.n = n
         self.deps = {} if deps is None else deps
-        self.result = results
+        self.results = results
         self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
-        self.caches = caches
         self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh]))[i:n]
-        self.result[self.id] = None
+        self.results[self.id] = None
 
-    def withcaches(self, caches):
-        if self.caches is not None:
-            self.caches.append(caches)
-        return LazyiVal(self.f, self.i, self.n, self.deps, self.result, self.fhosh, caches)
+    def replace(self, **kwargs):
+        dic = dict(f=self.f, i=self.i, n=self.n, deps=self.deps, results=self.results, fid=self.fhosh, caches=self.caches)
+        dic.update(kwargs)
+        return LazyiVal(**dic)
 
     @property
     def value(self):
         if not self.isevaluated:
-            # Fetch.
-            if self.caches is not None:
-                outdated_caches = []
-                for cache in self.caches:
-                    if self.hosh.id in cache:
-                        val = cache[self.hosh.id]
-                        for outdated_cache in outdated_caches:
-                            outdated_cache[self.hosh.id] = val
-                        self.result[self.id] = val
-                        return val
-                    outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
+            if fetched := self.fetch():
+                return fetched
+            self.calculate()
+            self.store()
+        return self.results[self.id]
 
-            # Calculate.
-            argnames = []
-            kwargs = {}
-            for field, ival in self.deps.items():
-                if isinstance(field, int):
-                    argnames.append(field)
+    def fetch(self):
+        if self.caches is not None:
+            from hoshmap import FrozenIdict
+
+            outdated_caches = []
+            for cache in self.caches:
+                if self.id in cache:
+                    for outdated_cache in outdated_caches:
+                        outdated_cache[self.did] = {&#34;_ids&#34;: self.dids}
+                    val = self.traverse(self.id, cache, outdated_caches)
+                    # TODO: receber iVal de dentro do cache, nao value
+                    # TODO: passar cache pra ele quando for CacheableiVal
+                    self.results[self.id] = val
+                    return val
+                outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
+
+    def calculate(self):
+        from hoshmap import idict
+
+        argidxs = []
+        kwargs = {}
+        iterable_sources = {}
+        for field, ival in self.deps.items():
+            if isinstance(field, int):  # quando usa isso???
+                argidxs.append(field)
+            else:
+                if len(split := field.split(&#34;:*&#34;)) == 2:
+                    iterable_sources[split[1]] = iter(self.deps[field].value)
                 else:
                     kwargs[field] = ival.value
-            result = self.f(*(self.deps[name] for name in sorted(argnames)), **kwargs)
-            if self.n == 1:
-                result = [result]
-            elif isinstance(result, dict):
-                result = result.values()
-            elif isinstance(result, list) and len(result) != self.n:  # pragma: no cover
-                raise Exception(f&#34;Wrong result length: {len(result)} differs from {self.n}&#34;)
-            if not isinstance(result, Iterable):  # pragma: no cover
-                raise Exception(f&#34;Unsupported multi-valued result type: {type(result)}&#34;)
-            for id, res in zip(self.result, result):
-                self.result[id] = res
+        if iterable_sources:
+            result = []
+            loop = True
+            while loop:
+                i = None
+                try:
+                    for i, (target, it) in enumerate(iterable_sources.items()):
+                        kwargs[target] = next(it)
+                    r = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+                    if isinstance(r, idict):
+                        r = r.frozen
+                    result.append(r)
+                except StopIteration:
+                    if i not in [0, len(iterable_sources)]:
+                        raise ValueError(&#34;All iterable fields (e.g., &#39;xs:*x&#39;) should have the same length.&#34;)
+                    loop = False
+        else:
+            result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+            if isinstance(result, idict):
+                result = result.frozen
+        if self.n == 1:
+            result = [result]
+        elif isinstance(result, dict):
+            result = result.values()
+        elif isinstance(result, list) and len(result) != self.n:  # pragma: no cover
+            raise Exception(f&#34;Wrong result length: {len(result)} differs from {self.n}&#34;)
+        if not isinstance(result, Iterable):  # pragma: no cover
+            raise Exception(f&#34;Unsupported multi-valued result type: {type(result)}&#34;)
+        for id, res in zip(self.results, result):
+            self.results[id] = res
 
-            # Store.
-            if self.caches is not None:
-                from hoshmap import Idict, FrozenIdict
+    def store(self):
+        if self.caches is not None:
+            from hoshmap import FrozenIdict
 
-                for id, res in self.result.items():
-                    for cache in self.caches:
-                        if isinstance(res, (Idict, FrozenIdict)):
-                            res &gt;&gt; [[cache]]
-                        else:
-                            cache[id] = res  # TODO: pack (pickle+lz4)
+            for id, res in self.results.items():
+                for cache in self.caches:
+                    if self.did not in cache:
+                        cache[self.did] = {&#34;_ids&#34;: self.dids}
+                    if isinstance(res, FrozenIdict):
+                        # TODO:
+                        #  if res=cacheableival: add current cache to res.&#39;lazies*&#39;.caches caso não tenham
+                        #  [não faz sentido picklear caches, então...]
+                        #  busca no cache anterior do subdict pelo resultado já pronto (e grava no corrente?)
+                        #   senão:
+                        #       se cache corrente contém fid, armazena field como lazy
+                        #       senão, evaluate nesse field (p/ ser armazenado mais abaixo).
+                        #
+                        res.evaluate()  # &lt;-- retirar depois de feito TODOs acima
+                        if res.id not in cache:
+                            # REMINDER: entry id differs from internal did
+                            cache[id] = {&#34;_ids&#34;: res.ids}
+                        res &gt;&gt; [[cache]]
+                    elif id not in cache:
+                        cache[id] = res  # TODO: pack (pickle+lz4)
 
-        return self.result[self.id]
+    def traverse(self, id, cache, outdated_caches):
+        val = cache[id]
+        for outdated_cache in outdated_caches:
+            outdated_cache[id] = val
+        if isinstance(val, dict) and list(val.keys()) == [&#34;_ids&#34;]:
+            from hoshmap import FrozenIdict
 
-    def __repr__(self):
-        if not self.isevaluated:
-            return f&#34;←({&#39; &#39;.join(k + (&#39;&#39; if dep.isevaluated else repr(dep)) for k, dep in self.deps.items())})&#34;
-        return repr(self.value)</code></pre>
+            ids = val[&#34;_ids&#34;]
+            data = {}
+            for k, v in ids.items():
+                data[k] = self.traverse(v, cache, outdated_caches)
+            return FrozenIdict.fromdict(data, ids)
+        return val</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
+<li><a title="hoshmap.value.cacheableival.CacheableiVal" href="cacheableival.html#hoshmap.value.cacheableival.CacheableiVal">CacheableiVal</a></li>
 <li><a title="hoshmap.value.ival.iVal" href="ival.html#hoshmap.value.ival.iVal">iVal</a></li>
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="hoshmap.value.lazyival.LazyiVal.caches"><code class="name">var <span class="ident">caches</span> : Any</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="hoshmap.value.lazyival.LazyiVal.hosh"><code class="name">var <span class="ident">hosh</span> : hosh.hosh_.Hosh</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="hoshmap.value.lazyival.LazyiVal.result"><code class="name">var <span class="ident">result</span> : Any</code></dt>
+<dt id="hoshmap.value.lazyival.LazyiVal.deps"><code class="name">var <span class="ident">deps</span> : dict</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -354,57 +481,18 @@ True
 <pre><code class="python">@property
 def value(self):
     if not self.isevaluated:
-        # Fetch.
-        if self.caches is not None:
-            outdated_caches = []
-            for cache in self.caches:
-                if self.hosh.id in cache:
-                    val = cache[self.hosh.id]
-                    for outdated_cache in outdated_caches:
-                        outdated_cache[self.hosh.id] = val
-                    self.result[self.id] = val
-                    return val
-                outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
-
-        # Calculate.
-        argnames = []
-        kwargs = {}
-        for field, ival in self.deps.items():
-            if isinstance(field, int):
-                argnames.append(field)
-            else:
-                kwargs[field] = ival.value
-        result = self.f(*(self.deps[name] for name in sorted(argnames)), **kwargs)
-        if self.n == 1:
-            result = [result]
-        elif isinstance(result, dict):
-            result = result.values()
-        elif isinstance(result, list) and len(result) != self.n:  # pragma: no cover
-            raise Exception(f&#34;Wrong result length: {len(result)} differs from {self.n}&#34;)
-        if not isinstance(result, Iterable):  # pragma: no cover
-            raise Exception(f&#34;Unsupported multi-valued result type: {type(result)}&#34;)
-        for id, res in zip(self.result, result):
-            self.result[id] = res
-
-        # Store.
-        if self.caches is not None:
-            from hoshmap import Idict, FrozenIdict
-
-            for id, res in self.result.items():
-                for cache in self.caches:
-                    if isinstance(res, (Idict, FrozenIdict)):
-                        res &gt;&gt; [[cache]]
-                    else:
-                        cache[id] = res  # TODO: pack (pickle+lz4)
-
-    return self.result[self.id]</code></pre>
+        if fetched := self.fetch():
+            return fetched
+        self.calculate()
+        self.store()
+    return self.results[self.id]</code></pre>
 </details>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="hoshmap.value.lazyival.LazyiVal.withcaches"><code class="name flex">
-<span>def <span class="ident">withcaches</span></span>(<span>self, caches)</span>
+<dt id="hoshmap.value.lazyival.LazyiVal.calculate"><code class="name flex">
+<span>def <span class="ident">calculate</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -412,18 +500,159 @@ def value(self):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def withcaches(self, caches):
+<pre><code class="python">def calculate(self):
+    from hoshmap import idict
+
+    argidxs = []
+    kwargs = {}
+    iterable_sources = {}
+    for field, ival in self.deps.items():
+        if isinstance(field, int):  # quando usa isso???
+            argidxs.append(field)
+        else:
+            if len(split := field.split(&#34;:*&#34;)) == 2:
+                iterable_sources[split[1]] = iter(self.deps[field].value)
+            else:
+                kwargs[field] = ival.value
+    if iterable_sources:
+        result = []
+        loop = True
+        while loop:
+            i = None
+            try:
+                for i, (target, it) in enumerate(iterable_sources.items()):
+                    kwargs[target] = next(it)
+                r = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+                if isinstance(r, idict):
+                    r = r.frozen
+                result.append(r)
+            except StopIteration:
+                if i not in [0, len(iterable_sources)]:
+                    raise ValueError(&#34;All iterable fields (e.g., &#39;xs:*x&#39;) should have the same length.&#34;)
+                loop = False
+    else:
+        result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+        if isinstance(result, idict):
+            result = result.frozen
+    if self.n == 1:
+        result = [result]
+    elif isinstance(result, dict):
+        result = result.values()
+    elif isinstance(result, list) and len(result) != self.n:  # pragma: no cover
+        raise Exception(f&#34;Wrong result length: {len(result)} differs from {self.n}&#34;)
+    if not isinstance(result, Iterable):  # pragma: no cover
+        raise Exception(f&#34;Unsupported multi-valued result type: {type(result)}&#34;)
+    for id, res in zip(self.results, result):
+        self.results[id] = res</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.value.lazyival.LazyiVal.fetch"><code class="name flex">
+<span>def <span class="ident">fetch</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fetch(self):
     if self.caches is not None:
-        self.caches.append(caches)
-    return LazyiVal(self.f, self.i, self.n, self.deps, self.result, self.fhosh, caches)</code></pre>
+        from hoshmap import FrozenIdict
+
+        outdated_caches = []
+        for cache in self.caches:
+            if self.id in cache:
+                for outdated_cache in outdated_caches:
+                    outdated_cache[self.did] = {&#34;_ids&#34;: self.dids}
+                val = self.traverse(self.id, cache, outdated_caches)
+                # TODO: receber iVal de dentro do cache, nao value
+                # TODO: passar cache pra ele quando for CacheableiVal
+                self.results[self.id] = val
+                return val
+            outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.value.lazyival.LazyiVal.replace"><code class="name flex">
+<span>def <span class="ident">replace</span></span>(<span>self, **kwargs) ‑> <built-in function callable></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def replace(self, **kwargs):
+    dic = dict(f=self.f, i=self.i, n=self.n, deps=self.deps, results=self.results, fid=self.fhosh, caches=self.caches)
+    dic.update(kwargs)
+    return LazyiVal(**dic)</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.value.lazyival.LazyiVal.store"><code class="name flex">
+<span>def <span class="ident">store</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def store(self):
+    if self.caches is not None:
+        from hoshmap import FrozenIdict
+
+        for id, res in self.results.items():
+            for cache in self.caches:
+                if self.did not in cache:
+                    cache[self.did] = {&#34;_ids&#34;: self.dids}
+                if isinstance(res, FrozenIdict):
+                    # TODO:
+                    #  if res=cacheableival: add current cache to res.&#39;lazies*&#39;.caches caso não tenham
+                    #  [não faz sentido picklear caches, então...]
+                    #  busca no cache anterior do subdict pelo resultado já pronto (e grava no corrente?)
+                    #   senão:
+                    #       se cache corrente contém fid, armazena field como lazy
+                    #       senão, evaluate nesse field (p/ ser armazenado mais abaixo).
+                    #
+                    res.evaluate()  # &lt;-- retirar depois de feito TODOs acima
+                    if res.id not in cache:
+                        # REMINDER: entry id differs from internal did
+                        cache[id] = {&#34;_ids&#34;: res.ids}
+                    res &gt;&gt; [[cache]]
+                elif id not in cache:
+                    cache[id] = res  # TODO: pack (pickle+lz4)</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.value.lazyival.LazyiVal.traverse"><code class="name flex">
+<span>def <span class="ident">traverse</span></span>(<span>self, id, cache, outdated_caches)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def traverse(self, id, cache, outdated_caches):
+    val = cache[id]
+    for outdated_cache in outdated_caches:
+        outdated_cache[id] = val
+    if isinstance(val, dict) and list(val.keys()) == [&#34;_ids&#34;]:
+        from hoshmap import FrozenIdict
+
+        ids = val[&#34;_ids&#34;]
+        data = {}
+        for k, v in ids.items():
+            data[k] = self.traverse(v, cache, outdated_caches)
+        return FrozenIdict.fromdict(data, ids)
+    return val</code></pre>
 </details>
 </dd>
 </dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="hoshmap.value.ival.iVal" href="ival.html#hoshmap.value.ival.iVal">iVal</a></b></code>:
+<li><code><b><a title="hoshmap.value.cacheableival.CacheableiVal" href="cacheableival.html#hoshmap.value.cacheableival.CacheableiVal">CacheableiVal</a></b></code>:
 <ul class="hlist">
-<li><code><a title="hoshmap.value.ival.iVal.handle_id" href="ival.html#hoshmap.value.ival.iVal.handle_id">handle_id</a></code></li>
+<li><code><a title="hoshmap.value.cacheableival.CacheableiVal.handle_id" href="ival.html#hoshmap.value.ival.iVal.handle_id">handle_id</a></code></li>
+<li><code><a title="hoshmap.value.cacheableival.CacheableiVal.withcaches" href="cacheableival.html#hoshmap.value.cacheableival.CacheableiVal.withcaches">withcaches</a></code></li>
 </ul>
 </li>
 </ul>
@@ -446,12 +675,14 @@ def value(self):
 <ul>
 <li>
 <h4><code><a title="hoshmap.value.lazyival.LazyiVal" href="#hoshmap.value.lazyival.LazyiVal">LazyiVal</a></code></h4>
-<ul class="">
-<li><code><a title="hoshmap.value.lazyival.LazyiVal.caches" href="#hoshmap.value.lazyival.LazyiVal.caches">caches</a></code></li>
-<li><code><a title="hoshmap.value.lazyival.LazyiVal.hosh" href="#hoshmap.value.lazyival.LazyiVal.hosh">hosh</a></code></li>
-<li><code><a title="hoshmap.value.lazyival.LazyiVal.result" href="#hoshmap.value.lazyival.LazyiVal.result">result</a></code></li>
+<ul class="two-column">
+<li><code><a title="hoshmap.value.lazyival.LazyiVal.calculate" href="#hoshmap.value.lazyival.LazyiVal.calculate">calculate</a></code></li>
+<li><code><a title="hoshmap.value.lazyival.LazyiVal.deps" href="#hoshmap.value.lazyival.LazyiVal.deps">deps</a></code></li>
+<li><code><a title="hoshmap.value.lazyival.LazyiVal.fetch" href="#hoshmap.value.lazyival.LazyiVal.fetch">fetch</a></code></li>
+<li><code><a title="hoshmap.value.lazyival.LazyiVal.replace" href="#hoshmap.value.lazyival.LazyiVal.replace">replace</a></code></li>
+<li><code><a title="hoshmap.value.lazyival.LazyiVal.store" href="#hoshmap.value.lazyival.LazyiVal.store">store</a></code></li>
+<li><code><a title="hoshmap.value.lazyival.LazyiVal.traverse" href="#hoshmap.value.lazyival.LazyiVal.traverse">traverse</a></code></li>
 <li><code><a title="hoshmap.value.lazyival.LazyiVal.value" href="#hoshmap.value.lazyival.LazyiVal.value">value</a></code></li>
-<li><code><a title="hoshmap.value.lazyival.LazyiVal.withcaches" href="#hoshmap.value.lazyival.LazyiVal.withcaches">withcaches</a></code></li>
 </ul>
 </li>
 </ul>

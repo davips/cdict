@@ -58,7 +58,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     # self.mids[k] = self.data[k].hosh.id
                 else:
                     self.hosh += self.data[k].hosh * k.encode()
-            self.ids[k] = self.data[k].hosh.id  #TODO: separate mids from ids?
+            self.ids[k] = self.data[k].hosh.id  # TODO: separate mids from ids?
         # noinspection PyTypeChecker
         self.data["_id"] = self.id = self.hosh.id
         self.data["_ids"] = self.ids
@@ -119,6 +119,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     @cached_property
     def asdicts_hoshes_noneval(self):
         from hoshmap.value.cacheableival import CacheableiVal
+
         hoshes = set()
         dic = {}
         for k, ival in self.data.items():
@@ -149,7 +150,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 txt = txt.replace(f'"{h.id}"', h.idc)
         txt = re.sub(r'(": )"(λ.+?)"(?=,\n)', '": \\2', txt)
         if not key_quotes:
-            txt = re.sub(r'(?<!: )"([a-zA-Z0-9_ ]+?)"(?=: )', '\\1', txt)
+            txt = re.sub(r'(?<!: )"([a-zA-Z0-9_ ]+?)"(?=: )', "\\1", txt)
         return txt
 
     def show(self, colored=True, key_quotes=False):
@@ -189,7 +190,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
 
     def __str__(self):
         js = json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
-        return re.sub(r'(?<!: )"(\S*?)"', '\\1', js)
+        return re.sub(r'(?<!: )"(\S*?)"', "\\1", js)
 
     def __getitem__(self, item):
         return self.data[item] if item in ["_id", "_ids"] else self.data[item].value

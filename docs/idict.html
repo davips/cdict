@@ -34,7 +34,10 @@ from hoshmap.let import Let
 
 VT = TypeVar(&#34;VT&#34;)
 
-# TODO: store idict id-&gt;header
+
+# TODO: store functions (with reversed id)
+# TODO:  DFiVal
+# TODO: make storing of idict id-&gt;header flexible for new metafields/metavalues
 
 
 class Idict(Dict[str, VT]):
@@ -43,10 +46,10 @@ class Idict(Dict[str, VT]):
     &gt;&gt;&gt; d = _ &gt;&gt; {&#34;x&#34;:2}
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: 2,
-        &#34;_id&#34;: &#34;v2D2UVaKRzSIbUr-4rxpRYs0y0ChtLz7qDkWlwJq&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
+        x: 2,
+        _id: &#34;v2D2UVaKRzSIbUr-4rxpRYs0y0ChtLz7qDkWlwJq&#34;,
+        _ids: {
+            x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
         }
     }
     &gt;&gt;&gt; for k in d:
@@ -60,12 +63,12 @@ class Idict(Dict[str, VT]):
     &gt;&gt;&gt; d &gt;&gt;= f, &#34;-&gt;y&#34;
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: 2,
-        &#34;y&#34;: &#34;←(x)&#34;,
-        &#34;_id&#34;: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            &#34;y&#34;: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
+        x: 2,
+        y: λ(x),
+        _id: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
+        _ids: {
+            x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
+            y: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
         }
     }
     &gt;&gt;&gt; d.y, d[&#34;y&#34;]
@@ -99,12 +102,12 @@ class Idict(Dict[str, VT]):
     True
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: 2,
-        &#34;y&#34;: &#34;4&#34;,
-        &#34;_id&#34;: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            &#34;y&#34;: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
+        x: 2,
+        y: 4,
+        _id: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
+        _ids: {
+            x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
+            y: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
         }
     }
     &gt;&gt;&gt; cache1 = {}
@@ -115,21 +118,21 @@ class Idict(Dict[str, VT]):
     ...     return x * y
     &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; [[cache1]] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache2]
     &gt;&gt;&gt; cache1, cache2
-    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: 5,
-        &#34;y&#34;: 7,
-        &#34;z&#34;: &#34;←(x y)&#34;,
-        &#34;_id&#34;: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
-            &#34;y&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            &#34;z&#34;: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
+        x: 5,
+        y: 7,
+        z: λ(x y),
+        _id: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
+        _ids: {
+            x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+            y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
+            z: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
         }
     }
     &gt;&gt;&gt; cache1, cache2
-    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
     &gt;&gt;&gt; d.z
     Evaluated!
     35
@@ -138,14 +141,14 @@ class Idict(Dict[str, VT]):
     &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
-        &#34;x&#34;: 5,
-        &#34;y&#34;: 7,
-        &#34;z&#34;: &#34;←(x y)&#34;,
-        &#34;_id&#34;: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
-            &#34;y&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            &#34;z&#34;: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
+        x: 5,
+        y: 7,
+        z: λ(x y),
+        _id: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
+        _ids: {
+            x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+            y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
+            z: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
         }
     }
     &gt;&gt;&gt; e.z
@@ -159,6 +162,14 @@ class Idict(Dict[str, VT]):
         from hoshmap.frozenidict import FrozenIdict
 
         self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
+
+    def __setitem__(self, key, value):
+        self.frozen = self.frozen &gt;&gt; {key: value}
+
+    def __delitem__(self, key):
+        frozen = self.frozen.copy()
+        del frozen[key]
+        self.frozen = frozen
 
     def __getitem__(self, item):
         return self.frozen[item]
@@ -183,27 +194,27 @@ class Idict(Dict[str, VT]):
         &gt;&gt;&gt; d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
         &gt;&gt;&gt; d.show(colored=False)
         {
-            &#34;x&#34;: &#34;←()&#34;,
-            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            x: λ(),
+            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _ids: {
+                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
         &gt;&gt;&gt; d.evaluate()
         &gt;&gt;&gt; d.show(colored=False)
         {
-            &#34;x&#34;: &#34;2&#34;,
-            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            x: 2,
+            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _ids: {
+                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
         &gt;&gt;&gt; d.evaluated.show(colored=False)
         {
-            &#34;x&#34;: &#34;2&#34;,
-            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            x: 2,
+            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _ids: {
+                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
         &#34;&#34;&#34;
@@ -217,8 +228,8 @@ class Idict(Dict[str, VT]):
     def id(self):
         &#34;&#34;&#34;
         &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; idict(x=3, y=5, _z=5).id
-        &#39;ojflr9QKaLmxzQivMEss9hWVZfHpvihkPAYYd1da&#39;
+        &gt;&gt;&gt; idict(x=3, y=5, _z=5).id == idict(x=3, y=5).id
+        True
         &#34;&#34;&#34;
         return self.hosh.id
 
@@ -290,7 +301,7 @@ class Idict(Dict[str, VT]):
         &gt;&gt;&gt; from hosh import Hosh
         &gt;&gt;&gt; from hoshmap.value import StrictiVal
         &gt;&gt;&gt; print(Idict.fromdict({&#34;x&#34;: 3, &#34;y&#34;: 5, &#34;z&#34;: StrictiVal(7)}, ids={&#34;x&#34;: Hosh(b&#34;x&#34;), &#34;y&#34;: Hosh(b&#34;y&#34;).id}))
-        {&#34;x&#34;: 3, &#34;y&#34;: 5, &#34;z&#34;: 7, &#34;_id&#34;: &#34;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&#34;, &#34;_ids&#34;: {&#34;x&#34;: &#34;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&#34;, &#34;y&#34;: &#34;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&#34;, &#34;z&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;}}
+        {x: 3, y: 5, z: 7, _id: &#34;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&#34;, _ids: {x: &#34;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&#34;, y: &#34;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&#34;, z: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;}}
         &#34;&#34;&#34;
         from hoshmap.frozenidict import FrozenIdict
 
@@ -305,25 +316,34 @@ class Idict(Dict[str, VT]):
         &#34;&#34;&#34;
         return self.frozen.asdict
 
-    def astext(self, colored=True):
+    @property
+    def asdicts(self):
+        &#34;&#34;&#34;
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; idict(x=3, y=5).asdict
+        {&#39;x&#39;: 3, &#39;y&#39;: 5, &#39;_id&#39;: &#39;r5A2Mh6vRRO5rxi5nfXv1myeguGSTmqHuHev38qM&#39;, &#39;_ids&#39;: {&#39;x&#39;: &#39;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#39;, &#39;y&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;}}
+        &#34;&#34;&#34;
+        return self.frozen.asdicts
+
+    def astext(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;
         &gt;&gt;&gt; from hoshmap import idict
         &gt;&gt;&gt; repr(idict(x=3, y=5)) == idict(x=3, y=5).astext()
         True
         &gt;&gt;&gt; print(repr(idict(x=3, y=5)))
         {
-            &#34;x&#34;: 3,
-            &#34;y&#34;: 5,
-            &#34;_id&#34;: &#34;[38;5;225m[1m[48;5;0mr[0m[38;5;225m[1m[48;5;0m5[0m[38;5;15m[1m[48;5;0mA[0m[38;5;225m[1m[48;5;0m2[0m[38;5;225m[1m[48;5;0mM[0m[38;5;195m[1m[48;5;0mh[0m[38;5;225m[1m[48;5;0m6[0m[38;5;219m[1m[48;5;0mv[0m[38;5;183m[1m[48;5;0mR[0m[38;5;251m[1m[48;5;0mR[0m[38;5;177m[1m[48;5;0mO[0m[38;5;147m[1m[48;5;0m5[0m[38;5;183m[1m[48;5;0mr[0m[38;5;189m[1m[48;5;0mx[0m[38;5;15m[1m[48;5;0mi[0m[38;5;225m[1m[48;5;0m5[0m[38;5;225m[1m[48;5;0mn[0m[38;5;225m[1m[48;5;0mf[0m[38;5;15m[1m[48;5;0mX[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m1[0m[38;5;195m[1m[48;5;0mm[0m[38;5;225m[1m[48;5;0my[0m[38;5;219m[1m[48;5;0me[0m[38;5;183m[1m[48;5;0mg[0m[38;5;251m[1m[48;5;0mu[0m[38;5;177m[1m[48;5;0mG[0m[38;5;147m[1m[48;5;0mS[0m[38;5;183m[1m[48;5;0mT[0m[38;5;189m[1m[48;5;0mm[0m[38;5;15m[1m[48;5;0mq[0m[38;5;225m[1m[48;5;0mH[0m[38;5;225m[1m[48;5;0mu[0m[38;5;225m[1m[48;5;0mH[0m[38;5;15m[1m[48;5;0me[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m3[0m[38;5;195m[1m[48;5;0m8[0m[38;5;225m[1m[48;5;0mq[0m[38;5;219m[1m[48;5;0mM[0m&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;[38;5;239m[1m[48;5;0mK[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mW[0m[38;5;241m[1m[48;5;0mj[0m[38;5;97m[1m[48;5;0mj[0m[38;5;65m[1m[48;5;0m0[0m[38;5;133m[1m[48;5;0mi[0m[38;5;65m[1m[48;5;0my[0m[38;5;97m[1m[48;5;0mL[0m[38;5;66m[1m[48;5;0mA[0m[38;5;132m[1m[48;5;0mn[0m[38;5;61m[1m[48;5;0m1[0m[38;5;66m[1m[48;5;0mR[0m[38;5;95m[1m[48;5;0mG[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mR[0m[38;5;239m[1m[48;5;0mT[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mt[0m[38;5;241m[1m[48;5;0ms[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0mE[0m[38;5;133m[1m[48;5;0m3[0m[38;5;65m[1m[48;5;0mo[0m[38;5;97m[1m[48;5;0mm[0m[38;5;66m[1m[48;5;0mZ[0m[38;5;132m[1m[48;5;0mr[0m[38;5;61m[1m[48;5;0ma[0m[38;5;66m[1m[48;5;0mJ[0m[38;5;95m[1m[48;5;0mM[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mx[0m[38;5;239m[1m[48;5;0mO[0m[38;5;239m[1m[48;5;0m.[0m[38;5;60m[1m[48;5;0mk[0m[38;5;241m[1m[48;5;0mv[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0m5[0m[38;5;133m[1m[48;5;0mp[0m[38;5;65m[1m[48;5;0mr[0m&#34;,
-                &#34;y&#34;: &#34;[38;5;227m[1m[48;5;0me[0m[38;5;221m[1m[48;5;0mc[0m[38;5;209m[1m[48;5;0mv[0m[38;5;149m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mo[0m[38;5;215m[1m[48;5;0m-[0m[38;5;185m[1m[48;5;0mC[0m[38;5;221m[1m[48;5;0mB[0m[38;5;216m[1m[48;5;0mP[0m[38;5;192m[1m[48;5;0mi[0m[38;5;227m[1m[48;5;0m7[0m[38;5;222m[1m[48;5;0mw[0m[38;5;191m[1m[48;5;0mR[0m[38;5;215m[1m[48;5;0mW[0m[38;5;180m[1m[48;5;0mI[0m[38;5;192m[1m[48;5;0mx[0m[38;5;227m[1m[48;5;0mN[0m[38;5;221m[1m[48;5;0mz[0m[38;5;209m[1m[48;5;0mu[0m[38;5;149m[1m[48;5;0mo[0m[38;5;221m[1m[48;5;0m1[0m[38;5;215m[1m[48;5;0mH[0m[38;5;185m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mH[0m[38;5;216m[1m[48;5;0mQ[0m[38;5;192m[1m[48;5;0mC[0m[38;5;227m[1m[48;5;0mb[0m[38;5;222m[1m[48;5;0md[0m[38;5;191m[1m[48;5;0mv[0m[38;5;215m[1m[48;5;0mR[0m[38;5;180m[1m[48;5;0m0[0m[38;5;192m[1m[48;5;0m5[0m[38;5;227m[1m[48;5;0m8[0m[38;5;221m[1m[48;5;0mx[0m[38;5;209m[1m[48;5;0mi[0m[38;5;149m[1m[48;5;0m6[0m[38;5;221m[1m[48;5;0mz[0m[38;5;215m[1m[48;5;0mm[0m[38;5;185m[1m[48;5;0mr[0m[38;5;221m[1m[48;5;0m2[0m&#34;
+            x: 3,
+            y: 5,
+            _id: [38;5;225m[1m[48;5;0mr[0m[38;5;225m[1m[48;5;0m5[0m[38;5;15m[1m[48;5;0mA[0m[38;5;225m[1m[48;5;0m2[0m[38;5;225m[1m[48;5;0mM[0m[38;5;195m[1m[48;5;0mh[0m[38;5;225m[1m[48;5;0m6[0m[38;5;219m[1m[48;5;0mv[0m[38;5;183m[1m[48;5;0mR[0m[38;5;251m[1m[48;5;0mR[0m[38;5;177m[1m[48;5;0mO[0m[38;5;147m[1m[48;5;0m5[0m[38;5;183m[1m[48;5;0mr[0m[38;5;189m[1m[48;5;0mx[0m[38;5;15m[1m[48;5;0mi[0m[38;5;225m[1m[48;5;0m5[0m[38;5;225m[1m[48;5;0mn[0m[38;5;225m[1m[48;5;0mf[0m[38;5;15m[1m[48;5;0mX[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m1[0m[38;5;195m[1m[48;5;0mm[0m[38;5;225m[1m[48;5;0my[0m[38;5;219m[1m[48;5;0me[0m[38;5;183m[1m[48;5;0mg[0m[38;5;251m[1m[48;5;0mu[0m[38;5;177m[1m[48;5;0mG[0m[38;5;147m[1m[48;5;0mS[0m[38;5;183m[1m[48;5;0mT[0m[38;5;189m[1m[48;5;0mm[0m[38;5;15m[1m[48;5;0mq[0m[38;5;225m[1m[48;5;0mH[0m[38;5;225m[1m[48;5;0mu[0m[38;5;225m[1m[48;5;0mH[0m[38;5;15m[1m[48;5;0me[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m3[0m[38;5;195m[1m[48;5;0m8[0m[38;5;225m[1m[48;5;0mq[0m[38;5;219m[1m[48;5;0mM[0m,
+            _ids: {
+                x: [38;5;239m[1m[48;5;0mK[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mW[0m[38;5;241m[1m[48;5;0mj[0m[38;5;97m[1m[48;5;0mj[0m[38;5;65m[1m[48;5;0m0[0m[38;5;133m[1m[48;5;0mi[0m[38;5;65m[1m[48;5;0my[0m[38;5;97m[1m[48;5;0mL[0m[38;5;66m[1m[48;5;0mA[0m[38;5;132m[1m[48;5;0mn[0m[38;5;61m[1m[48;5;0m1[0m[38;5;66m[1m[48;5;0mR[0m[38;5;95m[1m[48;5;0mG[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mR[0m[38;5;239m[1m[48;5;0mT[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mt[0m[38;5;241m[1m[48;5;0ms[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0mE[0m[38;5;133m[1m[48;5;0m3[0m[38;5;65m[1m[48;5;0mo[0m[38;5;97m[1m[48;5;0mm[0m[38;5;66m[1m[48;5;0mZ[0m[38;5;132m[1m[48;5;0mr[0m[38;5;61m[1m[48;5;0ma[0m[38;5;66m[1m[48;5;0mJ[0m[38;5;95m[1m[48;5;0mM[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mx[0m[38;5;239m[1m[48;5;0mO[0m[38;5;239m[1m[48;5;0m.[0m[38;5;60m[1m[48;5;0mk[0m[38;5;241m[1m[48;5;0mv[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0m5[0m[38;5;133m[1m[48;5;0mp[0m[38;5;65m[1m[48;5;0mr[0m,
+                y: [38;5;227m[1m[48;5;0me[0m[38;5;221m[1m[48;5;0mc[0m[38;5;209m[1m[48;5;0mv[0m[38;5;149m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mo[0m[38;5;215m[1m[48;5;0m-[0m[38;5;185m[1m[48;5;0mC[0m[38;5;221m[1m[48;5;0mB[0m[38;5;216m[1m[48;5;0mP[0m[38;5;192m[1m[48;5;0mi[0m[38;5;227m[1m[48;5;0m7[0m[38;5;222m[1m[48;5;0mw[0m[38;5;191m[1m[48;5;0mR[0m[38;5;215m[1m[48;5;0mW[0m[38;5;180m[1m[48;5;0mI[0m[38;5;192m[1m[48;5;0mx[0m[38;5;227m[1m[48;5;0mN[0m[38;5;221m[1m[48;5;0mz[0m[38;5;209m[1m[48;5;0mu[0m[38;5;149m[1m[48;5;0mo[0m[38;5;221m[1m[48;5;0m1[0m[38;5;215m[1m[48;5;0mH[0m[38;5;185m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mH[0m[38;5;216m[1m[48;5;0mQ[0m[38;5;192m[1m[48;5;0mC[0m[38;5;227m[1m[48;5;0mb[0m[38;5;222m[1m[48;5;0md[0m[38;5;191m[1m[48;5;0mv[0m[38;5;215m[1m[48;5;0mR[0m[38;5;180m[1m[48;5;0m0[0m[38;5;192m[1m[48;5;0m5[0m[38;5;227m[1m[48;5;0m8[0m[38;5;221m[1m[48;5;0mx[0m[38;5;209m[1m[48;5;0mi[0m[38;5;149m[1m[48;5;0m6[0m[38;5;221m[1m[48;5;0mz[0m[38;5;215m[1m[48;5;0mm[0m[38;5;185m[1m[48;5;0mr[0m[38;5;221m[1m[48;5;0m2[0m
             }
         }
         &#34;&#34;&#34;
-        return self.frozen.astext(colored)
+        return self.frozen.astext(colored, key_quotes)
 
-    def show(self, colored=True):
+    def show(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;
         Textual representation of an idict object
 
@@ -332,20 +352,16 @@ class Idict(Dict[str, VT]):
         &gt;&gt;&gt; d = idict(x=1,y=2)
         &gt;&gt;&gt; d.show(colored=False)
         {
-            &#34;x&#34;: 1,
-            &#34;y&#34;: 2,
-            &#34;_id&#34;: &#34;41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&#34;,
-                &#34;y&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
+            x: 1,
+            y: 2,
+            _id: &#34;41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N&#34;,
+            _ids: {
+                x: &#34;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&#34;,
+                y: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
             }
         }
         &#34;&#34;&#34;
-        return self.frozen.show(colored)
-
-    # @property
-    # def data(self):
-    #     return self.frozen.data
+        return self.frozen.show(colored, key_quotes)
 
     def __iter__(self):
         return iter(self.frozen)
@@ -387,10 +403,10 @@ class Idict(Dict[str, VT]):
 &gt;&gt;&gt; d = _ &gt;&gt; {&quot;x&quot;:2}
 &gt;&gt;&gt; d.show(colored=False)
 {
-    &quot;x&quot;: 2,
-    &quot;_id&quot;: &quot;v2D2UVaKRzSIbUr-4rxpRYs0y0ChtLz7qDkWlwJq&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;
+    x: 2,
+    _id: &quot;v2D2UVaKRzSIbUr-4rxpRYs0y0ChtLz7qDkWlwJq&quot;,
+    _ids: {
+        x: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;
     }
 }
 &gt;&gt;&gt; for k in d:
@@ -404,12 +420,12 @@ True
 &gt;&gt;&gt; d &gt;&gt;= f, &quot;-&gt;y&quot;
 &gt;&gt;&gt; d.show(colored=False)
 {
-    &quot;x&quot;: 2,
-    &quot;y&quot;: &quot;←(x)&quot;,
-    &quot;_id&quot;: &quot;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
-        &quot;y&quot;: &quot;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&quot;
+    x: 2,
+    y: λ(x),
+    _id: &quot;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&quot;,
+    _ids: {
+        x: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
+        y: &quot;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&quot;
     }
 }
 &gt;&gt;&gt; d.y, d[&quot;y&quot;]
@@ -443,12 +459,12 @@ True
 True
 &gt;&gt;&gt; d.show(colored=False)
 {
-    &quot;x&quot;: 2,
-    &quot;y&quot;: &quot;4&quot;,
-    &quot;_id&quot;: &quot;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
-        &quot;y&quot;: &quot;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&quot;
+    x: 2,
+    y: 4,
+    _id: &quot;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&quot;,
+    _ids: {
+        x: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
+        y: &quot;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&quot;
     }
 }
 &gt;&gt;&gt; cache1 = {}
@@ -459,21 +475,21 @@ True
 ...     return x * y
 &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; [[cache1]] &gt;&gt; (f, &quot;x y→z&quot;) &gt;&gt; [cache2]
 &gt;&gt;&gt; cache1, cache2
-({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}})
+({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
 &gt;&gt;&gt; d.show(colored=False)
 {
-    &quot;x&quot;: 5,
-    &quot;y&quot;: 7,
-    &quot;z&quot;: &quot;←(x y)&quot;,
-    &quot;_id&quot;: &quot;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
-        &quot;y&quot;: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
-        &quot;z&quot;: &quot;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&quot;
+    x: 5,
+    y: 7,
+    z: λ(x y),
+    _id: &quot;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&quot;,
+    _ids: {
+        x: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
+        y: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
+        z: &quot;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&quot;
     }
 }
 &gt;&gt;&gt; cache1, cache2
-({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}})
+({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {})
 &gt;&gt;&gt; d.z
 Evaluated!
 35
@@ -482,14 +498,14 @@ Evaluated!
 &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &quot;x y→z&quot;) &gt;&gt; [cache3, cache2]
 &gt;&gt;&gt; e.show(colored=False)
 {
-    &quot;x&quot;: 5,
-    &quot;y&quot;: 7,
-    &quot;z&quot;: &quot;←(x y)&quot;,
-    &quot;_id&quot;: &quot;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
-        &quot;y&quot;: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
-        &quot;z&quot;: &quot;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&quot;
+    x: 5,
+    y: 7,
+    z: λ(x y),
+    _id: &quot;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&quot;,
+    _ids: {
+        x: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
+        y: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
+        z: &quot;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&quot;
     }
 }
 &gt;&gt;&gt; e.z
@@ -507,10 +523,10 @@ Evaluated!
     &gt;&gt;&gt; d = _ &gt;&gt; {&#34;x&#34;:2}
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: 2,
-        &#34;_id&#34;: &#34;v2D2UVaKRzSIbUr-4rxpRYs0y0ChtLz7qDkWlwJq&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
+        x: 2,
+        _id: &#34;v2D2UVaKRzSIbUr-4rxpRYs0y0ChtLz7qDkWlwJq&#34;,
+        _ids: {
+            x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
         }
     }
     &gt;&gt;&gt; for k in d:
@@ -524,12 +540,12 @@ Evaluated!
     &gt;&gt;&gt; d &gt;&gt;= f, &#34;-&gt;y&#34;
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: 2,
-        &#34;y&#34;: &#34;←(x)&#34;,
-        &#34;_id&#34;: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            &#34;y&#34;: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
+        x: 2,
+        y: λ(x),
+        _id: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
+        _ids: {
+            x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
+            y: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
         }
     }
     &gt;&gt;&gt; d.y, d[&#34;y&#34;]
@@ -563,12 +579,12 @@ Evaluated!
     True
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: 2,
-        &#34;y&#34;: &#34;4&#34;,
-        &#34;_id&#34;: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            &#34;y&#34;: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
+        x: 2,
+        y: 4,
+        _id: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
+        _ids: {
+            x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
+            y: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
         }
     }
     &gt;&gt;&gt; cache1 = {}
@@ -579,21 +595,21 @@ Evaluated!
     ...     return x * y
     &gt;&gt;&gt; d = idict(x=5, y=7) &gt;&gt; [[cache1]] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache2]
     &gt;&gt;&gt; cache1, cache2
-    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: 5,
-        &#34;y&#34;: 7,
-        &#34;z&#34;: &#34;←(x y)&#34;,
-        &#34;_id&#34;: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
-            &#34;y&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            &#34;z&#34;: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
+        x: 5,
+        y: 7,
+        z: λ(x y),
+        _id: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
+        _ids: {
+            x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+            y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
+            z: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
         }
     }
     &gt;&gt;&gt; cache1, cache2
-    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {})
     &gt;&gt;&gt; d.z
     Evaluated!
     35
@@ -602,14 +618,14 @@ Evaluated!
     &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
-        &#34;x&#34;: 5,
-        &#34;y&#34;: 7,
-        &#34;z&#34;: &#34;←(x y)&#34;,
-        &#34;_id&#34;: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
-            &#34;y&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            &#34;z&#34;: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
+        x: 5,
+        y: 7,
+        z: λ(x y),
+        _id: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
+        _ids: {
+            x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+            y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
+            z: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
         }
     }
     &gt;&gt;&gt; e.z
@@ -623,6 +639,14 @@ Evaluated!
         from hoshmap.frozenidict import FrozenIdict
 
         self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
+
+    def __setitem__(self, key, value):
+        self.frozen = self.frozen &gt;&gt; {key: value}
+
+    def __delitem__(self, key):
+        frozen = self.frozen.copy()
+        del frozen[key]
+        self.frozen = frozen
 
     def __getitem__(self, item):
         return self.frozen[item]
@@ -647,27 +671,27 @@ Evaluated!
         &gt;&gt;&gt; d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
         &gt;&gt;&gt; d.show(colored=False)
         {
-            &#34;x&#34;: &#34;←()&#34;,
-            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            x: λ(),
+            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _ids: {
+                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
         &gt;&gt;&gt; d.evaluate()
         &gt;&gt;&gt; d.show(colored=False)
         {
-            &#34;x&#34;: &#34;2&#34;,
-            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            x: 2,
+            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _ids: {
+                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
         &gt;&gt;&gt; d.evaluated.show(colored=False)
         {
-            &#34;x&#34;: &#34;2&#34;,
-            &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            x: 2,
+            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _ids: {
+                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
             }
         }
         &#34;&#34;&#34;
@@ -681,8 +705,8 @@ Evaluated!
     def id(self):
         &#34;&#34;&#34;
         &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; idict(x=3, y=5, _z=5).id
-        &#39;ojflr9QKaLmxzQivMEss9hWVZfHpvihkPAYYd1da&#39;
+        &gt;&gt;&gt; idict(x=3, y=5, _z=5).id == idict(x=3, y=5).id
+        True
         &#34;&#34;&#34;
         return self.hosh.id
 
@@ -754,7 +778,7 @@ Evaluated!
         &gt;&gt;&gt; from hosh import Hosh
         &gt;&gt;&gt; from hoshmap.value import StrictiVal
         &gt;&gt;&gt; print(Idict.fromdict({&#34;x&#34;: 3, &#34;y&#34;: 5, &#34;z&#34;: StrictiVal(7)}, ids={&#34;x&#34;: Hosh(b&#34;x&#34;), &#34;y&#34;: Hosh(b&#34;y&#34;).id}))
-        {&#34;x&#34;: 3, &#34;y&#34;: 5, &#34;z&#34;: 7, &#34;_id&#34;: &#34;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&#34;, &#34;_ids&#34;: {&#34;x&#34;: &#34;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&#34;, &#34;y&#34;: &#34;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&#34;, &#34;z&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;}}
+        {x: 3, y: 5, z: 7, _id: &#34;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&#34;, _ids: {x: &#34;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&#34;, y: &#34;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&#34;, z: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;}}
         &#34;&#34;&#34;
         from hoshmap.frozenidict import FrozenIdict
 
@@ -769,25 +793,34 @@ Evaluated!
         &#34;&#34;&#34;
         return self.frozen.asdict
 
-    def astext(self, colored=True):
+    @property
+    def asdicts(self):
+        &#34;&#34;&#34;
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; idict(x=3, y=5).asdict
+        {&#39;x&#39;: 3, &#39;y&#39;: 5, &#39;_id&#39;: &#39;r5A2Mh6vRRO5rxi5nfXv1myeguGSTmqHuHev38qM&#39;, &#39;_ids&#39;: {&#39;x&#39;: &#39;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#39;, &#39;y&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;}}
+        &#34;&#34;&#34;
+        return self.frozen.asdicts
+
+    def astext(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;
         &gt;&gt;&gt; from hoshmap import idict
         &gt;&gt;&gt; repr(idict(x=3, y=5)) == idict(x=3, y=5).astext()
         True
         &gt;&gt;&gt; print(repr(idict(x=3, y=5)))
         {
-            &#34;x&#34;: 3,
-            &#34;y&#34;: 5,
-            &#34;_id&#34;: &#34;[38;5;225m[1m[48;5;0mr[0m[38;5;225m[1m[48;5;0m5[0m[38;5;15m[1m[48;5;0mA[0m[38;5;225m[1m[48;5;0m2[0m[38;5;225m[1m[48;5;0mM[0m[38;5;195m[1m[48;5;0mh[0m[38;5;225m[1m[48;5;0m6[0m[38;5;219m[1m[48;5;0mv[0m[38;5;183m[1m[48;5;0mR[0m[38;5;251m[1m[48;5;0mR[0m[38;5;177m[1m[48;5;0mO[0m[38;5;147m[1m[48;5;0m5[0m[38;5;183m[1m[48;5;0mr[0m[38;5;189m[1m[48;5;0mx[0m[38;5;15m[1m[48;5;0mi[0m[38;5;225m[1m[48;5;0m5[0m[38;5;225m[1m[48;5;0mn[0m[38;5;225m[1m[48;5;0mf[0m[38;5;15m[1m[48;5;0mX[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m1[0m[38;5;195m[1m[48;5;0mm[0m[38;5;225m[1m[48;5;0my[0m[38;5;219m[1m[48;5;0me[0m[38;5;183m[1m[48;5;0mg[0m[38;5;251m[1m[48;5;0mu[0m[38;5;177m[1m[48;5;0mG[0m[38;5;147m[1m[48;5;0mS[0m[38;5;183m[1m[48;5;0mT[0m[38;5;189m[1m[48;5;0mm[0m[38;5;15m[1m[48;5;0mq[0m[38;5;225m[1m[48;5;0mH[0m[38;5;225m[1m[48;5;0mu[0m[38;5;225m[1m[48;5;0mH[0m[38;5;15m[1m[48;5;0me[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m3[0m[38;5;195m[1m[48;5;0m8[0m[38;5;225m[1m[48;5;0mq[0m[38;5;219m[1m[48;5;0mM[0m&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;[38;5;239m[1m[48;5;0mK[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mW[0m[38;5;241m[1m[48;5;0mj[0m[38;5;97m[1m[48;5;0mj[0m[38;5;65m[1m[48;5;0m0[0m[38;5;133m[1m[48;5;0mi[0m[38;5;65m[1m[48;5;0my[0m[38;5;97m[1m[48;5;0mL[0m[38;5;66m[1m[48;5;0mA[0m[38;5;132m[1m[48;5;0mn[0m[38;5;61m[1m[48;5;0m1[0m[38;5;66m[1m[48;5;0mR[0m[38;5;95m[1m[48;5;0mG[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mR[0m[38;5;239m[1m[48;5;0mT[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mt[0m[38;5;241m[1m[48;5;0ms[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0mE[0m[38;5;133m[1m[48;5;0m3[0m[38;5;65m[1m[48;5;0mo[0m[38;5;97m[1m[48;5;0mm[0m[38;5;66m[1m[48;5;0mZ[0m[38;5;132m[1m[48;5;0mr[0m[38;5;61m[1m[48;5;0ma[0m[38;5;66m[1m[48;5;0mJ[0m[38;5;95m[1m[48;5;0mM[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mx[0m[38;5;239m[1m[48;5;0mO[0m[38;5;239m[1m[48;5;0m.[0m[38;5;60m[1m[48;5;0mk[0m[38;5;241m[1m[48;5;0mv[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0m5[0m[38;5;133m[1m[48;5;0mp[0m[38;5;65m[1m[48;5;0mr[0m&#34;,
-                &#34;y&#34;: &#34;[38;5;227m[1m[48;5;0me[0m[38;5;221m[1m[48;5;0mc[0m[38;5;209m[1m[48;5;0mv[0m[38;5;149m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mo[0m[38;5;215m[1m[48;5;0m-[0m[38;5;185m[1m[48;5;0mC[0m[38;5;221m[1m[48;5;0mB[0m[38;5;216m[1m[48;5;0mP[0m[38;5;192m[1m[48;5;0mi[0m[38;5;227m[1m[48;5;0m7[0m[38;5;222m[1m[48;5;0mw[0m[38;5;191m[1m[48;5;0mR[0m[38;5;215m[1m[48;5;0mW[0m[38;5;180m[1m[48;5;0mI[0m[38;5;192m[1m[48;5;0mx[0m[38;5;227m[1m[48;5;0mN[0m[38;5;221m[1m[48;5;0mz[0m[38;5;209m[1m[48;5;0mu[0m[38;5;149m[1m[48;5;0mo[0m[38;5;221m[1m[48;5;0m1[0m[38;5;215m[1m[48;5;0mH[0m[38;5;185m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mH[0m[38;5;216m[1m[48;5;0mQ[0m[38;5;192m[1m[48;5;0mC[0m[38;5;227m[1m[48;5;0mb[0m[38;5;222m[1m[48;5;0md[0m[38;5;191m[1m[48;5;0mv[0m[38;5;215m[1m[48;5;0mR[0m[38;5;180m[1m[48;5;0m0[0m[38;5;192m[1m[48;5;0m5[0m[38;5;227m[1m[48;5;0m8[0m[38;5;221m[1m[48;5;0mx[0m[38;5;209m[1m[48;5;0mi[0m[38;5;149m[1m[48;5;0m6[0m[38;5;221m[1m[48;5;0mz[0m[38;5;215m[1m[48;5;0mm[0m[38;5;185m[1m[48;5;0mr[0m[38;5;221m[1m[48;5;0m2[0m&#34;
+            x: 3,
+            y: 5,
+            _id: [38;5;225m[1m[48;5;0mr[0m[38;5;225m[1m[48;5;0m5[0m[38;5;15m[1m[48;5;0mA[0m[38;5;225m[1m[48;5;0m2[0m[38;5;225m[1m[48;5;0mM[0m[38;5;195m[1m[48;5;0mh[0m[38;5;225m[1m[48;5;0m6[0m[38;5;219m[1m[48;5;0mv[0m[38;5;183m[1m[48;5;0mR[0m[38;5;251m[1m[48;5;0mR[0m[38;5;177m[1m[48;5;0mO[0m[38;5;147m[1m[48;5;0m5[0m[38;5;183m[1m[48;5;0mr[0m[38;5;189m[1m[48;5;0mx[0m[38;5;15m[1m[48;5;0mi[0m[38;5;225m[1m[48;5;0m5[0m[38;5;225m[1m[48;5;0mn[0m[38;5;225m[1m[48;5;0mf[0m[38;5;15m[1m[48;5;0mX[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m1[0m[38;5;195m[1m[48;5;0mm[0m[38;5;225m[1m[48;5;0my[0m[38;5;219m[1m[48;5;0me[0m[38;5;183m[1m[48;5;0mg[0m[38;5;251m[1m[48;5;0mu[0m[38;5;177m[1m[48;5;0mG[0m[38;5;147m[1m[48;5;0mS[0m[38;5;183m[1m[48;5;0mT[0m[38;5;189m[1m[48;5;0mm[0m[38;5;15m[1m[48;5;0mq[0m[38;5;225m[1m[48;5;0mH[0m[38;5;225m[1m[48;5;0mu[0m[38;5;225m[1m[48;5;0mH[0m[38;5;15m[1m[48;5;0me[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m3[0m[38;5;195m[1m[48;5;0m8[0m[38;5;225m[1m[48;5;0mq[0m[38;5;219m[1m[48;5;0mM[0m,
+            _ids: {
+                x: [38;5;239m[1m[48;5;0mK[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mW[0m[38;5;241m[1m[48;5;0mj[0m[38;5;97m[1m[48;5;0mj[0m[38;5;65m[1m[48;5;0m0[0m[38;5;133m[1m[48;5;0mi[0m[38;5;65m[1m[48;5;0my[0m[38;5;97m[1m[48;5;0mL[0m[38;5;66m[1m[48;5;0mA[0m[38;5;132m[1m[48;5;0mn[0m[38;5;61m[1m[48;5;0m1[0m[38;5;66m[1m[48;5;0mR[0m[38;5;95m[1m[48;5;0mG[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mR[0m[38;5;239m[1m[48;5;0mT[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mt[0m[38;5;241m[1m[48;5;0ms[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0mE[0m[38;5;133m[1m[48;5;0m3[0m[38;5;65m[1m[48;5;0mo[0m[38;5;97m[1m[48;5;0mm[0m[38;5;66m[1m[48;5;0mZ[0m[38;5;132m[1m[48;5;0mr[0m[38;5;61m[1m[48;5;0ma[0m[38;5;66m[1m[48;5;0mJ[0m[38;5;95m[1m[48;5;0mM[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mx[0m[38;5;239m[1m[48;5;0mO[0m[38;5;239m[1m[48;5;0m.[0m[38;5;60m[1m[48;5;0mk[0m[38;5;241m[1m[48;5;0mv[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0m5[0m[38;5;133m[1m[48;5;0mp[0m[38;5;65m[1m[48;5;0mr[0m,
+                y: [38;5;227m[1m[48;5;0me[0m[38;5;221m[1m[48;5;0mc[0m[38;5;209m[1m[48;5;0mv[0m[38;5;149m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mo[0m[38;5;215m[1m[48;5;0m-[0m[38;5;185m[1m[48;5;0mC[0m[38;5;221m[1m[48;5;0mB[0m[38;5;216m[1m[48;5;0mP[0m[38;5;192m[1m[48;5;0mi[0m[38;5;227m[1m[48;5;0m7[0m[38;5;222m[1m[48;5;0mw[0m[38;5;191m[1m[48;5;0mR[0m[38;5;215m[1m[48;5;0mW[0m[38;5;180m[1m[48;5;0mI[0m[38;5;192m[1m[48;5;0mx[0m[38;5;227m[1m[48;5;0mN[0m[38;5;221m[1m[48;5;0mz[0m[38;5;209m[1m[48;5;0mu[0m[38;5;149m[1m[48;5;0mo[0m[38;5;221m[1m[48;5;0m1[0m[38;5;215m[1m[48;5;0mH[0m[38;5;185m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mH[0m[38;5;216m[1m[48;5;0mQ[0m[38;5;192m[1m[48;5;0mC[0m[38;5;227m[1m[48;5;0mb[0m[38;5;222m[1m[48;5;0md[0m[38;5;191m[1m[48;5;0mv[0m[38;5;215m[1m[48;5;0mR[0m[38;5;180m[1m[48;5;0m0[0m[38;5;192m[1m[48;5;0m5[0m[38;5;227m[1m[48;5;0m8[0m[38;5;221m[1m[48;5;0mx[0m[38;5;209m[1m[48;5;0mi[0m[38;5;149m[1m[48;5;0m6[0m[38;5;221m[1m[48;5;0mz[0m[38;5;215m[1m[48;5;0mm[0m[38;5;185m[1m[48;5;0mr[0m[38;5;221m[1m[48;5;0m2[0m
             }
         }
         &#34;&#34;&#34;
-        return self.frozen.astext(colored)
+        return self.frozen.astext(colored, key_quotes)
 
-    def show(self, colored=True):
+    def show(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;
         Textual representation of an idict object
 
@@ -796,20 +829,16 @@ Evaluated!
         &gt;&gt;&gt; d = idict(x=1,y=2)
         &gt;&gt;&gt; d.show(colored=False)
         {
-            &#34;x&#34;: 1,
-            &#34;y&#34;: 2,
-            &#34;_id&#34;: &#34;41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N&#34;,
-            &#34;_ids&#34;: {
-                &#34;x&#34;: &#34;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&#34;,
-                &#34;y&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
+            x: 1,
+            y: 2,
+            _id: &#34;41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N&#34;,
+            _ids: {
+                x: &#34;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&#34;,
+                y: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
             }
         }
         &#34;&#34;&#34;
-        return self.frozen.show(colored)
-
-    # @property
-    # def data(self):
-    #     return self.frozen.data
+        return self.frozen.show(colored, key_quotes)
 
     def __iter__(self):
         return iter(self.frozen)
@@ -847,7 +876,7 @@ Evaluated!
 <pre><code class="language-python-repl">&gt;&gt;&gt; from hosh import Hosh
 &gt;&gt;&gt; from hoshmap.value import StrictiVal
 &gt;&gt;&gt; print(Idict.fromdict({&quot;x&quot;: 3, &quot;y&quot;: 5, &quot;z&quot;: StrictiVal(7)}, ids={&quot;x&quot;: Hosh(b&quot;x&quot;), &quot;y&quot;: Hosh(b&quot;y&quot;).id}))
-{&quot;x&quot;: 3, &quot;y&quot;: 5, &quot;z&quot;: 7, &quot;_id&quot;: &quot;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&quot;, &quot;_ids&quot;: {&quot;x&quot;: &quot;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&quot;, &quot;y&quot;: &quot;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&quot;, &quot;z&quot;: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;}}
+{x: 3, y: 5, z: 7, _id: &quot;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&quot;, _ids: {x: &quot;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&quot;, y: &quot;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&quot;, z: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;}}
 </code></pre></div>
 <details class="source">
 <summary>
@@ -860,7 +889,7 @@ def fromdict(dictionary, ids):
     &gt;&gt;&gt; from hosh import Hosh
     &gt;&gt;&gt; from hoshmap.value import StrictiVal
     &gt;&gt;&gt; print(Idict.fromdict({&#34;x&#34;: 3, &#34;y&#34;: 5, &#34;z&#34;: StrictiVal(7)}, ids={&#34;x&#34;: Hosh(b&#34;x&#34;), &#34;y&#34;: Hosh(b&#34;y&#34;).id}))
-    {&#34;x&#34;: 3, &#34;y&#34;: 5, &#34;z&#34;: 7, &#34;_id&#34;: &#34;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&#34;, &#34;_ids&#34;: {&#34;x&#34;: &#34;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&#34;, &#34;y&#34;: &#34;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&#34;, &#34;z&#34;: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;}}
+    {x: 3, y: 5, z: 7, _id: &#34;uf--zyyiojm5Tl.vFKALuyGhZRO0e0eH9irosr0i&#34;, _ids: {x: &#34;ue7X2I7fd9j0mLl1GjgJ2btdX1QFnb1UAQNUbFGh&#34;, y: &#34;5yg5fDxFPxhEqzhoHgXpKyl5f078iBhd.pR0G2X0&#34;, z: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;}}
     &#34;&#34;&#34;
     from hoshmap.frozenidict import FrozenIdict
 
@@ -888,6 +917,26 @@ def asdict(self):
     {&#39;x&#39;: 3, &#39;y&#39;: 5, &#39;_id&#39;: &#39;r5A2Mh6vRRO5rxi5nfXv1myeguGSTmqHuHev38qM&#39;, &#39;_ids&#39;: {&#39;x&#39;: &#39;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#39;, &#39;y&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;}}
     &#34;&#34;&#34;
     return self.frozen.asdict</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.idict.Idict.asdicts"><code class="name">var <span class="ident">asdicts</span></code></dt>
+<dd>
+<div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
+&gt;&gt;&gt; idict(x=3, y=5).asdict
+{'x': 3, 'y': 5, '_id': 'r5A2Mh6vRRO5rxi5nfXv1myeguGSTmqHuHev38qM', '_ids': {'x': 'KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr', 'y': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2'}}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def asdicts(self):
+    &#34;&#34;&#34;
+    &gt;&gt;&gt; from hoshmap import idict
+    &gt;&gt;&gt; idict(x=3, y=5).asdict
+    {&#39;x&#39;: 3, &#39;y&#39;: 5, &#39;_id&#39;: &#39;r5A2Mh6vRRO5rxi5nfXv1myeguGSTmqHuHev38qM&#39;, &#39;_ids&#39;: {&#39;x&#39;: &#39;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#39;, &#39;y&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;}}
+    &#34;&#34;&#34;
+    return self.frozen.asdicts</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.idict.Idict.evaluated"><code class="name">var <span class="ident">evaluated</span></code></dt>
@@ -940,8 +989,8 @@ def hosh(self):
 <dt id="hoshmap.idict.Idict.id"><code class="name">var <span class="ident">id</span></code></dt>
 <dd>
 <div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
-&gt;&gt;&gt; idict(x=3, y=5, _z=5).id
-'ojflr9QKaLmxzQivMEss9hWVZfHpvihkPAYYd1da'
+&gt;&gt;&gt; idict(x=3, y=5, _z=5).id == idict(x=3, y=5).id
+True
 </code></pre></div>
 <details class="source">
 <summary>
@@ -951,8 +1000,8 @@ def hosh(self):
 def id(self):
     &#34;&#34;&#34;
     &gt;&gt;&gt; from hoshmap import idict
-    &gt;&gt;&gt; idict(x=3, y=5, _z=5).id
-    &#39;ojflr9QKaLmxzQivMEss9hWVZfHpvihkPAYYd1da&#39;
+    &gt;&gt;&gt; idict(x=3, y=5, _z=5).id == idict(x=3, y=5).id
+    True
     &#34;&#34;&#34;
     return self.hosh.id</code></pre>
 </details>
@@ -1004,7 +1053,7 @@ def metafields(self):
 <h3>Methods</h3>
 <dl>
 <dt id="hoshmap.idict.Idict.astext"><code class="name flex">
-<span>def <span class="ident">astext</span></span>(<span>self, colored=True)</span>
+<span>def <span class="ident">astext</span></span>(<span>self, colored=True, key_quotes=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
@@ -1012,12 +1061,12 @@ def metafields(self):
 True
 &gt;&gt;&gt; print(repr(idict(x=3, y=5)))
 {
-    &quot;x&quot;: 3,
-    &quot;y&quot;: 5,
-    &quot;_id&quot;: &quot;[38;5;225m[1m[48;5;0mr[0m[38;5;225m[1m[48;5;0m5[0m[38;5;15m[1m[48;5;0mA[0m[38;5;225m[1m[48;5;0m2[0m[38;5;225m[1m[48;5;0mM[0m[38;5;195m[1m[48;5;0mh[0m[38;5;225m[1m[48;5;0m6[0m[38;5;219m[1m[48;5;0mv[0m[38;5;183m[1m[48;5;0mR[0m[38;5;251m[1m[48;5;0mR[0m[38;5;177m[1m[48;5;0mO[0m[38;5;147m[1m[48;5;0m5[0m[38;5;183m[1m[48;5;0mr[0m[38;5;189m[1m[48;5;0mx[0m[38;5;15m[1m[48;5;0mi[0m[38;5;225m[1m[48;5;0m5[0m[38;5;225m[1m[48;5;0mn[0m[38;5;225m[1m[48;5;0mf[0m[38;5;15m[1m[48;5;0mX[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m1[0m[38;5;195m[1m[48;5;0mm[0m[38;5;225m[1m[48;5;0my[0m[38;5;219m[1m[48;5;0me[0m[38;5;183m[1m[48;5;0mg[0m[38;5;251m[1m[48;5;0mu[0m[38;5;177m[1m[48;5;0mG[0m[38;5;147m[1m[48;5;0mS[0m[38;5;183m[1m[48;5;0mT[0m[38;5;189m[1m[48;5;0mm[0m[38;5;15m[1m[48;5;0mq[0m[38;5;225m[1m[48;5;0mH[0m[38;5;225m[1m[48;5;0mu[0m[38;5;225m[1m[48;5;0mH[0m[38;5;15m[1m[48;5;0me[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m3[0m[38;5;195m[1m[48;5;0m8[0m[38;5;225m[1m[48;5;0mq[0m[38;5;219m[1m[48;5;0mM[0m&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;[38;5;239m[1m[48;5;0mK[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mW[0m[38;5;241m[1m[48;5;0mj[0m[38;5;97m[1m[48;5;0mj[0m[38;5;65m[1m[48;5;0m0[0m[38;5;133m[1m[48;5;0mi[0m[38;5;65m[1m[48;5;0my[0m[38;5;97m[1m[48;5;0mL[0m[38;5;66m[1m[48;5;0mA[0m[38;5;132m[1m[48;5;0mn[0m[38;5;61m[1m[48;5;0m1[0m[38;5;66m[1m[48;5;0mR[0m[38;5;95m[1m[48;5;0mG[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mR[0m[38;5;239m[1m[48;5;0mT[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mt[0m[38;5;241m[1m[48;5;0ms[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0mE[0m[38;5;133m[1m[48;5;0m3[0m[38;5;65m[1m[48;5;0mo[0m[38;5;97m[1m[48;5;0mm[0m[38;5;66m[1m[48;5;0mZ[0m[38;5;132m[1m[48;5;0mr[0m[38;5;61m[1m[48;5;0ma[0m[38;5;66m[1m[48;5;0mJ[0m[38;5;95m[1m[48;5;0mM[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mx[0m[38;5;239m[1m[48;5;0mO[0m[38;5;239m[1m[48;5;0m.[0m[38;5;60m[1m[48;5;0mk[0m[38;5;241m[1m[48;5;0mv[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0m5[0m[38;5;133m[1m[48;5;0mp[0m[38;5;65m[1m[48;5;0mr[0m&quot;,
-        &quot;y&quot;: &quot;[38;5;227m[1m[48;5;0me[0m[38;5;221m[1m[48;5;0mc[0m[38;5;209m[1m[48;5;0mv[0m[38;5;149m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mo[0m[38;5;215m[1m[48;5;0m-[0m[38;5;185m[1m[48;5;0mC[0m[38;5;221m[1m[48;5;0mB[0m[38;5;216m[1m[48;5;0mP[0m[38;5;192m[1m[48;5;0mi[0m[38;5;227m[1m[48;5;0m7[0m[38;5;222m[1m[48;5;0mw[0m[38;5;191m[1m[48;5;0mR[0m[38;5;215m[1m[48;5;0mW[0m[38;5;180m[1m[48;5;0mI[0m[38;5;192m[1m[48;5;0mx[0m[38;5;227m[1m[48;5;0mN[0m[38;5;221m[1m[48;5;0mz[0m[38;5;209m[1m[48;5;0mu[0m[38;5;149m[1m[48;5;0mo[0m[38;5;221m[1m[48;5;0m1[0m[38;5;215m[1m[48;5;0mH[0m[38;5;185m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mH[0m[38;5;216m[1m[48;5;0mQ[0m[38;5;192m[1m[48;5;0mC[0m[38;5;227m[1m[48;5;0mb[0m[38;5;222m[1m[48;5;0md[0m[38;5;191m[1m[48;5;0mv[0m[38;5;215m[1m[48;5;0mR[0m[38;5;180m[1m[48;5;0m0[0m[38;5;192m[1m[48;5;0m5[0m[38;5;227m[1m[48;5;0m8[0m[38;5;221m[1m[48;5;0mx[0m[38;5;209m[1m[48;5;0mi[0m[38;5;149m[1m[48;5;0m6[0m[38;5;221m[1m[48;5;0mz[0m[38;5;215m[1m[48;5;0mm[0m[38;5;185m[1m[48;5;0mr[0m[38;5;221m[1m[48;5;0m2[0m&quot;
+    x: 3,
+    y: 5,
+    _id: [38;5;225m[1m[48;5;0mr[0m[38;5;225m[1m[48;5;0m5[0m[38;5;15m[1m[48;5;0mA[0m[38;5;225m[1m[48;5;0m2[0m[38;5;225m[1m[48;5;0mM[0m[38;5;195m[1m[48;5;0mh[0m[38;5;225m[1m[48;5;0m6[0m[38;5;219m[1m[48;5;0mv[0m[38;5;183m[1m[48;5;0mR[0m[38;5;251m[1m[48;5;0mR[0m[38;5;177m[1m[48;5;0mO[0m[38;5;147m[1m[48;5;0m5[0m[38;5;183m[1m[48;5;0mr[0m[38;5;189m[1m[48;5;0mx[0m[38;5;15m[1m[48;5;0mi[0m[38;5;225m[1m[48;5;0m5[0m[38;5;225m[1m[48;5;0mn[0m[38;5;225m[1m[48;5;0mf[0m[38;5;15m[1m[48;5;0mX[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m1[0m[38;5;195m[1m[48;5;0mm[0m[38;5;225m[1m[48;5;0my[0m[38;5;219m[1m[48;5;0me[0m[38;5;183m[1m[48;5;0mg[0m[38;5;251m[1m[48;5;0mu[0m[38;5;177m[1m[48;5;0mG[0m[38;5;147m[1m[48;5;0mS[0m[38;5;183m[1m[48;5;0mT[0m[38;5;189m[1m[48;5;0mm[0m[38;5;15m[1m[48;5;0mq[0m[38;5;225m[1m[48;5;0mH[0m[38;5;225m[1m[48;5;0mu[0m[38;5;225m[1m[48;5;0mH[0m[38;5;15m[1m[48;5;0me[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m3[0m[38;5;195m[1m[48;5;0m8[0m[38;5;225m[1m[48;5;0mq[0m[38;5;219m[1m[48;5;0mM[0m,
+    _ids: {
+        x: [38;5;239m[1m[48;5;0mK[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mW[0m[38;5;241m[1m[48;5;0mj[0m[38;5;97m[1m[48;5;0mj[0m[38;5;65m[1m[48;5;0m0[0m[38;5;133m[1m[48;5;0mi[0m[38;5;65m[1m[48;5;0my[0m[38;5;97m[1m[48;5;0mL[0m[38;5;66m[1m[48;5;0mA[0m[38;5;132m[1m[48;5;0mn[0m[38;5;61m[1m[48;5;0m1[0m[38;5;66m[1m[48;5;0mR[0m[38;5;95m[1m[48;5;0mG[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mR[0m[38;5;239m[1m[48;5;0mT[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mt[0m[38;5;241m[1m[48;5;0ms[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0mE[0m[38;5;133m[1m[48;5;0m3[0m[38;5;65m[1m[48;5;0mo[0m[38;5;97m[1m[48;5;0mm[0m[38;5;66m[1m[48;5;0mZ[0m[38;5;132m[1m[48;5;0mr[0m[38;5;61m[1m[48;5;0ma[0m[38;5;66m[1m[48;5;0mJ[0m[38;5;95m[1m[48;5;0mM[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mx[0m[38;5;239m[1m[48;5;0mO[0m[38;5;239m[1m[48;5;0m.[0m[38;5;60m[1m[48;5;0mk[0m[38;5;241m[1m[48;5;0mv[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0m5[0m[38;5;133m[1m[48;5;0mp[0m[38;5;65m[1m[48;5;0mr[0m,
+        y: [38;5;227m[1m[48;5;0me[0m[38;5;221m[1m[48;5;0mc[0m[38;5;209m[1m[48;5;0mv[0m[38;5;149m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mo[0m[38;5;215m[1m[48;5;0m-[0m[38;5;185m[1m[48;5;0mC[0m[38;5;221m[1m[48;5;0mB[0m[38;5;216m[1m[48;5;0mP[0m[38;5;192m[1m[48;5;0mi[0m[38;5;227m[1m[48;5;0m7[0m[38;5;222m[1m[48;5;0mw[0m[38;5;191m[1m[48;5;0mR[0m[38;5;215m[1m[48;5;0mW[0m[38;5;180m[1m[48;5;0mI[0m[38;5;192m[1m[48;5;0mx[0m[38;5;227m[1m[48;5;0mN[0m[38;5;221m[1m[48;5;0mz[0m[38;5;209m[1m[48;5;0mu[0m[38;5;149m[1m[48;5;0mo[0m[38;5;221m[1m[48;5;0m1[0m[38;5;215m[1m[48;5;0mH[0m[38;5;185m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mH[0m[38;5;216m[1m[48;5;0mQ[0m[38;5;192m[1m[48;5;0mC[0m[38;5;227m[1m[48;5;0mb[0m[38;5;222m[1m[48;5;0md[0m[38;5;191m[1m[48;5;0mv[0m[38;5;215m[1m[48;5;0mR[0m[38;5;180m[1m[48;5;0m0[0m[38;5;192m[1m[48;5;0m5[0m[38;5;227m[1m[48;5;0m8[0m[38;5;221m[1m[48;5;0mx[0m[38;5;209m[1m[48;5;0mi[0m[38;5;149m[1m[48;5;0m6[0m[38;5;221m[1m[48;5;0mz[0m[38;5;215m[1m[48;5;0mm[0m[38;5;185m[1m[48;5;0mr[0m[38;5;221m[1m[48;5;0m2[0m
     }
 }
 </code></pre></div>
@@ -1025,23 +1074,23 @@ True
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def astext(self, colored=True):
+<pre><code class="python">def astext(self, colored=True, key_quotes=False):
     r&#34;&#34;&#34;
     &gt;&gt;&gt; from hoshmap import idict
     &gt;&gt;&gt; repr(idict(x=3, y=5)) == idict(x=3, y=5).astext()
     True
     &gt;&gt;&gt; print(repr(idict(x=3, y=5)))
     {
-        &#34;x&#34;: 3,
-        &#34;y&#34;: 5,
-        &#34;_id&#34;: &#34;[38;5;225m[1m[48;5;0mr[0m[38;5;225m[1m[48;5;0m5[0m[38;5;15m[1m[48;5;0mA[0m[38;5;225m[1m[48;5;0m2[0m[38;5;225m[1m[48;5;0mM[0m[38;5;195m[1m[48;5;0mh[0m[38;5;225m[1m[48;5;0m6[0m[38;5;219m[1m[48;5;0mv[0m[38;5;183m[1m[48;5;0mR[0m[38;5;251m[1m[48;5;0mR[0m[38;5;177m[1m[48;5;0mO[0m[38;5;147m[1m[48;5;0m5[0m[38;5;183m[1m[48;5;0mr[0m[38;5;189m[1m[48;5;0mx[0m[38;5;15m[1m[48;5;0mi[0m[38;5;225m[1m[48;5;0m5[0m[38;5;225m[1m[48;5;0mn[0m[38;5;225m[1m[48;5;0mf[0m[38;5;15m[1m[48;5;0mX[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m1[0m[38;5;195m[1m[48;5;0mm[0m[38;5;225m[1m[48;5;0my[0m[38;5;219m[1m[48;5;0me[0m[38;5;183m[1m[48;5;0mg[0m[38;5;251m[1m[48;5;0mu[0m[38;5;177m[1m[48;5;0mG[0m[38;5;147m[1m[48;5;0mS[0m[38;5;183m[1m[48;5;0mT[0m[38;5;189m[1m[48;5;0mm[0m[38;5;15m[1m[48;5;0mq[0m[38;5;225m[1m[48;5;0mH[0m[38;5;225m[1m[48;5;0mu[0m[38;5;225m[1m[48;5;0mH[0m[38;5;15m[1m[48;5;0me[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m3[0m[38;5;195m[1m[48;5;0m8[0m[38;5;225m[1m[48;5;0mq[0m[38;5;219m[1m[48;5;0mM[0m&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;[38;5;239m[1m[48;5;0mK[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mW[0m[38;5;241m[1m[48;5;0mj[0m[38;5;97m[1m[48;5;0mj[0m[38;5;65m[1m[48;5;0m0[0m[38;5;133m[1m[48;5;0mi[0m[38;5;65m[1m[48;5;0my[0m[38;5;97m[1m[48;5;0mL[0m[38;5;66m[1m[48;5;0mA[0m[38;5;132m[1m[48;5;0mn[0m[38;5;61m[1m[48;5;0m1[0m[38;5;66m[1m[48;5;0mR[0m[38;5;95m[1m[48;5;0mG[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mR[0m[38;5;239m[1m[48;5;0mT[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mt[0m[38;5;241m[1m[48;5;0ms[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0mE[0m[38;5;133m[1m[48;5;0m3[0m[38;5;65m[1m[48;5;0mo[0m[38;5;97m[1m[48;5;0mm[0m[38;5;66m[1m[48;5;0mZ[0m[38;5;132m[1m[48;5;0mr[0m[38;5;61m[1m[48;5;0ma[0m[38;5;66m[1m[48;5;0mJ[0m[38;5;95m[1m[48;5;0mM[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mx[0m[38;5;239m[1m[48;5;0mO[0m[38;5;239m[1m[48;5;0m.[0m[38;5;60m[1m[48;5;0mk[0m[38;5;241m[1m[48;5;0mv[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0m5[0m[38;5;133m[1m[48;5;0mp[0m[38;5;65m[1m[48;5;0mr[0m&#34;,
-            &#34;y&#34;: &#34;[38;5;227m[1m[48;5;0me[0m[38;5;221m[1m[48;5;0mc[0m[38;5;209m[1m[48;5;0mv[0m[38;5;149m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mo[0m[38;5;215m[1m[48;5;0m-[0m[38;5;185m[1m[48;5;0mC[0m[38;5;221m[1m[48;5;0mB[0m[38;5;216m[1m[48;5;0mP[0m[38;5;192m[1m[48;5;0mi[0m[38;5;227m[1m[48;5;0m7[0m[38;5;222m[1m[48;5;0mw[0m[38;5;191m[1m[48;5;0mR[0m[38;5;215m[1m[48;5;0mW[0m[38;5;180m[1m[48;5;0mI[0m[38;5;192m[1m[48;5;0mx[0m[38;5;227m[1m[48;5;0mN[0m[38;5;221m[1m[48;5;0mz[0m[38;5;209m[1m[48;5;0mu[0m[38;5;149m[1m[48;5;0mo[0m[38;5;221m[1m[48;5;0m1[0m[38;5;215m[1m[48;5;0mH[0m[38;5;185m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mH[0m[38;5;216m[1m[48;5;0mQ[0m[38;5;192m[1m[48;5;0mC[0m[38;5;227m[1m[48;5;0mb[0m[38;5;222m[1m[48;5;0md[0m[38;5;191m[1m[48;5;0mv[0m[38;5;215m[1m[48;5;0mR[0m[38;5;180m[1m[48;5;0m0[0m[38;5;192m[1m[48;5;0m5[0m[38;5;227m[1m[48;5;0m8[0m[38;5;221m[1m[48;5;0mx[0m[38;5;209m[1m[48;5;0mi[0m[38;5;149m[1m[48;5;0m6[0m[38;5;221m[1m[48;5;0mz[0m[38;5;215m[1m[48;5;0mm[0m[38;5;185m[1m[48;5;0mr[0m[38;5;221m[1m[48;5;0m2[0m&#34;
+        x: 3,
+        y: 5,
+        _id: [38;5;225m[1m[48;5;0mr[0m[38;5;225m[1m[48;5;0m5[0m[38;5;15m[1m[48;5;0mA[0m[38;5;225m[1m[48;5;0m2[0m[38;5;225m[1m[48;5;0mM[0m[38;5;195m[1m[48;5;0mh[0m[38;5;225m[1m[48;5;0m6[0m[38;5;219m[1m[48;5;0mv[0m[38;5;183m[1m[48;5;0mR[0m[38;5;251m[1m[48;5;0mR[0m[38;5;177m[1m[48;5;0mO[0m[38;5;147m[1m[48;5;0m5[0m[38;5;183m[1m[48;5;0mr[0m[38;5;189m[1m[48;5;0mx[0m[38;5;15m[1m[48;5;0mi[0m[38;5;225m[1m[48;5;0m5[0m[38;5;225m[1m[48;5;0mn[0m[38;5;225m[1m[48;5;0mf[0m[38;5;15m[1m[48;5;0mX[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m1[0m[38;5;195m[1m[48;5;0mm[0m[38;5;225m[1m[48;5;0my[0m[38;5;219m[1m[48;5;0me[0m[38;5;183m[1m[48;5;0mg[0m[38;5;251m[1m[48;5;0mu[0m[38;5;177m[1m[48;5;0mG[0m[38;5;147m[1m[48;5;0mS[0m[38;5;183m[1m[48;5;0mT[0m[38;5;189m[1m[48;5;0mm[0m[38;5;15m[1m[48;5;0mq[0m[38;5;225m[1m[48;5;0mH[0m[38;5;225m[1m[48;5;0mu[0m[38;5;225m[1m[48;5;0mH[0m[38;5;15m[1m[48;5;0me[0m[38;5;225m[1m[48;5;0mv[0m[38;5;225m[1m[48;5;0m3[0m[38;5;195m[1m[48;5;0m8[0m[38;5;225m[1m[48;5;0mq[0m[38;5;219m[1m[48;5;0mM[0m,
+        _ids: {
+            x: [38;5;239m[1m[48;5;0mK[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mW[0m[38;5;241m[1m[48;5;0mj[0m[38;5;97m[1m[48;5;0mj[0m[38;5;65m[1m[48;5;0m0[0m[38;5;133m[1m[48;5;0mi[0m[38;5;65m[1m[48;5;0my[0m[38;5;97m[1m[48;5;0mL[0m[38;5;66m[1m[48;5;0mA[0m[38;5;132m[1m[48;5;0mn[0m[38;5;61m[1m[48;5;0m1[0m[38;5;66m[1m[48;5;0mR[0m[38;5;95m[1m[48;5;0mG[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mR[0m[38;5;239m[1m[48;5;0mT[0m[38;5;239m[1m[48;5;0mG[0m[38;5;60m[1m[48;5;0mt[0m[38;5;241m[1m[48;5;0ms[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0mE[0m[38;5;133m[1m[48;5;0m3[0m[38;5;65m[1m[48;5;0mo[0m[38;5;97m[1m[48;5;0mm[0m[38;5;66m[1m[48;5;0mZ[0m[38;5;132m[1m[48;5;0mr[0m[38;5;61m[1m[48;5;0ma[0m[38;5;66m[1m[48;5;0mJ[0m[38;5;95m[1m[48;5;0mM[0m[38;5;95m[1m[48;5;0m6[0m[38;5;239m[1m[48;5;0mx[0m[38;5;239m[1m[48;5;0mO[0m[38;5;239m[1m[48;5;0m.[0m[38;5;60m[1m[48;5;0mk[0m[38;5;241m[1m[48;5;0mv[0m[38;5;97m[1m[48;5;0mG[0m[38;5;65m[1m[48;5;0m5[0m[38;5;133m[1m[48;5;0mp[0m[38;5;65m[1m[48;5;0mr[0m,
+            y: [38;5;227m[1m[48;5;0me[0m[38;5;221m[1m[48;5;0mc[0m[38;5;209m[1m[48;5;0mv[0m[38;5;149m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mo[0m[38;5;215m[1m[48;5;0m-[0m[38;5;185m[1m[48;5;0mC[0m[38;5;221m[1m[48;5;0mB[0m[38;5;216m[1m[48;5;0mP[0m[38;5;192m[1m[48;5;0mi[0m[38;5;227m[1m[48;5;0m7[0m[38;5;222m[1m[48;5;0mw[0m[38;5;191m[1m[48;5;0mR[0m[38;5;215m[1m[48;5;0mW[0m[38;5;180m[1m[48;5;0mI[0m[38;5;192m[1m[48;5;0mx[0m[38;5;227m[1m[48;5;0mN[0m[38;5;221m[1m[48;5;0mz[0m[38;5;209m[1m[48;5;0mu[0m[38;5;149m[1m[48;5;0mo[0m[38;5;221m[1m[48;5;0m1[0m[38;5;215m[1m[48;5;0mH[0m[38;5;185m[1m[48;5;0mg[0m[38;5;221m[1m[48;5;0mH[0m[38;5;216m[1m[48;5;0mQ[0m[38;5;192m[1m[48;5;0mC[0m[38;5;227m[1m[48;5;0mb[0m[38;5;222m[1m[48;5;0md[0m[38;5;191m[1m[48;5;0mv[0m[38;5;215m[1m[48;5;0mR[0m[38;5;180m[1m[48;5;0m0[0m[38;5;192m[1m[48;5;0m5[0m[38;5;227m[1m[48;5;0m8[0m[38;5;221m[1m[48;5;0mx[0m[38;5;209m[1m[48;5;0mi[0m[38;5;149m[1m[48;5;0m6[0m[38;5;221m[1m[48;5;0mz[0m[38;5;215m[1m[48;5;0mm[0m[38;5;185m[1m[48;5;0mr[0m[38;5;221m[1m[48;5;0m2[0m
         }
     }
     &#34;&#34;&#34;
-    return self.frozen.astext(colored)</code></pre>
+    return self.frozen.astext(colored, key_quotes)</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.idict.Idict.entries"><code class="name flex">
@@ -1084,27 +1133,27 @@ y 2
 &gt;&gt;&gt; d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
 &gt;&gt;&gt; d.show(colored=False)
 {
-    &quot;x&quot;: &quot;←()&quot;,
-    &quot;_id&quot;: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
+    x: λ(),
+    _id: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
+    _ids: {
+        x: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
     }
 }
 &gt;&gt;&gt; d.evaluate()
 &gt;&gt;&gt; d.show(colored=False)
 {
-    &quot;x&quot;: &quot;2&quot;,
-    &quot;_id&quot;: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
+    x: 2,
+    _id: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
+    _ids: {
+        x: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
     }
 }
 &gt;&gt;&gt; d.evaluated.show(colored=False)
 {
-    &quot;x&quot;: &quot;2&quot;,
-    &quot;_id&quot;: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
+    x: 2,
+    _id: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
+    _ids: {
+        x: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
     }
 }
 </code></pre></div>
@@ -1118,27 +1167,27 @@ y 2
     &gt;&gt;&gt; d = Idict(x=LazyiVal(lambda: 2, 0, 1, {}, {}))
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: &#34;←()&#34;,
-        &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+        x: λ(),
+        _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+        _ids: {
+            x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
         }
     }
     &gt;&gt;&gt; d.evaluate()
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: &#34;2&#34;,
-        &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+        x: 2,
+        _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+        _ids: {
+            x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
         }
     }
     &gt;&gt;&gt; d.evaluated.show(colored=False)
     {
-        &#34;x&#34;: &#34;2&#34;,
-        &#34;_id&#34;: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+        x: 2,
+        _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+        _ids: {
+            x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
         }
     }
     &#34;&#34;&#34;
@@ -1182,7 +1231,7 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
 </details>
 </dd>
 <dt id="hoshmap.idict.Idict.show"><code class="name flex">
-<span>def <span class="ident">show</span></span>(<span>self, colored=True)</span>
+<span>def <span class="ident">show</span></span>(<span>self, colored=True, key_quotes=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Textual representation of an idict object</p>
@@ -1191,12 +1240,12 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
 &gt;&gt;&gt; d = idict(x=1,y=2)
 &gt;&gt;&gt; d.show(colored=False)
 {
-    &quot;x&quot;: 1,
-    &quot;y&quot;: 2,
-    &quot;_id&quot;: &quot;41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N&quot;,
-    &quot;_ids&quot;: {
-        &quot;x&quot;: &quot;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&quot;,
-        &quot;y&quot;: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;
+    x: 1,
+    y: 2,
+    _id: &quot;41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N&quot;,
+    _ids: {
+        x: &quot;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&quot;,
+        y: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;
     }
 }
 </code></pre></div>
@@ -1204,7 +1253,7 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def show(self, colored=True):
+<pre><code class="python">def show(self, colored=True, key_quotes=False):
     r&#34;&#34;&#34;
     Textual representation of an idict object
 
@@ -1213,16 +1262,16 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
     &gt;&gt;&gt; d = idict(x=1,y=2)
     &gt;&gt;&gt; d.show(colored=False)
     {
-        &#34;x&#34;: 1,
-        &#34;y&#34;: 2,
-        &#34;_id&#34;: &#34;41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N&#34;,
-        &#34;_ids&#34;: {
-            &#34;x&#34;: &#34;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&#34;,
-            &#34;y&#34;: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
+        x: 1,
+        y: 2,
+        _id: &#34;41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N&#34;,
+        _ids: {
+            x: &#34;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&#34;,
+            y: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;
         }
     }
     &#34;&#34;&#34;
-    return self.frozen.show(colored)</code></pre>
+    return self.frozen.show(colored, key_quotes)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1247,6 +1296,7 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
 <h4><code><a title="hoshmap.idict.Idict" href="#hoshmap.idict.Idict">Idict</a></code></h4>
 <ul class="two-column">
 <li><code><a title="hoshmap.idict.Idict.asdict" href="#hoshmap.idict.Idict.asdict">asdict</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.asdicts" href="#hoshmap.idict.Idict.asdicts">asdicts</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.astext" href="#hoshmap.idict.Idict.astext">astext</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.entries" href="#hoshmap.idict.Idict.entries">entries</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.evaluate" href="#hoshmap.idict.Idict.evaluate">evaluate</a></code></li>

@@ -27,14 +27,16 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import json
+import re
 from collections import UserDict
 from functools import cached_property
 from typing import Dict, Union
 from typing import TypeVar
 
-from hoshmap.customjson import CustomJSONEncoder
+from hoshmap.serialization.customjson import CustomJSONEncoder
 from hoshmap.let import Let
 from hoshmap.value import LazyiVal
+from hoshmap.value.dfival import DFiVal, explode_df
 from hoshmap.value.strictival import iVal, StrictiVal
 from hosh import ø
 
@@ -60,20 +62,36 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         data: Dict[str, Union[iVal, str, dict]] = _dictionary or {}
         data.update(kwargs)
         if &#34;_id&#34; in data.keys() or &#34;_ids&#34; in data.keys():  # pragma: no cover
-            raise Exception(&#34;Cannot have a field named &#39;_id&#39;/&#39;_ids&#39;: {data.keys()}&#34;)
+            raise Exception(f&#34;Cannot have a field named &#39;_id&#39;/&#39;_ids&#39;: {data.keys()}&#34;)
         self.data: Dict[str, Union[iVal, str, dict]] = {}
-        self.hosh = ø
+        self.hosh = self.mhosh = ø
         self.ids = {}
+        self.mids = {}
         for k, v in data.items():
             if isinstance(v, iVal):
                 self.data[k] = v
             else:
-                self.data[k] = StrictiVal(v.frozen, v.hosh) if isinstance(v, Idict) else StrictiVal(v)
-            self.hosh += self.data[k].hosh * k.encode()
-            self.ids[k] = self.data[k].hosh.id
+                if isinstance(v, Idict):
+                    self.data[k] = StrictiVal(v.frozen, v.hosh)
+                elif str(type(v)) == &#34;&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;&#34;:
+                    self.data[k], self.data[k + &#34;_&#34;] = explode_df(v)
+                else:
+                    self.data[k] = StrictiVal(v)
+            # pq msm aceita nao strs como key?
+            if isinstance(k, str):
+                if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                    pass
+                    # raise NotImplementedError
+                    # self.mhosh += self.data[k].hosh * k.encode()
+                    # self.mids[k] = self.data[k].hosh.id
+                else:
+                    self.hosh += self.data[k].hosh * k.encode()
+            self.ids[k] = self.data[k].hosh.id  # TODO: separate mids from ids?
         # noinspection PyTypeChecker
         self.data[&#34;_id&#34;] = self.id = self.hosh.id
         self.data[&#34;_ids&#34;] = self.ids
+        # self.data[&#34;_mid&#34;] = self.id = self.hosh.id
+        # self.data[&#34;_mids&#34;] = self.ids
 
     @property
     def evaluated(self):
@@ -117,21 +135,55 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         dic[&#34;_ids&#34;] = self.ids.copy()
         return dic
 
-    def astext(self, colored=True):
+    @cached_property
+    def asdicts(self):
+        dic = {}
+        for k, v in self.entries():
+            dic[k] = v.asdicts if isinstance(v, FrozenIdict) else v
+        dic[&#34;_id&#34;] = self.id
+        dic[&#34;_ids&#34;] = self.ids.copy()
+        return dic
+
+    @cached_property
+    def asdicts_hoshes_noneval(self):
+        from hoshmap.value.cacheableival import CacheableiVal
+
+        hoshes = set()
+        dic = {}
+        for k, ival in self.data.items():
+            if k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                hoshes.add(ival.hosh)
+                if isinstance(ival, CacheableiVal):
+                    dic[k] = ival
+                else:
+                    v = ival.value
+                    if isinstance(v, FrozenIdict):
+                        dic[k], subhoshes = v.asdicts_hoshes_noneval
+                        hoshes.update(subhoshes)
+                    else:
+                        dic[k] = v
+        hoshes.add(self.hosh)
+        dic[&#34;_id&#34;] = self.id
+        dic[&#34;_ids&#34;] = self.ids.copy()
+        return dic, hoshes
+
+    def astext(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;Textual representation of a frozenidict object&#34;&#34;&#34;
-        txt = json.dumps(self.data, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
+        dicts, hoshes = self.asdicts_hoshes_noneval
+        txt = json.dumps(dicts, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
 
         # Put colors after json, to avoid escaping ansi codes.
         if colored:
-            txt = txt.replace(self.data[&#34;_id&#34;], self.hosh.ansi)
-            for k, v in self.entries(evaluate=False):
-                txt = txt.replace(v.id, v.hosh.idc)
-
+            for h in hoshes:
+                txt = txt.replace(f&#39;&#34;{h.id}&#34;&#39;, h.idc)
+        txt = re.sub(r&#39;(&#34;: )&#34;(λ.+?)&#34;(?=,\n)&#39;, &#39;&#34;: \\2&#39;, txt)
+        if not key_quotes:
+            txt = re.sub(r&#39;(?&lt;!: )&#34;([a-zA-Z0-9_ ]+?)&#34;(?=: )&#39;, &#34;\\1&#34;, txt)
         return txt
 
-    def show(self, colored=True):
+    def show(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;Print textual representation of a frozenidict object&#34;&#34;&#34;
-        print(self.astext(colored))
+        print(self.astext(colored, key_quotes))
 
     def items(self, evaluate=True):
         &#34;&#34;&#34;Iterator over all items&#34;&#34;&#34;
@@ -165,7 +217,8 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return self.astext()
 
     def __str__(self):
-        return json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
+        js = json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
+        return re.sub(r&#39;(?&lt;!: )&#34;(\S*?)&#34;&#39;, &#34;\\1&#34;, js)
 
     def __getitem__(self, item):
         return self.data[item] if item in [&#34;_id&#34;, &#34;_ids&#34;] else self.data[item].value
@@ -173,14 +226,14 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     def __getattr__(self, item):  # pragma: no cover
         if item in self.data:
             return self.data[item].value
-        return AttributeError
+        return self.__getattribute__(item)
 
     def __rshift__(self, other):
         data = self.data.copy()
         del data[&#34;_id&#34;]
         del data[&#34;_ids&#34;]
         if isinstance(other, tuple):
-            other = Let(*other)
+            other = Let(other[0], other[1], *other[2:])
         from hoshmap.idict import Idict
 
         if isinstance(other, Idict):  # merge
@@ -201,13 +254,19 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     cache = cache[0]
                     strict.append(cache)
                 caches.append(cache)
-                cache[self.id] = {&#34;_ids&#34;: self.ids}
             for k, ival in self.entries(evaluate=False):
                 if ival.isevaluated:
                     for cache in strict:
-                        cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
+                        # TODO: esse IF evita gravar toda hora, mas impede que metafields sejam atualizados
+                        #   usar um (mfid1 * mfid2 * ... * mfidn) pra manter link p/ mfs e tb saber se já existe
+                        # if self.mid not in cache:
+                        #     cache[self.mid] = {&#34;_ids&#34;: self.mids}
+                        if self.id not in cache:
+                            cache[self.id] = {&#34;_ids&#34;: self.ids}
+                        if ival.id not in cache:
+                            cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
                 else:
-                    data[k] = ival.withcaches(caches)
+                    data[k] = ival.withcaches(caches, self.id, self.ids)
             return FrozenIdict(data)
 
         if isinstance(other, Let):
@@ -224,7 +283,14 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     # TODO: partial application [put multiple references for same iPartial if multioutput]
                     #   raise exc if missing right most argument
                     raise Exception(f&#34;Missing field &#39;{fin_source}&#39;: {other.input}&#34;)
-                deps[fin_target] = val if isinstance(val, iVal) else StrictiVal(val)
+                if isinstance(val, iVal):
+                    # REMINDER: only here &#39;val&#39; comes from a field (not from Let)
+                    deps[fin_target] = val
+                elif str(type(val)) == &#34;&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;&#34;:
+                    data[fin_target], data[fin_target + &#34;_&#34;] = explode_df(v)
+                    deps[fin_target] = data[fin_target]
+                else:
+                    deps[fin_target] = StrictiVal(val)
             shared_result = {}
             for i, fout in enumerate(other.output):
                 data[fout] = LazyiVal(other.f, i, n, deps, shared_result, fid=other.id)
@@ -294,20 +360,36 @@ True
         data: Dict[str, Union[iVal, str, dict]] = _dictionary or {}
         data.update(kwargs)
         if &#34;_id&#34; in data.keys() or &#34;_ids&#34; in data.keys():  # pragma: no cover
-            raise Exception(&#34;Cannot have a field named &#39;_id&#39;/&#39;_ids&#39;: {data.keys()}&#34;)
+            raise Exception(f&#34;Cannot have a field named &#39;_id&#39;/&#39;_ids&#39;: {data.keys()}&#34;)
         self.data: Dict[str, Union[iVal, str, dict]] = {}
-        self.hosh = ø
+        self.hosh = self.mhosh = ø
         self.ids = {}
+        self.mids = {}
         for k, v in data.items():
             if isinstance(v, iVal):
                 self.data[k] = v
             else:
-                self.data[k] = StrictiVal(v.frozen, v.hosh) if isinstance(v, Idict) else StrictiVal(v)
-            self.hosh += self.data[k].hosh * k.encode()
-            self.ids[k] = self.data[k].hosh.id
+                if isinstance(v, Idict):
+                    self.data[k] = StrictiVal(v.frozen, v.hosh)
+                elif str(type(v)) == &#34;&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;&#34;:
+                    self.data[k], self.data[k + &#34;_&#34;] = explode_df(v)
+                else:
+                    self.data[k] = StrictiVal(v)
+            # pq msm aceita nao strs como key?
+            if isinstance(k, str):
+                if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                    pass
+                    # raise NotImplementedError
+                    # self.mhosh += self.data[k].hosh * k.encode()
+                    # self.mids[k] = self.data[k].hosh.id
+                else:
+                    self.hosh += self.data[k].hosh * k.encode()
+            self.ids[k] = self.data[k].hosh.id  # TODO: separate mids from ids?
         # noinspection PyTypeChecker
         self.data[&#34;_id&#34;] = self.id = self.hosh.id
         self.data[&#34;_ids&#34;] = self.ids
+        # self.data[&#34;_mid&#34;] = self.id = self.hosh.id
+        # self.data[&#34;_mids&#34;] = self.ids
 
     @property
     def evaluated(self):
@@ -351,21 +433,55 @@ True
         dic[&#34;_ids&#34;] = self.ids.copy()
         return dic
 
-    def astext(self, colored=True):
+    @cached_property
+    def asdicts(self):
+        dic = {}
+        for k, v in self.entries():
+            dic[k] = v.asdicts if isinstance(v, FrozenIdict) else v
+        dic[&#34;_id&#34;] = self.id
+        dic[&#34;_ids&#34;] = self.ids.copy()
+        return dic
+
+    @cached_property
+    def asdicts_hoshes_noneval(self):
+        from hoshmap.value.cacheableival import CacheableiVal
+
+        hoshes = set()
+        dic = {}
+        for k, ival in self.data.items():
+            if k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                hoshes.add(ival.hosh)
+                if isinstance(ival, CacheableiVal):
+                    dic[k] = ival
+                else:
+                    v = ival.value
+                    if isinstance(v, FrozenIdict):
+                        dic[k], subhoshes = v.asdicts_hoshes_noneval
+                        hoshes.update(subhoshes)
+                    else:
+                        dic[k] = v
+        hoshes.add(self.hosh)
+        dic[&#34;_id&#34;] = self.id
+        dic[&#34;_ids&#34;] = self.ids.copy()
+        return dic, hoshes
+
+    def astext(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;Textual representation of a frozenidict object&#34;&#34;&#34;
-        txt = json.dumps(self.data, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
+        dicts, hoshes = self.asdicts_hoshes_noneval
+        txt = json.dumps(dicts, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
 
         # Put colors after json, to avoid escaping ansi codes.
         if colored:
-            txt = txt.replace(self.data[&#34;_id&#34;], self.hosh.ansi)
-            for k, v in self.entries(evaluate=False):
-                txt = txt.replace(v.id, v.hosh.idc)
-
+            for h in hoshes:
+                txt = txt.replace(f&#39;&#34;{h.id}&#34;&#39;, h.idc)
+        txt = re.sub(r&#39;(&#34;: )&#34;(λ.+?)&#34;(?=,\n)&#39;, &#39;&#34;: \\2&#39;, txt)
+        if not key_quotes:
+            txt = re.sub(r&#39;(?&lt;!: )&#34;([a-zA-Z0-9_ ]+?)&#34;(?=: )&#39;, &#34;\\1&#34;, txt)
         return txt
 
-    def show(self, colored=True):
+    def show(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;Print textual representation of a frozenidict object&#34;&#34;&#34;
-        print(self.astext(colored))
+        print(self.astext(colored, key_quotes))
 
     def items(self, evaluate=True):
         &#34;&#34;&#34;Iterator over all items&#34;&#34;&#34;
@@ -399,7 +515,8 @@ True
         return self.astext()
 
     def __str__(self):
-        return json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
+        js = json.dumps(self.data, ensure_ascii=False, cls=CustomJSONEncoder)
+        return re.sub(r&#39;(?&lt;!: )&#34;(\S*?)&#34;&#39;, &#34;\\1&#34;, js)
 
     def __getitem__(self, item):
         return self.data[item] if item in [&#34;_id&#34;, &#34;_ids&#34;] else self.data[item].value
@@ -407,14 +524,14 @@ True
     def __getattr__(self, item):  # pragma: no cover
         if item in self.data:
             return self.data[item].value
-        return AttributeError
+        return self.__getattribute__(item)
 
     def __rshift__(self, other):
         data = self.data.copy()
         del data[&#34;_id&#34;]
         del data[&#34;_ids&#34;]
         if isinstance(other, tuple):
-            other = Let(*other)
+            other = Let(other[0], other[1], *other[2:])
         from hoshmap.idict import Idict
 
         if isinstance(other, Idict):  # merge
@@ -435,13 +552,19 @@ True
                     cache = cache[0]
                     strict.append(cache)
                 caches.append(cache)
-                cache[self.id] = {&#34;_ids&#34;: self.ids}
             for k, ival in self.entries(evaluate=False):
                 if ival.isevaluated:
                     for cache in strict:
-                        cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
+                        # TODO: esse IF evita gravar toda hora, mas impede que metafields sejam atualizados
+                        #   usar um (mfid1 * mfid2 * ... * mfidn) pra manter link p/ mfs e tb saber se já existe
+                        # if self.mid not in cache:
+                        #     cache[self.mid] = {&#34;_ids&#34;: self.mids}
+                        if self.id not in cache:
+                            cache[self.id] = {&#34;_ids&#34;: self.ids}
+                        if ival.id not in cache:
+                            cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
                 else:
-                    data[k] = ival.withcaches(caches)
+                    data[k] = ival.withcaches(caches, self.id, self.ids)
             return FrozenIdict(data)
 
         if isinstance(other, Let):
@@ -458,7 +581,14 @@ True
                     # TODO: partial application [put multiple references for same iPartial if multioutput]
                     #   raise exc if missing right most argument
                     raise Exception(f&#34;Missing field &#39;{fin_source}&#39;: {other.input}&#34;)
-                deps[fin_target] = val if isinstance(val, iVal) else StrictiVal(val)
+                if isinstance(val, iVal):
+                    # REMINDER: only here &#39;val&#39; comes from a field (not from Let)
+                    deps[fin_target] = val
+                elif str(type(val)) == &#34;&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;&#34;:
+                    data[fin_target], data[fin_target + &#34;_&#34;] = explode_df(v)
+                    deps[fin_target] = data[fin_target]
+                else:
+                    deps[fin_target] = StrictiVal(val)
             shared_result = {}
             for i, fout in enumerate(other.output):
                 data[fout] = LazyiVal(other.f, i, n, deps, shared_result, fid=other.id)
@@ -526,6 +656,84 @@ def fromdict(dictionary, ids):
 <h3>Instance variables</h3>
 <dl>
 <dt id="hoshmap.frozenidict.FrozenIdict.asdict"><code class="name">var <span class="ident">asdict</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner=None):
+    if instance is None:
+        return self
+    if self.attrname is None:
+        raise TypeError(
+            &#34;Cannot use cached_property instance without calling __set_name__ on it.&#34;)
+    try:
+        cache = instance.__dict__
+    except AttributeError:  # not all objects have __dict__ (e.g. class defines slots)
+        msg = (
+            f&#34;No &#39;__dict__&#39; attribute on {type(instance).__name__!r} &#34;
+            f&#34;instance to cache {self.attrname!r} property.&#34;
+        )
+        raise TypeError(msg) from None
+    val = cache.get(self.attrname, _NOT_FOUND)
+    if val is _NOT_FOUND:
+        with self.lock:
+            # check if another thread filled cache while we awaited lock
+            val = cache.get(self.attrname, _NOT_FOUND)
+            if val is _NOT_FOUND:
+                val = self.func(instance)
+                try:
+                    cache[self.attrname] = val
+                except TypeError:
+                    msg = (
+                        f&#34;The &#39;__dict__&#39; attribute on {type(instance).__name__!r} instance &#34;
+                        f&#34;does not support item assignment for caching {self.attrname!r} property.&#34;
+                    )
+                    raise TypeError(msg) from None
+    return val</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.frozenidict.FrozenIdict.asdicts"><code class="name">var <span class="ident">asdicts</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner=None):
+    if instance is None:
+        return self
+    if self.attrname is None:
+        raise TypeError(
+            &#34;Cannot use cached_property instance without calling __set_name__ on it.&#34;)
+    try:
+        cache = instance.__dict__
+    except AttributeError:  # not all objects have __dict__ (e.g. class defines slots)
+        msg = (
+            f&#34;No &#39;__dict__&#39; attribute on {type(instance).__name__!r} &#34;
+            f&#34;instance to cache {self.attrname!r} property.&#34;
+        )
+        raise TypeError(msg) from None
+    val = cache.get(self.attrname, _NOT_FOUND)
+    if val is _NOT_FOUND:
+        with self.lock:
+            # check if another thread filled cache while we awaited lock
+            val = cache.get(self.attrname, _NOT_FOUND)
+            if val is _NOT_FOUND:
+                val = self.func(instance)
+                try:
+                    cache[self.attrname] = val
+                except TypeError:
+                    msg = (
+                        f&#34;The &#39;__dict__&#39; attribute on {type(instance).__name__!r} instance &#34;
+                        f&#34;does not support item assignment for caching {self.attrname!r} property.&#34;
+                    )
+                    raise TypeError(msg) from None
+    return val</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.frozenidict.FrozenIdict.asdicts_hoshes_noneval"><code class="name">var <span class="ident">asdicts_hoshes_noneval</span></code></dt>
 <dd>
 <div class="desc"></div>
 <details class="source">
@@ -674,7 +882,7 @@ def unfrozen(self):
 <h3>Methods</h3>
 <dl>
 <dt id="hoshmap.frozenidict.FrozenIdict.astext"><code class="name flex">
-<span>def <span class="ident">astext</span></span>(<span>self, colored=True)</span>
+<span>def <span class="ident">astext</span></span>(<span>self, colored=True, key_quotes=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Textual representation of a frozenidict object</p></div>
@@ -682,16 +890,18 @@ def unfrozen(self):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def astext(self, colored=True):
+<pre><code class="python">def astext(self, colored=True, key_quotes=False):
     r&#34;&#34;&#34;Textual representation of a frozenidict object&#34;&#34;&#34;
-    txt = json.dumps(self.data, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
+    dicts, hoshes = self.asdicts_hoshes_noneval
+    txt = json.dumps(dicts, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
 
     # Put colors after json, to avoid escaping ansi codes.
     if colored:
-        txt = txt.replace(self.data[&#34;_id&#34;], self.hosh.ansi)
-        for k, v in self.entries(evaluate=False):
-            txt = txt.replace(v.id, v.hosh.idc)
-
+        for h in hoshes:
+            txt = txt.replace(f&#39;&#34;{h.id}&#34;&#39;, h.idc)
+    txt = re.sub(r&#39;(&#34;: )&#34;(λ.+?)&#34;(?=,\n)&#39;, &#39;&#34;: \\2&#39;, txt)
+    if not key_quotes:
+        txt = re.sub(r&#39;(?&lt;!: )&#34;([a-zA-Z0-9_ ]+?)&#34;(?=: )&#39;, &#34;\\1&#34;, txt)
     return txt</code></pre>
 </details>
 </dd>
@@ -757,7 +967,7 @@ def unfrozen(self):
 </details>
 </dd>
 <dt id="hoshmap.frozenidict.FrozenIdict.show"><code class="name flex">
-<span>def <span class="ident">show</span></span>(<span>self, colored=True)</span>
+<span>def <span class="ident">show</span></span>(<span>self, colored=True, key_quotes=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Print textual representation of a frozenidict object</p></div>
@@ -765,9 +975,9 @@ def unfrozen(self):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def show(self, colored=True):
+<pre><code class="python">def show(self, colored=True, key_quotes=False):
     r&#34;&#34;&#34;Print textual representation of a frozenidict object&#34;&#34;&#34;
-    print(self.astext(colored))</code></pre>
+    print(self.astext(colored, key_quotes))</code></pre>
 </details>
 </dd>
 </dl>
@@ -790,8 +1000,10 @@ def unfrozen(self):
 <ul>
 <li>
 <h4><code><a title="hoshmap.frozenidict.FrozenIdict" href="#hoshmap.frozenidict.FrozenIdict">FrozenIdict</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.asdict" href="#hoshmap.frozenidict.FrozenIdict.asdict">asdict</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.asdicts" href="#hoshmap.frozenidict.FrozenIdict.asdicts">asdicts</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.asdicts_hoshes_noneval" href="#hoshmap.frozenidict.FrozenIdict.asdicts_hoshes_noneval">asdicts_hoshes_noneval</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.astext" href="#hoshmap.frozenidict.FrozenIdict.astext">astext</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.copy" href="#hoshmap.frozenidict.FrozenIdict.copy">copy</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.entries" href="#hoshmap.frozenidict.FrozenIdict.entries">entries</a></code></li>

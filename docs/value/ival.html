@@ -57,12 +57,12 @@ from hosh import Hosh
 class iVal:
     value: Any
     hosh: Hosh
-    result: Any
+    results: Any
     caches: Any
 
     @property
     def isevaluated(self):
-        return self.result[self.id] is not None
+        return self.results[self.id] is not None
 
     def evaluate(self):
         val = self.value
@@ -119,12 +119,12 @@ class iVal:
 <pre><code class="python">class iVal:
     value: Any
     hosh: Hosh
-    result: Any
+    results: Any
     caches: Any
 
     @property
     def isevaluated(self):
-        return self.result[self.id] is not None
+        return self.results[self.id] is not None
 
     def evaluate(self):
         val = self.value
@@ -161,7 +161,7 @@ class iVal:
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="hoshmap.value.lazyival.LazyiVal" href="lazyival.html#hoshmap.value.lazyival.LazyiVal">LazyiVal</a></li>
+<li><a title="hoshmap.value.cacheableival.CacheableiVal" href="cacheableival.html#hoshmap.value.cacheableival.CacheableiVal">CacheableiVal</a></li>
 <li><a title="hoshmap.value.strictival.StrictiVal" href="strictival.html#hoshmap.value.strictival.StrictiVal">StrictiVal</a></li>
 </ul>
 <h3>Class variables</h3>
@@ -174,7 +174,7 @@ class iVal:
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="hoshmap.value.ival.iVal.result"><code class="name">var <span class="ident">result</span> : Any</code></dt>
+<dt id="hoshmap.value.ival.iVal.results"><code class="name">var <span class="ident">results</span> : Any</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -267,7 +267,7 @@ def handle_id(id):
 </summary>
 <pre><code class="python">@property
 def isevaluated(self):
-    return self.result[self.id] is not None</code></pre>
+    return self.results[self.id] is not None</code></pre>
 </details>
 </dd>
 </dl>
@@ -317,7 +317,7 @@ def isevaluated(self):
 <li><code><a title="hoshmap.value.ival.iVal.hosh" href="#hoshmap.value.ival.iVal.hosh">hosh</a></code></li>
 <li><code><a title="hoshmap.value.ival.iVal.id" href="#hoshmap.value.ival.iVal.id">id</a></code></li>
 <li><code><a title="hoshmap.value.ival.iVal.isevaluated" href="#hoshmap.value.ival.iVal.isevaluated">isevaluated</a></code></li>
-<li><code><a title="hoshmap.value.ival.iVal.result" href="#hoshmap.value.ival.iVal.result">result</a></code></li>
+<li><code><a title="hoshmap.value.ival.iVal.results" href="#hoshmap.value.ival.iVal.results">results</a></code></li>
 <li><code><a title="hoshmap.value.ival.iVal.value" href="#hoshmap.value.ival.iVal.value">value</a></code></li>
 </ul>
 </li>

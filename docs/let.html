@@ -79,14 +79,15 @@ class Let:
         self.metadata = _metadata
 
     def _parse_instr(self, instr, kwargs):
-        for i in instr.split(&#34; &#34;):
-            if &#34;:&#34; in i:
-                ii = i.split(&#34;:&#34;)
-                if len(ii) != 2:  # pragma: no cover
-                    raise Exception(f&#34;Wrong number ({len(ii)}) of &#39;:&#39; chars: {ii}&#34;)
-                isource, itarget = ii
+        for par in instr.split(&#34; &#34;):
+            if &#34;:&#34; in par:
+                split = par.split(&#34;:&#34;)
+                if len(split) != 2:  # pragma: no cover
+                    raise Exception(f&#34;Wrong number ({len(split)}) of &#39;:&#39; chars: {split}&#34;)
+                isource = split[0]
+                itarget = par if &#34;:*&#34; in par else split[1]
             else:
-                isource = itarget = i
+                isource = itarget = par
             if isource.startswith(&#34;~&#34;):  # TODO: write test
                 isource = isource[1:]
                 if isource not in kwargs or isinstance(kwargs[isource], Iterable):
@@ -144,14 +145,15 @@ class Let:
         self.metadata = _metadata
 
     def _parse_instr(self, instr, kwargs):
-        for i in instr.split(&#34; &#34;):
-            if &#34;:&#34; in i:
-                ii = i.split(&#34;:&#34;)
-                if len(ii) != 2:  # pragma: no cover
-                    raise Exception(f&#34;Wrong number ({len(ii)}) of &#39;:&#39; chars: {ii}&#34;)
-                isource, itarget = ii
+        for par in instr.split(&#34; &#34;):
+            if &#34;:&#34; in par:
+                split = par.split(&#34;:&#34;)
+                if len(split) != 2:  # pragma: no cover
+                    raise Exception(f&#34;Wrong number ({len(split)}) of &#39;:&#39; chars: {split}&#34;)
+                isource = split[0]
+                itarget = par if &#34;:*&#34; in par else split[1]
             else:
-                isource = itarget = i
+                isource = itarget = par
             if isource.startswith(&#34;~&#34;):  # TODO: write test
                 isource = isource[1:]
                 if isource not in kwargs or isinstance(kwargs[isource], Iterable):
