@@ -1,1 +1,6 @@
-Add nested eval support
+Nested idict save/load
+Implement set/get item for idict
+Recurse asdict
+Make show cleaner
+Fix printing of large value '...'
+Add ":*" syntax

@@ -3,15 +3,17 @@ from hoshmap.value.ival import iVal
 
 class CacheableiVal(iVal):
     replace: callable
-    deps:dict
+    deps: dict
 
-    def __init__(self, caches=None):
+    def __init__(self, caches=None, did=None, dids=None):
         self.caches = caches
+        self.did = did
+        self.dids = dids
 
-    def withcaches(self, caches):
-        if self.caches is not None:
-            self.caches.append(caches)
-        return self.replace(caches=caches)
+    def withcaches(self, caches, did, dids):
+        """Only set cache on cacheless CacheableiVal objects"""
+        if self.caches is None:
+            return self.replace(caches=caches, did=did, dids=dids)
 
     def __repr__(self):
         if not self.isevaluated:

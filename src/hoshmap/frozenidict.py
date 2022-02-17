@@ -34,10 +34,11 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         data: Dict[str, Union[iVal, str, dict]] = _dictionary or {}
         data.update(kwargs)
         if "_id" in data.keys() or "_ids" in data.keys():  # pragma: no cover
-            raise Exception("Cannot have a field named '_id'/'_ids': {data.keys()}")
+            raise Exception(f"Cannot have a field named '_id'/'_ids': {data.keys()}")
         self.data: Dict[str, Union[iVal, str, dict]] = {}
-        self.hosh = ø
+        self.hosh = self.mhosh = ø
         self.ids = {}
+        self.mids = {}
         for k, v in data.items():
             if isinstance(v, iVal):
                 self.data[k] = v
@@ -48,12 +49,21 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     self.data[k], self.data[k + "_"] = explode_df(v)
                 else:
                     self.data[k] = StrictiVal(v)
-            if isinstance(k, str) and not k.startswith("_"):
-                self.hosh += self.data[k].hosh * k.encode()
-            self.ids[k] = self.data[k].hosh.id
+            # pq msm aceita nao strs como key?
+            if isinstance(k, str):
+                if k.startswith("_") and k not in ["_id", "_ids"]:
+                    pass
+                    # raise NotImplementedError
+                    # self.mhosh += self.data[k].hosh * k.encode()
+                    # self.mids[k] = self.data[k].hosh.id
+                else:
+                    self.hosh += self.data[k].hosh * k.encode()
+            self.ids[k] = self.data[k].hosh.id  #TODO: separate mids from ids?
         # noinspection PyTypeChecker
         self.data["_id"] = self.id = self.hosh.id
         self.data["_ids"] = self.ids
+        # self.data["_mid"] = self.id = self.hosh.id
+        # self.data["_mids"] = self.ids
 
     @property
     def evaluated(self):
@@ -107,18 +117,22 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return dic
 
     @cached_property
-    def asdicts_hoshes(self):
+    def asdicts_hoshes_noneval(self):
+        from hoshmap.value.cacheableival import CacheableiVal
         hoshes = set()
         dic = {}
         for k, ival in self.data.items():
             if k not in ["_id", "_ids"]:
-                v = ival.value
                 hoshes.add(ival.hosh)
-                if isinstance(v, FrozenIdict):
-                    dic[k], subhoshes = v.asdicts_hoshes
-                    hoshes.update(subhoshes)
+                if isinstance(ival, CacheableiVal):
+                    dic[k] = ival
                 else:
-                    dic[k] = v
+                    v = ival.value
+                    if isinstance(v, FrozenIdict):
+                        dic[k], subhoshes = v.asdicts_hoshes_noneval
+                        hoshes.update(subhoshes)
+                    else:
+                        dic[k] = v
         hoshes.add(self.hosh)
         dic["_id"] = self.id
         dic["_ids"] = self.ids.copy()
@@ -126,7 +140,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
 
     def astext(self, colored=True, key_quotes=False):
         r"""Textual representation of a frozenidict object"""
-        dicts, hoshes = self.asdicts_hoshes
+        dicts, hoshes = self.asdicts_hoshes_noneval
         txt = json.dumps(dicts, indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
 
         # Put colors after json, to avoid escaping ansi codes.
@@ -211,13 +225,19 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     cache = cache[0]
                     strict.append(cache)
                 caches.append(cache)
-                cache[self.id] = {"_ids": self.ids}
             for k, ival in self.entries(evaluate=False):
                 if ival.isevaluated:
                     for cache in strict:
-                        cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
+                        # TODO: esse IF evita gravar toda hora, mas impede que metafields sejam atualizados
+                        #   usar um (mfid1 * mfid2 * ... * mfidn) pra manter link p/ mfs e tb saber se já existe
+                        # if self.mid not in cache:
+                        #     cache[self.mid] = {"_ids": self.mids}
+                        if self.id not in cache:
+                            cache[self.id] = {"_ids": self.ids}
+                        if ival.id not in cache:
+                            cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
                 else:
-                    data[k] = ival.withcaches(caches)
+                    data[k] = ival.withcaches(caches, self.id, self.ids)
             return FrozenIdict(data)
 
         if isinstance(other, Let):

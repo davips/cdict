@@ -29,7 +29,6 @@ from hosh import Hosh
 
 from hoshmap.serialization.parsing import f2hosh
 from hoshmap.value.cacheableival import CacheableiVal
-from hoshmap.value.ival import iVal
 
 
 class LazyiVal(CacheableiVal):
@@ -68,10 +67,10 @@ class LazyiVal(CacheableiVal):
     True
     """
 
-    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None):
+    def __init__(self, f: callable, i: int, n: int, deps: dict, results: dict, fid: Union[str, Hosh] = None, caches=None, did=None, dids=None):
         # if i >= len(result):  # pragma: no cover
         #     raise Exception(f"Index {i} inconsistent with current expected result size {len(result)}.")
-        super().__init__(caches)
+        super().__init__(caches, did, dids)
         self.f = f
         self.i = i
         self.n = n
@@ -89,76 +88,105 @@ class LazyiVal(CacheableiVal):
     @property
     def value(self):
         if not self.isevaluated:
-            from hoshmap import idict
-
-            # Fetch.
-            if self.caches is not None:
-                outdated_caches = []
-                for cache in self.caches:
-                    if self.hosh.id in cache:
-                        val = cache[self.hosh.id]
-                        # TODO: reconstruir nested idict
-                        # TODO: receber iVal de dentro do cache, nao value
-                        # TODO: passar cache pra ele quando for CacheableiVal
-                        for outdated_cache in outdated_caches:
-                            outdated_cache[self.hosh.id] = val
-                        self.results[self.id] = val
-                        return val
-                    outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
-
-            # Calculate.
-            argidxs = []
-            kwargs = {}
-            iterable_sources = {}
-            for field, ival in self.deps.items():
-                if isinstance(field, int):  # quando usa isso???
-                    argidxs.append(field)
-                else:
-                    if len(split := field.split(":*")) == 2:
-                        iterable_sources[split[1]] = iter(self.deps[field].value)
-                    else:
-                        kwargs[field] = ival.value
-            if iterable_sources:
-                result = []
-                loop = True
-                while loop:
-                    i = None
-                    try:
-                        for i, (target, it) in enumerate(iterable_sources.items()):
-                            kwargs[target] = next(it)
-                        # print(kwargs)
-                        r = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
-                        if isinstance(r, idict):
-                            r = r.frozen
-                        result.append(r)
-                    except StopIteration:
-                        if i not in [0, len(iterable_sources)]:
-                            raise ValueError("All iterable fields (e.g., 'xs:*x') should have the same length.")
-                        loop = False
-            else:
-                result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
-                if isinstance(result, idict):
-                    result = result.frozen
-            if self.n == 1:
-                result = [result]
-            elif isinstance(result, dict):
-                result = result.values()
-            elif isinstance(result, list) and len(result) != self.n:  # pragma: no cover
-                raise Exception(f"Wrong result length: {len(result)} differs from {self.n}")
-            if not isinstance(result, Iterable):  # pragma: no cover
-                raise Exception(f"Unsupported multi-valued result type: {type(result)}")
-            for id, res in zip(self.results, result):
-                self.results[id] = res
-
-            # Store.
-            if self.caches is not None:
-                from hoshmap import Idict, FrozenIdict
-
-                for id, res in self.results.items():
-                    for cache in self.caches:
-                        if isinstance(res, (Idict, FrozenIdict)):
-                            res >> [[cache]]
-                        else:
-                            cache[id] = res  # TODO: pack (pickle+lz4)
-
+            if fetched := self.fetch():
+                return fetched
+            self.calculate()
+            self.store()
         return self.results[self.id]
+
+    def fetch(self):
+        if self.caches is not None:
+            from hoshmap import FrozenIdict
+            outdated_caches = []
+            for cache in self.caches:
+                if self.id in cache:
+                    for outdated_cache in outdated_caches:
+                        outdated_cache[self.did] = {"_ids": self.dids}
+                    val = self.traverse(self.id, cache, outdated_caches)
+                    # TODO: receber iVal de dentro do cache, nao value
+                    # TODO: passar cache pra ele quando for CacheableiVal
+                    self.results[self.id] = val
+                    return val
+                outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
+
+    def calculate(self):
+        from hoshmap import idict
+        argidxs = []
+        kwargs = {}
+        iterable_sources = {}
+        for field, ival in self.deps.items():
+            if isinstance(field, int):  # quando usa isso???
+                argidxs.append(field)
+            else:
+                if len(split := field.split(":*")) == 2:
+                    iterable_sources[split[1]] = iter(self.deps[field].value)
+                else:
+                    kwargs[field] = ival.value
+        if iterable_sources:
+            result = []
+            loop = True
+            while loop:
+                i = None
+                try:
+                    for i, (target, it) in enumerate(iterable_sources.items()):
+                        kwargs[target] = next(it)
+                    r = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+                    if isinstance(r, idict):
+                        r = r.frozen
+                    result.append(r)
+                except StopIteration:
+                    if i not in [0, len(iterable_sources)]:
+                        raise ValueError("All iterable fields (e.g., 'xs:*x') should have the same length.")
+                    loop = False
+        else:
+            result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+            if isinstance(result, idict):
+                result = result.frozen
+        if self.n == 1:
+            result = [result]
+        elif isinstance(result, dict):
+            result = result.values()
+        elif isinstance(result, list) and len(result) != self.n:  # pragma: no cover
+            raise Exception(f"Wrong result length: {len(result)} differs from {self.n}")
+        if not isinstance(result, Iterable):  # pragma: no cover
+            raise Exception(f"Unsupported multi-valued result type: {type(result)}")
+        for id, res in zip(self.results, result):
+            self.results[id] = res
+
+    def store(self):
+        if self.caches is not None:
+            from hoshmap import FrozenIdict
+
+            for id, res in self.results.items():
+                for cache in self.caches:
+                    if self.did not in cache:
+                        cache[self.did] = {"_ids": self.dids}
+                    if isinstance(res, FrozenIdict):
+                        # TODO:
+                        #  if res=cacheableival: add current cache to res.'lazies*'.caches caso não tenham
+                        #  [não faz sentido picklear caches, então...]
+                        #  busca no cache anterior do subdict pelo resultado já pronto (e grava no corrente?)
+                        #   senão:
+                        #       se cache corrente contém fid, armazena field como lazy
+                        #       senão, evaluate nesse field (p/ ser armazenado mais abaixo).
+                        #
+                        res.evaluate()  # <-- retirar depois de feito TODOs acima
+                        if res.id not in cache:
+                            # REMINDER: entry id differs from internal did
+                            cache[id] = {"_ids": res.ids}
+                        res >> [[cache]]
+                    elif id not in cache:
+                        cache[id] = res  # TODO: pack (pickle+lz4)
+
+    def traverse(self, id, cache, outdated_caches):
+        val = cache[id]
+        for outdated_cache in outdated_caches:
+            outdated_cache[id] = val
+        if isinstance(val, dict) and list(val.keys()) == ["_ids"]:
+            from hoshmap import FrozenIdict
+            ids = val["_ids"]
+            data = {}
+            for k, v in ids.items():
+                data[k] = self.traverse(v, cache, outdated_caches)
+            return FrozenIdict.fromdict(data, ids)
+        return val
