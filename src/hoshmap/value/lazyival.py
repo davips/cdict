@@ -89,6 +89,8 @@ class LazyiVal(CacheableiVal):
     @property
     def value(self):
         if not self.isevaluated:
+            from hoshmap import idict
+
             # Fetch.
             if self.caches is not None:
                 outdated_caches = []
@@ -126,6 +128,8 @@ class LazyiVal(CacheableiVal):
                             kwargs[target] = next(it)
                         # print(kwargs)
                         r = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+                        if isinstance(r, idict):
+                            r = r.frozen
                         result.append(r)
                     except StopIteration:
                         if i not in [0, len(iterable_sources)]:
@@ -133,6 +137,8 @@ class LazyiVal(CacheableiVal):
                         loop = False
             else:
                 result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
+                if isinstance(result, idict):
+                    result = result.frozen
             if self.n == 1:
                 result = [result]
             elif isinstance(result, dict):
