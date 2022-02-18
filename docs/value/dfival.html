@@ -117,7 +117,7 @@ def explode_df(df):
 
     dic = {&#34;index&#34;: df.index.to_series()}
     for col in df:
-        dic[col] = df[col]
+        dic[str(col)] = df[col]
     d = FrozenIdict(dic)
     return DFiVal(df, d.hosh), StrictiVal(d, d.hosh)</code></pre>
 </details>
@@ -187,7 +187,7 @@ c  3  7
 
     dic = {&#34;index&#34;: df.index.to_series()}
     for col in df:
-        dic[col] = df[col]
+        dic[str(col)] = df[col]
     d = FrozenIdict(dic)
     return DFiVal(df, d.hosh), StrictiVal(d, d.hosh)</code></pre>
 </details>

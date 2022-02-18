@@ -26,10 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import Dict
-from typing import TypeVar
+<pre><code class="python">from typing import Dict, TypeVar
 
-from hoshmap.frozenidict import FrozenIdict
 from hoshmap.let import Let
 
 VT = TypeVar(&#34;VT&#34;)
@@ -242,58 +240,6 @@ class Idict(Dict[str, VT]):
         &#34;&#34;&#34;
         return self.frozen.ids
 
-    @property
-    def fields(self):
-        &#34;&#34;&#34;
-        List of keys which don&#39;t start with &#39;_&#39;
-
-        &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; idict(x=3, y=5, _z=5).fields
-        [&#39;x&#39;, &#39;y&#39;]
-        &#34;&#34;&#34;
-        return self.frozen.fields
-
-    @property
-    def metafields(self):
-        &#34;&#34;&#34;
-        List of keys which don&#39;t start with &#39;_&#39;
-
-        &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; idict(x=3, y=5, _z=5).metafields
-        [&#39;_z&#39;]
-        &#34;&#34;&#34;
-        return self.frozen.metafields
-
-    def entries(self, evaluate=True):
-        &#34;&#34;&#34;Iterator over entries
-
-        Ignore id entries.
-
-        &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; from hoshmap.appearance import decolorize
-        &gt;&gt;&gt; for k, v in idict(x=1, y=2).entries():
-        ...     print(k, v)
-        x 1
-        y 2
-        &#34;&#34;&#34;
-        return self.frozen.entries(evaluate)
-
-    def items(self, evaluate=True):
-        &#34;&#34;&#34;Iterator over all items
-
-        Include ids and other items starting with &#39;_&#39;.
-
-        &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; from hoshmap.appearance import decolorize
-        &gt;&gt;&gt; for k, v in idict(x=1, y=2).items():
-        ...     print(k, v)
-        x 1
-        y 2
-        _id 41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N
-        _ids {&#39;x&#39;: &#39;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&#39;, &#39;y&#39;: &#39;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#39;}
-        &#34;&#34;&#34;
-        return self.frozen.items(evaluate)
-
     @staticmethod
     def fromdict(dictionary, ids):
         &#34;&#34;&#34;Build an idict from values and pre-defined ids
@@ -382,7 +328,81 @@ class Idict(Dict[str, VT]):
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.frozen.data.copy(),)</code></pre>
+        return self.__class__, (self.frozen.data.copy(),)
+
+    def keys(self):
+        &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
+        return self.frozen.keys()
+
+    def values(self, evaluate=True):
+        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        return self.frozen.values(evaluate)
+
+    def items(self, evaluate=True):
+        &#34;&#34;&#34;Generator over field-value pairs
+
+        Include ids and other items starting with &#39;_&#39;.
+
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; from hoshmap.appearance import decolorize
+        &gt;&gt;&gt; for k, v in idict(x=1, y=2).items():
+        ...     print(k, v)
+        x 1
+        y 2
+        &#34;&#34;&#34;
+        return self.frozen.items(evaluate)
+
+    def metakeys(self):
+        &#34;&#34;&#34;Generator of keys which start with &#39;_&#39;&#34;&#34;&#34;
+        return self.frozen.metakeys()
+
+    def metavalues(self, evaluate=True):
+        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        return self.frozen.metavalues(evaluate)
+
+    def metaitems(self, evaluate=True):
+        &#34;&#34;&#34;Generator over field-value pairs&#34;&#34;&#34;
+        return self.frozen.metaitems(evaluate)
+
+    def entries(self, evaluate=True):
+        &#34;&#34;&#34;Iterator over all entries
+
+        Ignore id entries.
+
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; from hoshmap.appearance import decolorize
+        &gt;&gt;&gt; for k, v in idict(x=1, y=2).entries():
+        ...     print(k, v)
+        x 1
+        y 2
+        &#34;&#34;&#34;
+        return self.frozen.entries(evaluate)
+
+    @property
+    def fields(self):
+        &#34;&#34;&#34;
+        List of keys which don&#39;t start with &#39;_&#39;
+
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; idict(x=3, y=5, _z=5).fields
+        [&#39;x&#39;, &#39;y&#39;]
+        &#34;&#34;&#34;
+        return self.frozen.fields
+
+    @property
+    def aslist(self):
+        return self.frozen.aslist
+
+    @property
+    def metafields(self):
+        &#34;&#34;&#34;
+        List of keys which don&#39;t start with &#39;_&#39;
+
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; idict(x=3, y=5, _z=5).metafields
+        [&#39;_z&#39;]
+        &#34;&#34;&#34;
+        return self.frozen.metafields</code></pre>
 </details>
 </section>
 <section>
@@ -719,58 +739,6 @@ Evaluated!
         &#34;&#34;&#34;
         return self.frozen.ids
 
-    @property
-    def fields(self):
-        &#34;&#34;&#34;
-        List of keys which don&#39;t start with &#39;_&#39;
-
-        &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; idict(x=3, y=5, _z=5).fields
-        [&#39;x&#39;, &#39;y&#39;]
-        &#34;&#34;&#34;
-        return self.frozen.fields
-
-    @property
-    def metafields(self):
-        &#34;&#34;&#34;
-        List of keys which don&#39;t start with &#39;_&#39;
-
-        &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; idict(x=3, y=5, _z=5).metafields
-        [&#39;_z&#39;]
-        &#34;&#34;&#34;
-        return self.frozen.metafields
-
-    def entries(self, evaluate=True):
-        &#34;&#34;&#34;Iterator over entries
-
-        Ignore id entries.
-
-        &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; from hoshmap.appearance import decolorize
-        &gt;&gt;&gt; for k, v in idict(x=1, y=2).entries():
-        ...     print(k, v)
-        x 1
-        y 2
-        &#34;&#34;&#34;
-        return self.frozen.entries(evaluate)
-
-    def items(self, evaluate=True):
-        &#34;&#34;&#34;Iterator over all items
-
-        Include ids and other items starting with &#39;_&#39;.
-
-        &gt;&gt;&gt; from hoshmap import idict
-        &gt;&gt;&gt; from hoshmap.appearance import decolorize
-        &gt;&gt;&gt; for k, v in idict(x=1, y=2).items():
-        ...     print(k, v)
-        x 1
-        y 2
-        _id 41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N
-        _ids {&#39;x&#39;: &#39;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&#39;, &#39;y&#39;: &#39;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#39;}
-        &#34;&#34;&#34;
-        return self.frozen.items(evaluate)
-
     @staticmethod
     def fromdict(dictionary, ids):
         &#34;&#34;&#34;Build an idict from values and pre-defined ids
@@ -859,7 +827,81 @@ Evaluated!
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.frozen.data.copy(),)</code></pre>
+        return self.__class__, (self.frozen.data.copy(),)
+
+    def keys(self):
+        &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
+        return self.frozen.keys()
+
+    def values(self, evaluate=True):
+        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        return self.frozen.values(evaluate)
+
+    def items(self, evaluate=True):
+        &#34;&#34;&#34;Generator over field-value pairs
+
+        Include ids and other items starting with &#39;_&#39;.
+
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; from hoshmap.appearance import decolorize
+        &gt;&gt;&gt; for k, v in idict(x=1, y=2).items():
+        ...     print(k, v)
+        x 1
+        y 2
+        &#34;&#34;&#34;
+        return self.frozen.items(evaluate)
+
+    def metakeys(self):
+        &#34;&#34;&#34;Generator of keys which start with &#39;_&#39;&#34;&#34;&#34;
+        return self.frozen.metakeys()
+
+    def metavalues(self, evaluate=True):
+        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        return self.frozen.metavalues(evaluate)
+
+    def metaitems(self, evaluate=True):
+        &#34;&#34;&#34;Generator over field-value pairs&#34;&#34;&#34;
+        return self.frozen.metaitems(evaluate)
+
+    def entries(self, evaluate=True):
+        &#34;&#34;&#34;Iterator over all entries
+
+        Ignore id entries.
+
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; from hoshmap.appearance import decolorize
+        &gt;&gt;&gt; for k, v in idict(x=1, y=2).entries():
+        ...     print(k, v)
+        x 1
+        y 2
+        &#34;&#34;&#34;
+        return self.frozen.entries(evaluate)
+
+    @property
+    def fields(self):
+        &#34;&#34;&#34;
+        List of keys which don&#39;t start with &#39;_&#39;
+
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; idict(x=3, y=5, _z=5).fields
+        [&#39;x&#39;, &#39;y&#39;]
+        &#34;&#34;&#34;
+        return self.frozen.fields
+
+    @property
+    def aslist(self):
+        return self.frozen.aslist
+
+    @property
+    def metafields(self):
+        &#34;&#34;&#34;
+        List of keys which don&#39;t start with &#39;_&#39;
+
+        &gt;&gt;&gt; from hoshmap import idict
+        &gt;&gt;&gt; idict(x=3, y=5, _z=5).metafields
+        [&#39;_z&#39;]
+        &#34;&#34;&#34;
+        return self.frozen.metafields</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -937,6 +979,18 @@ def asdicts(self):
     {&#39;x&#39;: 3, &#39;y&#39;: 5, &#39;_id&#39;: &#39;r5A2Mh6vRRO5rxi5nfXv1myeguGSTmqHuHev38qM&#39;, &#39;_ids&#39;: {&#39;x&#39;: &#39;KGWjj0iyLAn1RG6RTGtsGE3omZraJM6xO.kvG5pr&#39;, &#39;y&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;}}
     &#34;&#34;&#34;
     return self.frozen.asdicts</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.idict.Idict.aslist"><code class="name">var <span class="ident">aslist</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def aslist(self):
+    return self.frozen.aslist</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.idict.Idict.evaluated"><code class="name">var <span class="ident">evaluated</span></code></dt>
@@ -1097,7 +1151,7 @@ True
 <span>def <span class="ident">entries</span></span>(<span>self, evaluate=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Iterator over entries</p>
+<div class="desc"><p>Iterator over all entries</p>
 <p>Ignore id entries.</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
 &gt;&gt;&gt; from hoshmap.appearance import decolorize
@@ -1111,7 +1165,7 @@ y 2
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def entries(self, evaluate=True):
-    &#34;&#34;&#34;Iterator over entries
+    &#34;&#34;&#34;Iterator over all entries
 
     Ignore id entries.
 
@@ -1198,7 +1252,7 @@ y 2
 <span>def <span class="ident">items</span></span>(<span>self, evaluate=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Iterator over all items</p>
+<div class="desc"><p>Generator over field-value pairs</p>
 <p>Include ids and other items starting with '_'.</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
 &gt;&gt;&gt; from hoshmap.appearance import decolorize
@@ -1206,15 +1260,13 @@ y 2
 ...     print(k, v)
 x 1
 y 2
-_id 41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N
-_ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29'}
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def items(self, evaluate=True):
-    &#34;&#34;&#34;Iterator over all items
+    &#34;&#34;&#34;Generator over field-value pairs
 
     Include ids and other items starting with &#39;_&#39;.
 
@@ -1224,10 +1276,64 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
     ...     print(k, v)
     x 1
     y 2
-    _id 41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N
-    _ids {&#39;x&#39;: &#39;DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl&#39;, &#39;y&#39;: &#39;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#39;}
     &#34;&#34;&#34;
     return self.frozen.items(evaluate)</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.idict.Idict.keys"><code class="name flex">
+<span>def <span class="ident">keys</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator of keys which don't start with '_'</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def keys(self):
+    &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
+    return self.frozen.keys()</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.idict.Idict.metaitems"><code class="name flex">
+<span>def <span class="ident">metaitems</span></span>(<span>self, evaluate=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator over field-value pairs</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def metaitems(self, evaluate=True):
+    &#34;&#34;&#34;Generator over field-value pairs&#34;&#34;&#34;
+    return self.frozen.metaitems(evaluate)</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.idict.Idict.metakeys"><code class="name flex">
+<span>def <span class="ident">metakeys</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator of keys which start with '_'</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def metakeys(self):
+    &#34;&#34;&#34;Generator of keys which start with &#39;_&#39;&#34;&#34;&#34;
+    return self.frozen.metakeys()</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.idict.Idict.metavalues"><code class="name flex">
+<span>def <span class="ident">metavalues</span></span>(<span>self, evaluate=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator of field values (keys don't start with '_')</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def metavalues(self, evaluate=True):
+    &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+    return self.frozen.metavalues(evaluate)</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.idict.Idict.show"><code class="name flex">
@@ -1274,6 +1380,20 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
     return self.frozen.show(colored, key_quotes)</code></pre>
 </details>
 </dd>
+<dt id="hoshmap.idict.Idict.values"><code class="name flex">
+<span>def <span class="ident">values</span></span>(<span>self, evaluate=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator of field values (keys don't start with '_')</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def values(self, evaluate=True):
+    &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+    return self.frozen.values(evaluate)</code></pre>
+</details>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -1297,6 +1417,7 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
 <ul class="two-column">
 <li><code><a title="hoshmap.idict.Idict.asdict" href="#hoshmap.idict.Idict.asdict">asdict</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.asdicts" href="#hoshmap.idict.Idict.asdicts">asdicts</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.aslist" href="#hoshmap.idict.Idict.aslist">aslist</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.astext" href="#hoshmap.idict.Idict.astext">astext</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.entries" href="#hoshmap.idict.Idict.entries">entries</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.evaluate" href="#hoshmap.idict.Idict.evaluate">evaluate</a></code></li>
@@ -1307,8 +1428,13 @@ _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6r
 <li><code><a title="hoshmap.idict.Idict.id" href="#hoshmap.idict.Idict.id">id</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.ids" href="#hoshmap.idict.Idict.ids">ids</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.items" href="#hoshmap.idict.Idict.items">items</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.keys" href="#hoshmap.idict.Idict.keys">keys</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.metafields" href="#hoshmap.idict.Idict.metafields">metafields</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.metaitems" href="#hoshmap.idict.Idict.metaitems">metaitems</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.metakeys" href="#hoshmap.idict.Idict.metakeys">metakeys</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.metavalues" href="#hoshmap.idict.Idict.metavalues">metavalues</a></code></li>
 <li><code><a title="hoshmap.idict.Idict.show" href="#hoshmap.idict.Idict.show">show</a></code></li>
+<li><code><a title="hoshmap.idict.Idict.values" href="#hoshmap.idict.Idict.values">values</a></code></li>
 </ul>
 </li>
 </ul>

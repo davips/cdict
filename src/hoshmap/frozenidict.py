@@ -214,7 +214,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                         if self.id not in cache:
                             cache[self.id] = {"_ids": self.ids}
                         if ival.id not in cache:
-                            if isinstance(ival.value,FrozenIdict):
+                            if isinstance(ival.value, FrozenIdict):
                                 ival.value >> [[cache]]
                             cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
                 else:

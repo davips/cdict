@@ -30,15 +30,15 @@
 import re
 from collections import UserDict
 from functools import cached_property
-from typing import Dict, Union
-from typing import TypeVar
+from typing import Dict, TypeVar, Union
 
-from hoshmap.serialization.customjson import CustomJSONEncoder
-from hoshmap.let import Let
-from hoshmap.value import LazyiVal
-from hoshmap.value.dfival import DFiVal, explode_df
-from hoshmap.value.strictival import iVal, StrictiVal
 from hosh import ø
+
+from hoshmap.let import Let
+from hoshmap.serialization.customjson import CustomJSONEncoder
+from hoshmap.value import LazyiVal
+from hoshmap.value.dfival import explode_df
+from hoshmap.value.strictival import StrictiVal, iVal
 
 VT = TypeVar(&#34;VT&#34;)
 
@@ -93,28 +93,6 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         # self.data[&#34;_mid&#34;] = self.id = self.hosh.id
         # self.data[&#34;_mids&#34;] = self.ids
 
-    @property
-    def evaluated(self):
-        if self._evaluated is None:
-            self._evaluated = self.evaluate()
-        return self
-
-    def evaluate(self):
-        for k, ival in self.data.items():
-            if k not in [&#34;_id&#34;, &#34;_ids&#34;]:
-                ival.evaluate()
-        return self
-
-    @cached_property
-    def fields(self):
-        &#34;&#34;&#34;List of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
-        return [k for k in self.data if not k.startswith(&#34;_&#34;)]
-
-    @cached_property
-    def metafields(self):
-        &#34;&#34;&#34;List of keys which start with &#39;_&#39;&#34;&#34;&#34;
-        return [k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]]
-
     @staticmethod
     def fromdict(dictionary, ids):
         &#34;&#34;&#34;Build a frozenidict from values and pre-defined ids&#34;&#34;&#34;
@@ -127,6 +105,18 @@ class FrozenIdict(UserDict, Dict[str, VT]):
             else:
                 data[k] = StrictiVal(v, ids[k])
         return FrozenIdict(data)
+
+    @property
+    def evaluated(self):
+        if self._evaluated is None:
+            self._evaluated = self.evaluate()
+        return self
+
+    def evaluate(self):
+        for k, ival in self.data.items():
+            if k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                ival.evaluate()
+        return self
 
     @cached_property
     def asdict(self):
@@ -184,18 +174,6 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     def show(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;Print textual representation of a frozenidict object&#34;&#34;&#34;
         print(self.astext(colored, key_quotes))
-
-    def items(self, evaluate=True):
-        &#34;&#34;&#34;Iterator over all items&#34;&#34;&#34;
-        yield from self.entries(evaluate)
-        yield &#34;_id&#34;, self.id
-        yield &#34;_ids&#34;, self.ids
-
-    def entries(self, evaluate=True):
-        &#34;&#34;&#34;Iterator over entries&#34;&#34;&#34;
-        for k, ival in self.data.items():
-            if k not in [&#34;_id&#34;, &#34;_ids&#34;]:
-                yield k, (ival.value if evaluate else ival)
 
     def copy(self):  # pragma: no cover
         raise Exception(&#34;A FrozenIdict doesn&#39;t need copies&#34;)
@@ -264,6 +242,8 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                         if self.id not in cache:
                             cache[self.id] = {&#34;_ids&#34;: self.ids}
                         if ival.id not in cache:
+                            if isinstance(ival.value, FrozenIdict):
+                                ival.value &gt;&gt; [[cache]]
                             cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
                 else:
                     data[k] = ival.withcaches(caches, self.id, self.ids)
@@ -301,7 +281,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         if isinstance(other, dict):
             if &#34;_id&#34; in other:
                 return self.id == other[&#34;_id&#34;]
-            if list(self.keys())[:-2] != list(other.keys()):
+            if list(self.keys()) != list(other.keys()):
                 return False
         if isinstance(other, dict):
             self.evaluate()
@@ -315,7 +295,53 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.data.copy(),)</code></pre>
+        return self.__class__, (self.data.copy(),)
+
+    def keys(self):
+        &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
+        return (k for k in self.data if not k.startswith(&#34;_&#34;))
+
+    def values(self, evaluate=True):
+        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        return ((v.value if evaluate else v) for k, v in self.data.items() if not k.startswith(&#34;_&#34;))
+
+    def items(self, evaluate=True):
+        &#34;&#34;&#34;Generator over field-value pairs&#34;&#34;&#34;
+        for k, ival in self.data.items():
+            if not k.startswith(&#34;_&#34;):
+                yield k, (ival.value if evaluate else ival)
+
+    def metakeys(self):
+        &#34;&#34;&#34;Generator of keys which start with &#39;_&#39;&#34;&#34;&#34;
+        return (k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;])
+
+    def metavalues(self, evaluate=True):
+        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        return ((v.value if evaluate else v) for k, v in self.data.items() if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;])
+
+    def metaitems(self, evaluate=True):
+        &#34;&#34;&#34;Generator over field-value pairs&#34;&#34;&#34;
+        for k, ival in self.data.items():
+            if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                yield k, (ival.value if evaluate else ival)
+
+    def entries(self, evaluate=True):
+        &#34;&#34;&#34;Iterator over all items&#34;&#34;&#34;
+        yield from self.items(evaluate)
+        yield from self.metaitems(evaluate)
+
+    @cached_property
+    def fields(self):
+        return list(self.keys())
+
+    @cached_property
+    def aslist(self):
+        return list(self.values())
+
+    @cached_property
+    def metafields(self):
+        &#34;&#34;&#34;List of keys which start with &#39;_&#39;&#34;&#34;&#34;
+        return [k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]]</code></pre>
 </details>
 </section>
 <section>
@@ -391,28 +417,6 @@ True
         # self.data[&#34;_mid&#34;] = self.id = self.hosh.id
         # self.data[&#34;_mids&#34;] = self.ids
 
-    @property
-    def evaluated(self):
-        if self._evaluated is None:
-            self._evaluated = self.evaluate()
-        return self
-
-    def evaluate(self):
-        for k, ival in self.data.items():
-            if k not in [&#34;_id&#34;, &#34;_ids&#34;]:
-                ival.evaluate()
-        return self
-
-    @cached_property
-    def fields(self):
-        &#34;&#34;&#34;List of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
-        return [k for k in self.data if not k.startswith(&#34;_&#34;)]
-
-    @cached_property
-    def metafields(self):
-        &#34;&#34;&#34;List of keys which start with &#39;_&#39;&#34;&#34;&#34;
-        return [k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]]
-
     @staticmethod
     def fromdict(dictionary, ids):
         &#34;&#34;&#34;Build a frozenidict from values and pre-defined ids&#34;&#34;&#34;
@@ -425,6 +429,18 @@ True
             else:
                 data[k] = StrictiVal(v, ids[k])
         return FrozenIdict(data)
+
+    @property
+    def evaluated(self):
+        if self._evaluated is None:
+            self._evaluated = self.evaluate()
+        return self
+
+    def evaluate(self):
+        for k, ival in self.data.items():
+            if k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                ival.evaluate()
+        return self
 
     @cached_property
     def asdict(self):
@@ -482,18 +498,6 @@ True
     def show(self, colored=True, key_quotes=False):
         r&#34;&#34;&#34;Print textual representation of a frozenidict object&#34;&#34;&#34;
         print(self.astext(colored, key_quotes))
-
-    def items(self, evaluate=True):
-        &#34;&#34;&#34;Iterator over all items&#34;&#34;&#34;
-        yield from self.entries(evaluate)
-        yield &#34;_id&#34;, self.id
-        yield &#34;_ids&#34;, self.ids
-
-    def entries(self, evaluate=True):
-        &#34;&#34;&#34;Iterator over entries&#34;&#34;&#34;
-        for k, ival in self.data.items():
-            if k not in [&#34;_id&#34;, &#34;_ids&#34;]:
-                yield k, (ival.value if evaluate else ival)
 
     def copy(self):  # pragma: no cover
         raise Exception(&#34;A FrozenIdict doesn&#39;t need copies&#34;)
@@ -562,6 +566,8 @@ True
                         if self.id not in cache:
                             cache[self.id] = {&#34;_ids&#34;: self.ids}
                         if ival.id not in cache:
+                            if isinstance(ival.value, FrozenIdict):
+                                ival.value &gt;&gt; [[cache]]
                             cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
                 else:
                     data[k] = ival.withcaches(caches, self.id, self.ids)
@@ -599,7 +605,7 @@ True
         if isinstance(other, dict):
             if &#34;_id&#34; in other:
                 return self.id == other[&#34;_id&#34;]
-            if list(self.keys())[:-2] != list(other.keys()):
+            if list(self.keys()) != list(other.keys()):
                 return False
         if isinstance(other, dict):
             self.evaluate()
@@ -613,7 +619,53 @@ True
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.data.copy(),)</code></pre>
+        return self.__class__, (self.data.copy(),)
+
+    def keys(self):
+        &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
+        return (k for k in self.data if not k.startswith(&#34;_&#34;))
+
+    def values(self, evaluate=True):
+        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        return ((v.value if evaluate else v) for k, v in self.data.items() if not k.startswith(&#34;_&#34;))
+
+    def items(self, evaluate=True):
+        &#34;&#34;&#34;Generator over field-value pairs&#34;&#34;&#34;
+        for k, ival in self.data.items():
+            if not k.startswith(&#34;_&#34;):
+                yield k, (ival.value if evaluate else ival)
+
+    def metakeys(self):
+        &#34;&#34;&#34;Generator of keys which start with &#39;_&#39;&#34;&#34;&#34;
+        return (k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;])
+
+    def metavalues(self, evaluate=True):
+        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        return ((v.value if evaluate else v) for k, v in self.data.items() if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;])
+
+    def metaitems(self, evaluate=True):
+        &#34;&#34;&#34;Generator over field-value pairs&#34;&#34;&#34;
+        for k, ival in self.data.items():
+            if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                yield k, (ival.value if evaluate else ival)
+
+    def entries(self, evaluate=True):
+        &#34;&#34;&#34;Iterator over all items&#34;&#34;&#34;
+        yield from self.items(evaluate)
+        yield from self.metaitems(evaluate)
+
+    @cached_property
+    def fields(self):
+        return list(self.keys())
+
+    @cached_property
+    def aslist(self):
+        return list(self.values())
+
+    @cached_property
+    def metafields(self):
+        &#34;&#34;&#34;List of keys which start with &#39;_&#39;&#34;&#34;&#34;
+        return [k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]]</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -772,6 +824,45 @@ def fromdict(dictionary, ids):
     return val</code></pre>
 </details>
 </dd>
+<dt id="hoshmap.frozenidict.FrozenIdict.aslist"><code class="name">var <span class="ident">aslist</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner=None):
+    if instance is None:
+        return self
+    if self.attrname is None:
+        raise TypeError(
+            &#34;Cannot use cached_property instance without calling __set_name__ on it.&#34;)
+    try:
+        cache = instance.__dict__
+    except AttributeError:  # not all objects have __dict__ (e.g. class defines slots)
+        msg = (
+            f&#34;No &#39;__dict__&#39; attribute on {type(instance).__name__!r} &#34;
+            f&#34;instance to cache {self.attrname!r} property.&#34;
+        )
+        raise TypeError(msg) from None
+    val = cache.get(self.attrname, _NOT_FOUND)
+    if val is _NOT_FOUND:
+        with self.lock:
+            # check if another thread filled cache while we awaited lock
+            val = cache.get(self.attrname, _NOT_FOUND)
+            if val is _NOT_FOUND:
+                val = self.func(instance)
+                try:
+                    cache[self.attrname] = val
+                except TypeError:
+                    msg = (
+                        f&#34;The &#39;__dict__&#39; attribute on {type(instance).__name__!r} instance &#34;
+                        f&#34;does not support item assignment for caching {self.attrname!r} property.&#34;
+                    )
+                    raise TypeError(msg) from None
+    return val</code></pre>
+</details>
+</dd>
 <dt id="hoshmap.frozenidict.FrozenIdict.evaluated"><code class="name">var <span class="ident">evaluated</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -788,7 +879,7 @@ def evaluated(self):
 </dd>
 <dt id="hoshmap.frozenidict.FrozenIdict.fields"><code class="name">var <span class="ident">fields</span></code></dt>
 <dd>
-<div class="desc"><p>List of keys which don't start with '_'</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -922,16 +1013,15 @@ def unfrozen(self):
 <span>def <span class="ident">entries</span></span>(<span>self, evaluate=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Iterator over entries</p></div>
+<div class="desc"><p>Iterator over all items</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def entries(self, evaluate=True):
-    &#34;&#34;&#34;Iterator over entries&#34;&#34;&#34;
-    for k, ival in self.data.items():
-        if k not in [&#34;_id&#34;, &#34;_ids&#34;]:
-            yield k, (ival.value if evaluate else ival)</code></pre>
+    &#34;&#34;&#34;Iterator over all items&#34;&#34;&#34;
+    yield from self.items(evaluate)
+    yield from self.metaitems(evaluate)</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.frozenidict.FrozenIdict.evaluate"><code class="name flex">
@@ -954,16 +1044,74 @@ def unfrozen(self):
 <span>def <span class="ident">items</span></span>(<span>self, evaluate=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Iterator over all items</p></div>
+<div class="desc"><p>Generator over field-value pairs</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def items(self, evaluate=True):
-    &#34;&#34;&#34;Iterator over all items&#34;&#34;&#34;
-    yield from self.entries(evaluate)
-    yield &#34;_id&#34;, self.id
-    yield &#34;_ids&#34;, self.ids</code></pre>
+    &#34;&#34;&#34;Generator over field-value pairs&#34;&#34;&#34;
+    for k, ival in self.data.items():
+        if not k.startswith(&#34;_&#34;):
+            yield k, (ival.value if evaluate else ival)</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.frozenidict.FrozenIdict.keys"><code class="name flex">
+<span>def <span class="ident">keys</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator of keys which don't start with '_'</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def keys(self):
+    &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
+    return (k for k in self.data if not k.startswith(&#34;_&#34;))</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.frozenidict.FrozenIdict.metaitems"><code class="name flex">
+<span>def <span class="ident">metaitems</span></span>(<span>self, evaluate=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator over field-value pairs</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def metaitems(self, evaluate=True):
+    &#34;&#34;&#34;Generator over field-value pairs&#34;&#34;&#34;
+    for k, ival in self.data.items():
+        if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+            yield k, (ival.value if evaluate else ival)</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.frozenidict.FrozenIdict.metakeys"><code class="name flex">
+<span>def <span class="ident">metakeys</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator of keys which start with '_'</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def metakeys(self):
+    &#34;&#34;&#34;Generator of keys which start with &#39;_&#39;&#34;&#34;&#34;
+    return (k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;])</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.frozenidict.FrozenIdict.metavalues"><code class="name flex">
+<span>def <span class="ident">metavalues</span></span>(<span>self, evaluate=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator of field values (keys don't start with '_')</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def metavalues(self, evaluate=True):
+    &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+    return ((v.value if evaluate else v) for k, v in self.data.items() if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;])</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.frozenidict.FrozenIdict.show"><code class="name flex">
@@ -978,6 +1126,20 @@ def unfrozen(self):
 <pre><code class="python">def show(self, colored=True, key_quotes=False):
     r&#34;&#34;&#34;Print textual representation of a frozenidict object&#34;&#34;&#34;
     print(self.astext(colored, key_quotes))</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.frozenidict.FrozenIdict.values"><code class="name flex">
+<span>def <span class="ident">values</span></span>(<span>self, evaluate=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator of field values (keys don't start with '_')</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def values(self, evaluate=True):
+    &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+    return ((v.value if evaluate else v) for k, v in self.data.items() if not k.startswith(&#34;_&#34;))</code></pre>
 </details>
 </dd>
 </dl>
@@ -1004,6 +1166,7 @@ def unfrozen(self):
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.asdict" href="#hoshmap.frozenidict.FrozenIdict.asdict">asdict</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.asdicts" href="#hoshmap.frozenidict.FrozenIdict.asdicts">asdicts</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.asdicts_hoshes_noneval" href="#hoshmap.frozenidict.FrozenIdict.asdicts_hoshes_noneval">asdicts_hoshes_noneval</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.aslist" href="#hoshmap.frozenidict.FrozenIdict.aslist">aslist</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.astext" href="#hoshmap.frozenidict.FrozenIdict.astext">astext</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.copy" href="#hoshmap.frozenidict.FrozenIdict.copy">copy</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.entries" href="#hoshmap.frozenidict.FrozenIdict.entries">entries</a></code></li>
@@ -1012,9 +1175,14 @@ def unfrozen(self):
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.fields" href="#hoshmap.frozenidict.FrozenIdict.fields">fields</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.fromdict" href="#hoshmap.frozenidict.FrozenIdict.fromdict">fromdict</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.items" href="#hoshmap.frozenidict.FrozenIdict.items">items</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.keys" href="#hoshmap.frozenidict.FrozenIdict.keys">keys</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.metafields" href="#hoshmap.frozenidict.FrozenIdict.metafields">metafields</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.metaitems" href="#hoshmap.frozenidict.FrozenIdict.metaitems">metaitems</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.metakeys" href="#hoshmap.frozenidict.FrozenIdict.metakeys">metakeys</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.metavalues" href="#hoshmap.frozenidict.FrozenIdict.metavalues">metavalues</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.show" href="#hoshmap.frozenidict.FrozenIdict.show">show</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.unfrozen" href="#hoshmap.frozenidict.FrozenIdict.unfrozen">unfrozen</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.values" href="#hoshmap.frozenidict.FrozenIdict.values">values</a></code></li>
 </ul>
 </li>
 </ul>
