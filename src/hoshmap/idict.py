@@ -1,7 +1,5 @@
-from typing import Dict
-from typing import TypeVar
+from typing import Dict, TypeVar
 
-from hoshmap.frozenidict import FrozenIdict
 from hoshmap.let import Let
 
 VT = TypeVar("VT")
@@ -214,58 +212,6 @@ class Idict(Dict[str, VT]):
         """
         return self.frozen.ids
 
-    @property
-    def fields(self):
-        """
-        List of keys which don't start with '_'
-
-        >>> from hoshmap import idict
-        >>> idict(x=3, y=5, _z=5).fields
-        ['x', 'y']
-        """
-        return self.frozen.fields
-
-    @property
-    def metafields(self):
-        """
-        List of keys which don't start with '_'
-
-        >>> from hoshmap import idict
-        >>> idict(x=3, y=5, _z=5).metafields
-        ['_z']
-        """
-        return self.frozen.metafields
-
-    def entries(self, evaluate=True):
-        """Iterator over entries
-
-        Ignore id entries.
-
-        >>> from hoshmap import idict
-        >>> from hoshmap.appearance import decolorize
-        >>> for k, v in idict(x=1, y=2).entries():
-        ...     print(k, v)
-        x 1
-        y 2
-        """
-        return self.frozen.entries(evaluate)
-
-    def items(self, evaluate=True):
-        """Iterator over all items
-
-        Include ids and other items starting with '_'.
-
-        >>> from hoshmap import idict
-        >>> from hoshmap.appearance import decolorize
-        >>> for k, v in idict(x=1, y=2).items():
-        ...     print(k, v)
-        x 1
-        y 2
-        _id 41wHsGFMSo0vbD2n6zAXogYG9YE3FwzIRSqjWc8N
-        _ids {'x': 'DYu5bfVvb6FOhBCWNsss4wsEWHZYTbKnsVgoWFvl', 'y': 'k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29'}
-        """
-        return self.frozen.items(evaluate)
-
     @staticmethod
     def fromdict(dictionary, ids):
         """Build an idict from values and pre-defined ids
@@ -355,3 +301,77 @@ class Idict(Dict[str, VT]):
 
     def __reduce__(self):
         return self.__class__, (self.frozen.data.copy(),)
+
+    def keys(self):
+        """Generator of keys which don't start with '_'"""
+        return self.frozen.keys()
+
+    def values(self, evaluate=True):
+        """Generator of field values (keys don't start with '_')"""
+        return self.frozen.values(evaluate)
+
+    def items(self, evaluate=True):
+        """Generator over field-value pairs
+
+        Include ids and other items starting with '_'.
+
+        >>> from hoshmap import idict
+        >>> from hoshmap.appearance import decolorize
+        >>> for k, v in idict(x=1, y=2).items():
+        ...     print(k, v)
+        x 1
+        y 2
+        """
+        return self.frozen.items(evaluate)
+
+    def metakeys(self):
+        """Generator of keys which start with '_'"""
+        return self.frozen.metakeys()
+
+    def metavalues(self, evaluate=True):
+        """Generator of field values (keys don't start with '_')"""
+        return self.frozen.metavalues(evaluate)
+
+    def metaitems(self, evaluate=True):
+        """Generator over field-value pairs"""
+        return self.frozen.metaitems(evaluate)
+
+    def entries(self, evaluate=True):
+        """Iterator over all entries
+
+        Ignore id entries.
+
+        >>> from hoshmap import idict
+        >>> from hoshmap.appearance import decolorize
+        >>> for k, v in idict(x=1, y=2).entries():
+        ...     print(k, v)
+        x 1
+        y 2
+        """
+        return self.frozen.entries(evaluate)
+
+    @property
+    def fields(self):
+        """
+        List of keys which don't start with '_'
+
+        >>> from hoshmap import idict
+        >>> idict(x=3, y=5, _z=5).fields
+        ['x', 'y']
+        """
+        return self.frozen.fields
+
+    @property
+    def aslist(self):
+        return self.frozen.aslist
+
+    @property
+    def metafields(self):
+        """
+        List of keys which don't start with '_'
+
+        >>> from hoshmap import idict
+        >>> idict(x=3, y=5, _z=5).metafields
+        ['_z']
+        """
+        return self.frozen.metafields
