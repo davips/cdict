@@ -1,1 +1,1 @@
-Change interface keys/values/items etc
+Widen scope of acceptable fromdic parameters

@@ -71,8 +71,8 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         data = {}
         for k, v in dictionary.items():
             if isinstance(v, iVal):
-                if k in ids:  # pragma: no cover
-                    raise Exception(f"Conflict: key '{k}' provided for an iVal")
+                if k in ids and ids[k] != v.id:  # pragma: no cover
+                    raise Exception(f"Conflicting ids provided for key '{k}': ival.id={v.id}; ids[{k}]={ids[k]}")
                 data[k] = v
             else:
                 data[k] = StrictiVal(v, ids[k])
@@ -267,7 +267,10 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.data.copy(),)
+        dic = self.data.copy()
+        ids = dic.pop("_ids").copy()
+        del dic["_id"]
+        return self.fromdict, (dic, ids)
 
     def keys(self):
         """Generator of keys which don't start with '_'"""
