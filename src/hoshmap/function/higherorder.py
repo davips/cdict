@@ -20,10 +20,23 @@ def map(f, field, in_out, asdict=False):
     instr = f"{field}:collection{(' ' + instr) if instr else ''}"
 
     def fun(collection, **kwargs):
-        if isinstance(collection, dict):
-            return dict(f(kv, **kwargs) for kv in collection.items())
-        elif asdict:
-            return dict(f(v, **kwargs) for v in collection)
+        if isinstance(collection, dict) or asdict:
+            if not asdict:
+                collection = collection.items()
+            dic = {}
+            for kv in collection:
+                kv_ret = f(kv, **kwargs)
+                if kv_ret is not ...:
+                    k, v = kv_ret
+                    dic[k] = v
+            return dic
         else:
-            return [f(v, **kwargs) for v in collection]
+            lst = []
+            for item in collection:
+                ret = f(item, **kwargs)
+                if ret is not ...:
+                    lst.append(ret)
+            return lst
+
     return fun, f"{instr}→{outstr}"
+
