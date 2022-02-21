@@ -234,7 +234,11 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 else:  # pragma: no cover
                     # TODO: partial application [put multiple references for same iPartial if multioutput]
                     #   raise exc if missing right most argument
-                    raise Exception(f"Missing field '{fin_source}': {other.input}")
+                    raise Exception(f"Missing field '{fin_source}'.\n"
+                                    f"idict:{list(self.keys())}\n"
+                                    f"let input:{other.input}\n"
+                                    f"let default:{other.input_values}\n"
+                                    f"let space:{other.input_space}")
                 if isinstance(val, iVal):
                     # REMINDER: only here 'val' comes from a field (not from Let)
                     deps[fin_target] = val
@@ -267,6 +271,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return not (self == other)
 
     def __reduce__(self):
+        # TODO: pickling idicts shouldn't be necessary after cache[id]=DFiVal is implemented
         dic = self.data.copy()
         ids = dic.pop("_ids").copy()
         del dic["_id"]

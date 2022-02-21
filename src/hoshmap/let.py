@@ -44,11 +44,18 @@ class Let:
                 self.input[par.name] = par.name
                 if par.default is not par.empty:
                     self.input_values[par.name] = par.default
+            instr = " ".join(self.input.values())
+            in_out = instr + "→" + outstr
+            self.parsed = True
         else:
             self._parse_instr(instr, kwargs)
+            self.parsed = False
         self.output = outstr.split(" ")
         self.id = id
         self.metadata = _metadata
+        self.in_out = in_out
+        self.instr = instr
+        self.outstr = outstr
 
     def _parse_instr(self, instr, kwargs):
         for par in instr.split(" "):
@@ -68,6 +75,5 @@ class Let:
             elif isource in kwargs:  # TODO: write test
                 self.input_values[isource] = kwargs[isource]
             self.input[isource] = itarget
-
 
 # TODO: add : mapping to output as well, so to accept exploding returned dicts

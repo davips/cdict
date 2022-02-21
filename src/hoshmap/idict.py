@@ -300,7 +300,7 @@ class Idict(Dict[str, VT]):
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.frozen.data.copy(),)
+        return self.frozen.__reduce__()
 
     def keys(self):
         """Generator of keys which don't start with '_'"""

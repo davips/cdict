@@ -192,6 +192,8 @@ class LazyiVal(CacheableiVal):
                         cache[id] = res  # TODO: pack (pickle+lz4)
 
     def traverse(self, id, cache, outdated_caches):
+        if id not in cache:
+            raise Exception(f"Id {id} not found.")
         val = cache[id]
         for outdated_cache in outdated_caches:
             outdated_cache[id] = val
