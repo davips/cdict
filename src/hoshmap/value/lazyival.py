@@ -89,7 +89,7 @@ class LazyiVal(CacheableiVal):
         self.results = results
         self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
         self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh]))[i:n]
-        self.results[self.id] = None
+        self.results[self.id] = Unevaluated
 
     def replace(self, **kwargs):
         dic = dict(f=self.f, i=self.i, n=self.n, deps=self.deps, results=self.results, fid=self.fhosh, caches=self.caches)
@@ -206,3 +206,10 @@ class LazyiVal(CacheableiVal):
                 data[k] = self.traverse(v, cache, outdated_caches)
             return FrozenIdict.fromdict(data, ids)
         return val
+
+
+class Unevaluated:
+    pass
+
+
+Unevaluated = Unevaluated()
