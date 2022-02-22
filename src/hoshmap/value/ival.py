@@ -35,6 +35,7 @@ class iVal:
     @property
     def isevaluated(self):
         from hoshmap.value.lazyival import Unevaluated
+
         return self.results[self.id] is not Unevaluated
 
     def evaluate(self):

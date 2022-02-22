@@ -99,8 +99,8 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         data = {}
         for k, v in dictionary.items():
             if isinstance(v, iVal):
-                if k in ids:  # pragma: no cover
-                    raise Exception(f&#34;Conflict: key &#39;{k}&#39; provided for an iVal&#34;)
+                if k in ids and ids[k] != v.id:  # pragma: no cover
+                    raise Exception(f&#34;Conflicting ids provided for key &#39;{k}&#39;: ival.id={v.id}; ids[{k}]={ids[k]}&#34;)
                 data[k] = v
             else:
                 data[k] = StrictiVal(v, ids[k])
@@ -262,7 +262,13 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 else:  # pragma: no cover
                     # TODO: partial application [put multiple references for same iPartial if multioutput]
                     #   raise exc if missing right most argument
-                    raise Exception(f&#34;Missing field &#39;{fin_source}&#39;: {other.input}&#34;)
+                    raise Exception(
+                        f&#34;Missing field &#39;{fin_source}&#39;.\n&#34;
+                        f&#34;idict:{list(self.keys())}\n&#34;
+                        f&#34;let input:{other.input}\n&#34;
+                        f&#34;let default:{other.input_values}\n&#34;
+                        f&#34;let space:{other.input_space}&#34;
+                    )
                 if isinstance(val, iVal):
                     # REMINDER: only here &#39;val&#39; comes from a field (not from Let)
                     deps[fin_target] = val
@@ -295,7 +301,11 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.data.copy(),)
+        # TODO: pickling idicts shouldn&#39;t be necessary after cache[id]=DFiVal is implemented
+        dic = self.data.copy()
+        ids = dic.pop(&#34;_ids&#34;).copy()
+        del dic[&#34;_id&#34;]
+        return self.fromdict, (dic, ids)
 
     def keys(self):
         &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
@@ -423,8 +433,8 @@ True
         data = {}
         for k, v in dictionary.items():
             if isinstance(v, iVal):
-                if k in ids:  # pragma: no cover
-                    raise Exception(f&#34;Conflict: key &#39;{k}&#39; provided for an iVal&#34;)
+                if k in ids and ids[k] != v.id:  # pragma: no cover
+                    raise Exception(f&#34;Conflicting ids provided for key &#39;{k}&#39;: ival.id={v.id}; ids[{k}]={ids[k]}&#34;)
                 data[k] = v
             else:
                 data[k] = StrictiVal(v, ids[k])
@@ -586,7 +596,13 @@ True
                 else:  # pragma: no cover
                     # TODO: partial application [put multiple references for same iPartial if multioutput]
                     #   raise exc if missing right most argument
-                    raise Exception(f&#34;Missing field &#39;{fin_source}&#39;: {other.input}&#34;)
+                    raise Exception(
+                        f&#34;Missing field &#39;{fin_source}&#39;.\n&#34;
+                        f&#34;idict:{list(self.keys())}\n&#34;
+                        f&#34;let input:{other.input}\n&#34;
+                        f&#34;let default:{other.input_values}\n&#34;
+                        f&#34;let space:{other.input_space}&#34;
+                    )
                 if isinstance(val, iVal):
                     # REMINDER: only here &#39;val&#39; comes from a field (not from Let)
                     deps[fin_target] = val
@@ -619,7 +635,11 @@ True
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.data.copy(),)
+        # TODO: pickling idicts shouldn&#39;t be necessary after cache[id]=DFiVal is implemented
+        dic = self.data.copy()
+        ids = dic.pop(&#34;_ids&#34;).copy()
+        del dic[&#34;_id&#34;]
+        return self.fromdict, (dic, ids)
 
     def keys(self):
         &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
@@ -696,8 +716,8 @@ def fromdict(dictionary, ids):
     data = {}
     for k, v in dictionary.items():
         if isinstance(v, iVal):
-            if k in ids:  # pragma: no cover
-                raise Exception(f&#34;Conflict: key &#39;{k}&#39; provided for an iVal&#34;)
+            if k in ids and ids[k] != v.id:  # pragma: no cover
+                raise Exception(f&#34;Conflicting ids provided for key &#39;{k}&#39;: ival.id={v.id}; ids[{k}]={ids[k]}&#34;)
             data[k] = v
         else:
             data[k] = StrictiVal(v, ids[k])

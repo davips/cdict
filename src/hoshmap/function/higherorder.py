@@ -4,13 +4,13 @@ from hoshmap import Let
 def dmap(f, field, in_out, aslist=False):
     """Apply 'f' to every element in dict 'field'
 
-     Assume the pair key-element are the first two args of 'f'.
-     'f' should receive and return key-value tuples.
-     'field' should not apper inside 'in_out'.
+    Assume the pair key-element are the first two args of 'f'.
+    'f' should receive and return key-value tuples.
+    'field' should not apper inside 'in_out'.
 
-     If 'aslist=True', the mapping is from dict to list.
-     Ignore entries which result in '...'.
-     """
+    If 'aslist=True', the mapping is from dict to list.
+    Ignore entries which result in '...'.
+    """
     let = Let(f, in_out)
     input, outstr = let.input, let.outstr
     if let.parsed:
@@ -46,12 +46,12 @@ def dmap(f, field, in_out, aslist=False):
 def lmap(f, field, in_out, asdict=False):
     """Apply 'f' to every element in list 'field'
 
-     Assume the element goes as the first arg of 'f'.
-     It should not apper inside 'in_out'.
+    Assume the element goes as the first arg of 'f'.
+    It should not apper inside 'in_out'.
 
-     if 'asdict=True', f should return key-value tuples.
-     Ignore entries which result in '...'.
-     """
+    if 'asdict=True', f should return key-value tuples.
+    Ignore entries which result in '...'.
+    """
     let = Let(f, in_out)
     input, outstr = let.input, let.outstr
     if let.parsed:
@@ -80,4 +80,3 @@ def lmap(f, field, in_out, asdict=False):
             return lst
 
     return fun, f"{instr}→{outstr}"
-

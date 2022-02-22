@@ -117,7 +117,7 @@ class LazyiVal(CacheableiVal):
         self.results = results
         self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
         self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh]))[i:n]
-        self.results[self.id] = None
+        self.results[self.id] = Unevaluated
 
     def replace(self, **kwargs):
         dic = dict(f=self.f, i=self.i, n=self.n, deps=self.deps, results=self.results, fid=self.fhosh, caches=self.caches)
@@ -220,6 +220,8 @@ class LazyiVal(CacheableiVal):
                         cache[id] = res  # TODO: pack (pickle+lz4)
 
     def traverse(self, id, cache, outdated_caches):
+        if id not in cache:
+            raise Exception(f&#34;Id {id} not found.&#34;)
         val = cache[id]
         for outdated_cache in outdated_caches:
             outdated_cache[id] = val
@@ -231,7 +233,14 @@ class LazyiVal(CacheableiVal):
             for k, v in ids.items():
                 data[k] = self.traverse(v, cache, outdated_caches)
             return FrozenIdict.fromdict(data, ids)
-        return val</code></pre>
+        return val
+
+
+class Unevaluated:
+    pass
+
+
+Unevaluated = Unevaluated()</code></pre>
 </details>
 </section>
 <section>
@@ -341,7 +350,7 @@ True
         self.results = results
         self.fhosh = f2hosh(f) if fid is None else self.handle_id(fid)
         self.hosh = reduce(operator.mul, chain(self.deps.values(), [self.fhosh]))[i:n]
-        self.results[self.id] = None
+        self.results[self.id] = Unevaluated
 
     def replace(self, **kwargs):
         dic = dict(f=self.f, i=self.i, n=self.n, deps=self.deps, results=self.results, fid=self.fhosh, caches=self.caches)
@@ -444,6 +453,8 @@ True
                         cache[id] = res  # TODO: pack (pickle+lz4)
 
     def traverse(self, id, cache, outdated_caches):
+        if id not in cache:
+            raise Exception(f&#34;Id {id} not found.&#34;)
         val = cache[id]
         for outdated_cache in outdated_caches:
             outdated_cache[id] = val
@@ -632,6 +643,8 @@ def value(self):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def traverse(self, id, cache, outdated_caches):
+    if id not in cache:
+        raise Exception(f&#34;Id {id} not found.&#34;)
     val = cache[id]
     for outdated_cache in outdated_caches:
         outdated_cache[id] = val

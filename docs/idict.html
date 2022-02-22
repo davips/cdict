@@ -328,7 +328,7 @@ class Idict(Dict[str, VT]):
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.frozen.data.copy(),)
+        return self.frozen.__reduce__()
 
     def keys(self):
         &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;
@@ -827,7 +827,7 @@ Evaluated!
         return not (self == other)
 
     def __reduce__(self):
-        return self.__class__, (self.frozen.data.copy(),)
+        return self.frozen.__reduce__()
 
     def keys(self):
         &#34;&#34;&#34;Generator of keys which don&#39;t start with &#39;_&#39;&#34;&#34;&#34;

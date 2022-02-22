@@ -1,5 +1,6 @@
 def series2df(k, measures):
     import pandas as pd
+
     allseries = list(measures.values())
     try:
         table = pd.concat(allseries, axis=1)

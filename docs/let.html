@@ -72,11 +72,18 @@ class Let:
                 self.input[par.name] = par.name
                 if par.default is not par.empty:
                     self.input_values[par.name] = par.default
+            instr = &#34; &#34;.join(self.input.values())
+            in_out = instr + &#34;→&#34; + outstr
+            self.parsed = True
         else:
             self._parse_instr(instr, kwargs)
+            self.parsed = False
         self.output = outstr.split(&#34; &#34;)
         self.id = id
         self.metadata = _metadata
+        self.in_out = in_out
+        self.instr = instr
+        self.outstr = outstr
 
     def _parse_instr(self, instr, kwargs):
         for par in instr.split(&#34; &#34;):
@@ -138,11 +145,18 @@ class Let:
                 self.input[par.name] = par.name
                 if par.default is not par.empty:
                     self.input_values[par.name] = par.default
+            instr = &#34; &#34;.join(self.input.values())
+            in_out = instr + &#34;→&#34; + outstr
+            self.parsed = True
         else:
             self._parse_instr(instr, kwargs)
+            self.parsed = False
         self.output = outstr.split(&#34; &#34;)
         self.id = id
         self.metadata = _metadata
+        self.in_out = in_out
+        self.instr = instr
+        self.outstr = outstr
 
     def _parse_instr(self, instr, kwargs):
         for par in instr.split(&#34; &#34;):
