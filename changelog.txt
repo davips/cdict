@@ -1,1 +1,5 @@
+Introduce lmap,dmap
+Implement Unevaluated for shared results dict
+Add ... as indicator of 'drop this entry in the result of imap'
+Fix missing 'correct reduce' in idict class
 Widen scope of acceptable fromdic parameters

@@ -1,6 +1,5 @@
-def series2df(key__measures):
+def series2df(k, measures):
     import pandas as pd
-    k, measures = key__measures
     allseries = list(measures.values())
     try:
         table = pd.concat(allseries, axis=1)
