@@ -31,6 +31,8 @@ from hosh import Hosh
 
 
 def f2hosh(f: callable):
+    if hasattr(f, "hosh"):
+        return f.hosh
     fields_and_params = signature(f).parameters.values()
     fields_and_params = {v.name: None if v.default is v.empty else v.default for v in fields_and_params}
     # if not fields_and_params:
