@@ -15,7 +15,6 @@ def dmap(f, field, in_out, aslist=False):
     input, outstr = let.input, let.outstr
     if let.parsed:
         it = iter(input.items())
-        print(input)
         next(it)
         next(it)
         instr = " ".join(f"{k}:{v}" for k, v in it)
