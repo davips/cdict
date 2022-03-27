@@ -9,7 +9,12 @@ VT = TypeVar("VT")
 # TODO:  DFiVal
 # TODO: make storing of idict id->header flexible for new metafields/metavalues
 
-
+# REMINDER: hoshing should always be applied to wrapped contents (e.g. pickle), to avoid resulting in the same hosh of a key.
+#   For instance, this inequality should always hold:
+#   idict(x=b"asd").ids["x"]   !=   Hosh(b"x").id   !=   Hosh("x").id
+#   This is needed because '*' operator serves two purposes:
+#       function application to a value
+#       binding between a key and a value into an idict entry
 class Idict(Dict[str, VT]):
     """
     >>> from hoshmap import _

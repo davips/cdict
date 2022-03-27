@@ -39,7 +39,7 @@ class Let:
         self.input = {}
         self.input_space = {}
         self.input_values = {}
-        if instr == "":
+        if instr == "":  # TODO: always parse signature, so user can omit some fields in in_out
             for par in signature(f).parameters.values():
                 self.input[par.name] = par.name
                 if par.default is not par.empty:
@@ -75,6 +75,5 @@ class Let:
             elif isource in kwargs:  # TODO: write test
                 self.input_values[isource] = kwargs[isource]
             self.input[isource] = itarget
-
 
 # TODO: add : mapping to output as well, so to accept exploding returned dicts

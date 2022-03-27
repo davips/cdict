@@ -45,7 +45,7 @@ class StrictiVal(iVal):
                 try:
                     self.hosh = Hosh(pickle.dumps(value, protocol=5))
                 except TypeError as e:
-                    raise Exception(f"Cannot pickle: {e}")
+                    raise Exception(f"Cannot pickle. Pickling is needed to hosh idict values ({value}): {e}")
         else:
             self.hosh = self.handle_id(id)
         self.results = {self.hosh.id: value}

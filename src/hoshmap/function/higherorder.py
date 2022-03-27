@@ -1,4 +1,5 @@
 from hoshmap import Let
+from hoshmap.serialization.parsing import f2hosh
 
 
 def dmap(f, field, in_out, aslist=False):
@@ -39,6 +40,7 @@ def dmap(f, field, in_out, aslist=False):
                     dic[k] = v
             return dic
 
+    fun.hosh = b"dmap()" * f2hosh(f)
     return fun, f"{instr}→{outstr}"
 
 
@@ -78,4 +80,5 @@ def lmap(f, field, in_out, asdict=False):
                     lst.append(ret)
             return lst
 
+    fun.hosh = b"lmap()" * f2hosh(f)
     return fun, f"{instr}→{outstr}"
