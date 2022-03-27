@@ -99,7 +99,7 @@ class LazyiVal(CacheableiVal):
     @property
     def value(self):
         if not self.isevaluated:
-            if fetched := self.fetch():
+            if (fetched := self.fetch()) is not None:
                 return fetched
             self.calculate()
             self.store()
