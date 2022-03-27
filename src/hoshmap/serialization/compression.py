@@ -76,6 +76,10 @@ def traversal_enc(obj, ensure_determinism=True):
         pass
     if str(obj.__class__) == "<class 'numpy.ndarray'>":
         return b"nmpy_" + serialize_numpy(obj)
+    if str(obj.__class__) == "<class 'pandas.core.frame.DataFrame'>":
+        return b"pddf_" + serialize_numpy(obj.to_numpy())
+    if str(obj.__class__) == "<class 'pandas.core.series.Series'>":
+        return b"pdsr_" + serialize_numpy(obj.to_numpy())
     if isinstance(obj, list):
         lst_of_bins = []
         for o in obj:
@@ -88,10 +92,20 @@ def pack(obj, ensure_determinism=True, compressed=True):
     r"""
     >>> import numpy as np
     >>> d = [[np.array([[1, 2/3], [4, 5]]), {"x": b"dsa"}], [b"asd", 5]]
+    >>> blob = pack(d)
+    >>> unpack(blob)
+    [[array([[1.        , 0.66666667],
+           [4.        , 5.        ]]), {'x': b'dsa'}], [b'asd', 5]]
     >>> blob = pack(d, compressed=False)
     >>> unpack(blob, compressed=False)
     [[array([[1.        , 0.66666667],
            [4.        , 5.        ]]), {'x': b'dsa'}], [b'asd', 5]]
+    >>> import pandas as pd
+    >>> df = pd.DataFrame(np.array([[1, 2/3], [4, 5]]))
+    >>> unpack(pack(df))
+         0         1
+    0  1.0  0.666667
+    1  4.0  5.000000
     """
     dump = traversal_enc(obj, ensure_determinism)
     return lz4.compress(dump) if compressed else dump
@@ -106,6 +120,12 @@ def traversal_dec(dump):
             return bson.loads(dump[5:])["_"]
         if header == b"nmpy_":
             return deserialize_numpy(dump[5:])
+        if header == b"pddf_":
+            from pandas import DataFrame
+            return DataFrame(deserialize_numpy(dump[5:]))
+        if header == b"pdsr_":
+            from pandas import Series
+            return Series(deserialize_numpy(dump[5:]))
         if header == b"trav_":
             return traversal_dec(bson.loads(dump[5:])["_"])
         return dump
