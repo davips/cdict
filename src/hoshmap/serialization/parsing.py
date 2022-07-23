@@ -19,11 +19,12 @@
 #  works or verbatim, obfuscated, compiled or rewritten versions of any
 #  part of this work is illegal and unethical regarding the effort and
 #  time spent here.
-
-
+import dis
 import pickle
+import re
 from inspect import signature
 from io import StringIO
+from pprint import pprint
 
 from decompyle3.main import decompile
 from decompyle3.semantics.parser_error import ParserError
@@ -41,23 +42,22 @@ def f2hosh(f: callable):
     #     return None
 
     # Remove line numbers.
-
-    # REMINDER: memory address makes this nondeterministic
-    # groups = [l for l in dis.Bytecode(f).dis().split("\n\n") if l]
-    # clean_lines = [fields_and_params]
-    # for group in groups:
-    #     lines = [segment for segment in group.split(" ") if segment][1:]
-    #     clean_lines.append(lines)
-
-    clean_lines = f2code(f)
+    groups = [l for l in dis.Bytecode(f).dis().split("\n\n") if l]
+    clean_lines = [fields_and_params]
+    for group in groups:
+        # Replace memory addresses and file names by 'CODE'.
+        group = re.sub(r'<code object .+ at 0x[0-f]+, file ".+", line \d+>', "CODE", group)
+        lines = [segment for segment in group.split(" ")][1:]
+        clean_lines.append(lines)
     return Hosh(pickle.dumps([fields_and_params, clean_lines], protocol=5))
 
 
 def f2code(f: callable):
     out = StringIO()
     try:
-        decompile(bytecode_version=(3, 8, 10), co=f.__code__, out=out)
-    except ParserError:
+        decompile(bytecode_version=(3, 8), co=f.__code__, out=out)
+    except ParserError as e:
+        print(e)
         raise Exception("Could not extract function code.")
     code = [line for line in out.getvalue().split("\n") if not line.startswith("#")]
     return code

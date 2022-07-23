@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hoshmap"
-version = "0.220221.1"
+version = "0.220723.0"
 description = "Hosh-based cacheable lazy dict with deterministic predictable universally unique identifiers"
 authors = ["davips <dpsabc@gmail.com>"]
 license = "GPL"
@@ -17,7 +17,6 @@ sqla = ["sqlalchemy"]
 python = "^3.8"
 sqlalchemy = { version = "^1.4.23", optional = true }
 hosh = "^1.211228.2"
-decompyle3 = "^3.8.0"
 lz4 = "^4.0.0"
 dill = "^0.3.4"
 orjson = "^3.6.7"
