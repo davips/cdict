@@ -44,6 +44,8 @@ class Let:
                 self.input[par.name] = par.name
                 if par.default is not par.empty:
                     self.input_values[par.name] = par.default
+                if par.name in kwargs:  # TODO: verify if this is needed
+                    self.input_values[par.name] = kwargs[par.name]
             instr = " ".join(self.input.values())
             in_out = instr + "→" + outstr
             self.parsed = True

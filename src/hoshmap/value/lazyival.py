@@ -68,16 +68,16 @@ class LazyiVal(CacheableiVal):
     """
 
     def __init__(
-        self,
-        f: callable,
-        i: int,
-        n: int,
-        deps: dict,
-        results: dict,
-        fid: Union[str, Hosh] = None,
-        caches=None,
-        did=None,
-        dids=None,
+            self,
+            f: callable,
+            i: int,
+            n: int,
+            deps: dict,
+            results: dict,
+            fid: Union[str, Hosh] = None,
+            caches=None,
+            did=None,
+            dids=None,
     ):
         # if i >= len(result):  # pragma: no cover
         #     raise Exception(f"Index {i} inconsistent with current expected result size {len(result)}.")
@@ -119,7 +119,7 @@ class LazyiVal(CacheableiVal):
                     # TODO: passar cache pra ele quando for CacheableiVal
                     self.results[self.id] = val
                     return val
-                outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
+                outdated_caches.append(cache)
 
     def calculate(self):
         from hoshmap import idict

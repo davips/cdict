@@ -23,11 +23,7 @@ import dis
 import pickle
 import re
 from inspect import signature
-from io import StringIO
-from pprint import pprint
 
-from decompyle3.main import decompile
-from decompyle3.semantics.parser_error import ParserError
 from hosh import Hosh
 
 
@@ -44,20 +40,20 @@ def f2hosh(f: callable):
     # Remove line numbers.
     groups = [l for l in dis.Bytecode(f).dis().split("\n\n") if l]
     clean_lines = [fields_and_params]
+
     for group in groups:
-        # Replace memory addresses and file names by 'CODE'.
-        group = re.sub(r'<code object .+ at 0x[0-f]+, file ".+", line \d+>', "CODE", group)
+        # Replace memory addresses and file names by just the object name.
+        group = re.sub(r'<code object (.+) at 0x[0-f]+, file ".+", line \d+>',  r"\1", group)
         lines = [segment for segment in group.split(" ")][1:]
         clean_lines.append(lines)
     return Hosh(pickle.dumps([fields_and_params, clean_lines], protocol=5))
 
-
-def f2code(f: callable):
-    out = StringIO()
-    try:
-        decompile(bytecode_version=(3, 8), co=f.__code__, out=out)
-    except ParserError as e:
-        print(e)
-        raise Exception("Could not extract function code.")
-    code = [line for line in out.getvalue().split("\n") if not line.startswith("#")]
-    return code
+# def f2code(f: callable):
+#     out = StringIO()
+#     try:
+#         decompile(bytecode_version=(3, 8), co=f.__code__, out=out)
+#     except ParserError as e:
+#         print(e)
+#         raise Exception("Could not extract function code.")
+#     code = [line for line in out.getvalue().split("\n") if not line.startswith("#")]
+#     return code

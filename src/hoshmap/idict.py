@@ -1,4 +1,7 @@
+from shelve import Shelf
 from typing import Dict, TypeVar
+
+from hosh import Hosh
 
 from hoshmap.let import Let
 
@@ -130,21 +133,56 @@ class Idict(Dict[str, VT]):
     35
     >>> cache3
     {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}, 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}
+    >>> idict('KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF', cache1 | cache3).show(colored=False)
+    {
+        x: 5,
+        y: 7,
+        z: 35,
+        _id: "KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF",
+        _ids: {
+            x: "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
+            y: "eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf",
+            z: "ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD"
+        }
+    }
     """
 
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
         from hoshmap.frozenidict import FrozenIdict
 
-        self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
+        # Build idict from id+cache.
+        if isinstance(_dictionary, Hosh):
+            _dictionary = Hosh.id
+        if isinstance(_dictionary, str):
+            if len(_dictionary) != 40:
+                raise Exception(f"id should have lenght of 40, not {len(_dictionary)}")
+            # TODO: checar for other types like Cache?
+            if not isinstance(_frozen, (dict, Shelf, list)) and str(_frozen.__class__) not in ["<class 'shelchemy.core.Cache'>"]:  # pragma: no cover
+                raise Exception("An id argument was provided, but a dict-like cache (or list of caches) is missing as the second argument.")
+            if kwargs:  # pragma: no cover
+                raise Exception("Cannot pass more arguments when loading from cache (i.e., first argument is an id and the second argument is a dict-like cache).")
+            self.frozen = FrozenIdict.fromid(_dictionary, _frozen)
+        else:
+            self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
     def __setitem__(self, key, value):
-        self.frozen = self.frozen >> {key: value}
+        if callable(value):
+            if isinstance(key, tuple):
+                key = ",".join(key)
+            if not key.startswith("→") or not key.startswith("->"):
+                key = f"→{key}"
+            self.frozen = self.frozen >> (value, key)
+        else:
+            self.frozen = self.frozen >> {key: value}
 
     def __delitem__(self, key):
-        frozen = self.frozen.copy()
-        del frozen[key]
-        self.frozen = frozen
+        from hoshmap.frozenidict import FrozenIdict
+        data = self.frozen.data.copy()
+        del data[key]
+        del data["_id"]
+        del data["_ids"]
+        self.frozen = FrozenIdict(data)
 
     def __getitem__(self, item):
         return self.frozen[item]
@@ -312,13 +350,13 @@ class Idict(Dict[str, VT]):
         return self.frozen.keys()
 
     def values(self, evaluate=True):
-        """Generator of field values (keys don't start with '_')"""
+        """Generator of field values (keys that don't start with '_')"""
         return self.frozen.values(evaluate)
 
     def items(self, evaluate=True):
         """Generator over field-value pairs
 
-        Include ids and other items starting with '_'.
+        Exclude ids and other items starting with '_'.
 
         >>> from hoshmap import idict
         >>> from hoshmap.appearance import decolorize
