@@ -65,6 +65,7 @@ class LazyiVal(CacheableiVal):
 
     Threefold lazy: It is calculated only when needed, only once and it is cached.
 
+    &gt;&gt;&gt; from hoshmap.value import LazyiVal
     &gt;&gt;&gt; cache = {}
     &gt;&gt;&gt; from hoshmap.value.strictival import StrictiVal
     &gt;&gt;&gt; deps = {&#34;x&#34;: StrictiVal(2)}
@@ -88,24 +89,24 @@ class LazyiVal(CacheableiVal):
     &gt;&gt;&gt; lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     &gt;&gt;&gt; lvz2.id
-    &#39;WgrpQORjCn0iZsyxLPO6YZKKVJ-kJvYhFfwPKX34&#39;
+    &#39;DnEpPaV2RgSFqbiyUvIgF-yM-PRv-ZS5M55oY9D5&#39;
     &gt;&gt;&gt; lvw.id
-    &#39;PIEs62X24oKHoPgjaXgxKkl1wmBicYCmoTgr3CGL&#39;
+    &#39;tZhpXFv5YPuwH-2cFvPO2WsTKpwWui2gGHetySo-&#39;
     &gt;&gt;&gt; lvz2.hosh * lvw.hosh == lvz.hosh * lvw.fhosh
     True
     &#34;&#34;&#34;
 
     def __init__(
-        self,
-        f: callable,
-        i: int,
-        n: int,
-        deps: dict,
-        results: dict,
-        fid: Union[str, Hosh] = None,
-        caches=None,
-        did=None,
-        dids=None,
+            self,
+            f: callable,
+            i: int,
+            n: int,
+            deps: dict,
+            results: dict,
+            fid: Union[str, Hosh] = None,
+            caches=None,
+            did=None,
+            dids=None,
     ):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
@@ -127,7 +128,7 @@ class LazyiVal(CacheableiVal):
     @property
     def value(self):
         if not self.isevaluated:
-            if fetched := self.fetch():
+            if (fetched := self.fetch()) is not None:
                 return fetched
             self.calculate()
             self.store()
@@ -147,7 +148,7 @@ class LazyiVal(CacheableiVal):
                     # TODO: passar cache pra ele quando for CacheableiVal
                     self.results[self.id] = val
                     return val
-                outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
+                outdated_caches.append(cache)
 
     def calculate(self):
         from hoshmap import idict
@@ -217,7 +218,7 @@ class LazyiVal(CacheableiVal):
                             cache[id] = {&#34;_ids&#34;: res.ids}
                         res &gt;&gt; [[cache]]
                     elif id not in cache:
-                        cache[id] = res  # TODO: pack (pickle+lz4)
+                        cache[id] = res
 
     def traverse(self, id, cache, outdated_caches):
         if id not in cache:
@@ -259,7 +260,8 @@ Unevaluated = Unevaluated()</code></pre>
 <dd>
 <div class="desc"><p>Identified lazy value</p>
 <p>Threefold lazy: It is calculated only when needed, only once and it is cached.</p>
-<pre><code class="language-python-repl">&gt;&gt;&gt; cache = {}
+<pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap.value import LazyiVal
+&gt;&gt;&gt; cache = {}
 &gt;&gt;&gt; from hoshmap.value.strictival import StrictiVal
 &gt;&gt;&gt; deps = {&quot;x&quot;: StrictiVal(2)}
 &gt;&gt;&gt; lvx = LazyiVal(lambda x: x**2, 0, 1, deps, {}, caches=[cache])
@@ -282,9 +284,9 @@ Unevaluated = Unevaluated()</code></pre>
 &gt;&gt;&gt; lvx.value, lvy.value, lvz2.value, lvw.value
 (4, 7, 729, 59049)
 &gt;&gt;&gt; lvz2.id
-'WgrpQORjCn0iZsyxLPO6YZKKVJ-kJvYhFfwPKX34'
+'DnEpPaV2RgSFqbiyUvIgF-yM-PRv-ZS5M55oY9D5'
 &gt;&gt;&gt; lvw.id
-'PIEs62X24oKHoPgjaXgxKkl1wmBicYCmoTgr3CGL'
+'tZhpXFv5YPuwH-2cFvPO2WsTKpwWui2gGHetySo-'
 &gt;&gt;&gt; lvz2.hosh * lvw.hosh == lvz.hosh * lvw.fhosh
 True
 </code></pre></div>
@@ -298,6 +300,7 @@ True
 
     Threefold lazy: It is calculated only when needed, only once and it is cached.
 
+    &gt;&gt;&gt; from hoshmap.value import LazyiVal
     &gt;&gt;&gt; cache = {}
     &gt;&gt;&gt; from hoshmap.value.strictival import StrictiVal
     &gt;&gt;&gt; deps = {&#34;x&#34;: StrictiVal(2)}
@@ -321,24 +324,24 @@ True
     &gt;&gt;&gt; lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     &gt;&gt;&gt; lvz2.id
-    &#39;WgrpQORjCn0iZsyxLPO6YZKKVJ-kJvYhFfwPKX34&#39;
+    &#39;DnEpPaV2RgSFqbiyUvIgF-yM-PRv-ZS5M55oY9D5&#39;
     &gt;&gt;&gt; lvw.id
-    &#39;PIEs62X24oKHoPgjaXgxKkl1wmBicYCmoTgr3CGL&#39;
+    &#39;tZhpXFv5YPuwH-2cFvPO2WsTKpwWui2gGHetySo-&#39;
     &gt;&gt;&gt; lvz2.hosh * lvw.hosh == lvz.hosh * lvw.fhosh
     True
     &#34;&#34;&#34;
 
     def __init__(
-        self,
-        f: callable,
-        i: int,
-        n: int,
-        deps: dict,
-        results: dict,
-        fid: Union[str, Hosh] = None,
-        caches=None,
-        did=None,
-        dids=None,
+            self,
+            f: callable,
+            i: int,
+            n: int,
+            deps: dict,
+            results: dict,
+            fid: Union[str, Hosh] = None,
+            caches=None,
+            did=None,
+            dids=None,
     ):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
@@ -360,7 +363,7 @@ True
     @property
     def value(self):
         if not self.isevaluated:
-            if fetched := self.fetch():
+            if (fetched := self.fetch()) is not None:
                 return fetched
             self.calculate()
             self.store()
@@ -380,7 +383,7 @@ True
                     # TODO: passar cache pra ele quando for CacheableiVal
                     self.results[self.id] = val
                     return val
-                outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)
+                outdated_caches.append(cache)
 
     def calculate(self):
         from hoshmap import idict
@@ -450,7 +453,7 @@ True
                             cache[id] = {&#34;_ids&#34;: res.ids}
                         res &gt;&gt; [[cache]]
                     elif id not in cache:
-                        cache[id] = res  # TODO: pack (pickle+lz4)
+                        cache[id] = res
 
     def traverse(self, id, cache, outdated_caches):
         if id not in cache:
@@ -473,13 +476,6 @@ True
 <li><a title="hoshmap.value.cacheableival.CacheableiVal" href="cacheableival.html#hoshmap.value.cacheableival.CacheableiVal">CacheableiVal</a></li>
 <li><a title="hoshmap.value.ival.iVal" href="ival.html#hoshmap.value.ival.iVal">iVal</a></li>
 </ul>
-<h3>Class variables</h3>
-<dl>
-<dt id="hoshmap.value.lazyival.LazyiVal.deps"><code class="name">var <span class="ident">deps</span> : dict</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="hoshmap.value.lazyival.LazyiVal.value"><code class="name">var <span class="ident">value</span> : Any</code></dt>
@@ -492,7 +488,7 @@ True
 <pre><code class="python">@property
 def value(self):
     if not self.isevaluated:
-        if fetched := self.fetch():
+        if (fetched := self.fetch()) is not None:
             return fetched
         self.calculate()
         self.store()
@@ -580,7 +576,7 @@ def value(self):
                 # TODO: passar cache pra ele quando for CacheableiVal
                 self.results[self.id] = val
                 return val
-            outdated_caches.append(cache)  # TODO: unpack (pickle+lz4)</code></pre>
+            outdated_caches.append(cache)</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.value.lazyival.LazyiVal.replace"><code class="name flex">
@@ -630,7 +626,7 @@ def value(self):
                         cache[id] = {&#34;_ids&#34;: res.ids}
                     res &gt;&gt; [[cache]]
                 elif id not in cache:
-                    cache[id] = res  # TODO: pack (pickle+lz4)</code></pre>
+                    cache[id] = res</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.value.lazyival.LazyiVal.traverse"><code class="name flex">
@@ -690,7 +686,6 @@ def value(self):
 <h4><code><a title="hoshmap.value.lazyival.LazyiVal" href="#hoshmap.value.lazyival.LazyiVal">LazyiVal</a></code></h4>
 <ul class="two-column">
 <li><code><a title="hoshmap.value.lazyival.LazyiVal.calculate" href="#hoshmap.value.lazyival.LazyiVal.calculate">calculate</a></code></li>
-<li><code><a title="hoshmap.value.lazyival.LazyiVal.deps" href="#hoshmap.value.lazyival.LazyiVal.deps">deps</a></code></li>
 <li><code><a title="hoshmap.value.lazyival.LazyiVal.fetch" href="#hoshmap.value.lazyival.LazyiVal.fetch">fetch</a></code></li>
 <li><code><a title="hoshmap.value.lazyival.LazyiVal.replace" href="#hoshmap.value.lazyival.LazyiVal.replace">replace</a></code></li>
 <li><code><a title="hoshmap.value.lazyival.LazyiVal.store" href="#hoshmap.value.lazyival.LazyiVal.store">store</a></code></li>

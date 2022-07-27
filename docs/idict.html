@@ -26,7 +26,10 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import Dict, TypeVar
+<pre><code class="python">from shelve import Shelf
+from typing import Dict, TypeVar
+
+from hosh import Hosh
 
 from hoshmap.let import Let
 
@@ -37,7 +40,12 @@ VT = TypeVar(&#34;VT&#34;)
 # TODO:  DFiVal
 # TODO: make storing of idict id-&gt;header flexible for new metafields/metavalues
 
-
+# REMINDER: hoshing should always be applied to wrapped contents (e.g. pickle), to avoid resulting in the same hosh of a key.
+#   For instance, this inequality should always hold:
+#   idict(x=b&#34;asd&#34;).ids[&#34;x&#34;]   !=   Hosh(b&#34;x&#34;).id   !=   Hosh(&#34;x&#34;).id
+#   This is needed because &#39;*&#39; operator serves two purposes:
+#       function application to a value
+#       binding between a key and a value into an idict entry
 class Idict(Dict[str, VT]):
     &#34;&#34;&#34;
     &gt;&gt;&gt; from hoshmap import _
@@ -63,10 +71,10 @@ class Idict(Dict[str, VT]):
     {
         x: 2,
         y: λ(x),
-        _id: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
+        _id: &#34;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&#34;,
         _ids: {
             x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            y: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
+            y: &#34;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&#34;
         }
     }
     &gt;&gt;&gt; d.y, d[&#34;y&#34;]
@@ -102,10 +110,10 @@ class Idict(Dict[str, VT]):
     {
         x: 2,
         y: 4,
-        _id: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
+        _id: &#34;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&#34;,
         _ids: {
             x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            y: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
+            y: &#34;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&#34;
         }
     }
     &gt;&gt;&gt; cache1 = {}
@@ -122,11 +130,11 @@ class Idict(Dict[str, VT]):
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
+        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
+            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
         }
     }
     &gt;&gt;&gt; cache1, cache2
@@ -135,39 +143,74 @@ class Idict(Dict[str, VT]):
     Evaluated!
     35
     &gt;&gt;&gt; cache1, cache2, cache3
-    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}, &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;}}, &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;: 35}, {})
     &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
+        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
+            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
         }
     }
     &gt;&gt;&gt; e.z
     35
     &gt;&gt;&gt; cache3
-    {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}, &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}
+    {&#39;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;}}, &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;: 35}
+    &gt;&gt;&gt; idict(&#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;, cache1 | cache3).show(colored=False)
+    {
+        x: 5,
+        y: 7,
+        z: 35,
+        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
+        _ids: {
+            x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+            y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
+            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
+        }
+    }
     &#34;&#34;&#34;
 
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
         from hoshmap.frozenidict import FrozenIdict
 
-        self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
+        # Build idict from id+cache.
+        if isinstance(_dictionary, Hosh):
+            _dictionary = Hosh.id
+        if isinstance(_dictionary, str):
+            if len(_dictionary) != 40:
+                raise Exception(f&#34;id should have lenght of 40, not {len(_dictionary)}&#34;)
+            # TODO: checar for other types like Cache?
+            if not isinstance(_frozen, (dict, Shelf, list)) and str(_frozen.__class__) not in [&#34;&lt;class &#39;shelchemy.core.Cache&#39;&gt;&#34;]:  # pragma: no cover
+                raise Exception(&#34;An id argument was provided, but a dict-like cache (or list of caches) is missing as the second argument.&#34;)
+            if kwargs:  # pragma: no cover
+                raise Exception(&#34;Cannot pass more arguments when loading from cache (i.e., first argument is an id and the second argument is a dict-like cache).&#34;)
+            self.frozen = FrozenIdict.fromid(_dictionary, _frozen)
+        else:
+            self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
     def __setitem__(self, key, value):
-        self.frozen = self.frozen &gt;&gt; {key: value}
+        if callable(value):
+            if isinstance(key, tuple):
+                key = &#34;,&#34;.join(key)
+            if not key.startswith(&#34;→&#34;) or not key.startswith(&#34;-&gt;&#34;):
+                key = f&#34;→{key}&#34;
+            self.frozen = self.frozen &gt;&gt; (value, key)
+        else:
+            self.frozen = self.frozen &gt;&gt; {key: value}
 
     def __delitem__(self, key):
-        frozen = self.frozen.copy()
-        del frozen[key]
-        self.frozen = frozen
+        from hoshmap.frozenidict import FrozenIdict
+        data = self.frozen.data.copy()
+        del data[key]
+        del data[&#34;_id&#34;]
+        del data[&#34;_ids&#34;]
+        self.frozen = FrozenIdict(data)
 
     def __getitem__(self, item):
         return self.frozen[item]
@@ -193,26 +236,26 @@ class Idict(Dict[str, VT]):
         &gt;&gt;&gt; d.show(colored=False)
         {
             x: λ(),
-            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
             _ids: {
-                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
             }
         }
         &gt;&gt;&gt; d.evaluate()
         &gt;&gt;&gt; d.show(colored=False)
         {
             x: 2,
-            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
             _ids: {
-                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
             }
         }
         &gt;&gt;&gt; d.evaluated.show(colored=False)
         {
             x: 2,
-            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
             _ids: {
-                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
             }
         }
         &#34;&#34;&#34;
@@ -335,13 +378,13 @@ class Idict(Dict[str, VT]):
         return self.frozen.keys()
 
     def values(self, evaluate=True):
-        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        &#34;&#34;&#34;Generator of field values (keys that don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
         return self.frozen.values(evaluate)
 
     def items(self, evaluate=True):
         &#34;&#34;&#34;Generator over field-value pairs
 
-        Include ids and other items starting with &#39;_&#39;.
+        Exclude ids and other items starting with &#39;_&#39;.
 
         &gt;&gt;&gt; from hoshmap import idict
         &gt;&gt;&gt; from hoshmap.appearance import decolorize
@@ -442,10 +485,10 @@ True
 {
     x: 2,
     y: λ(x),
-    _id: &quot;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&quot;,
+    _id: &quot;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&quot;,
     _ids: {
         x: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
-        y: &quot;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&quot;
+        y: &quot;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&quot;
     }
 }
 &gt;&gt;&gt; d.y, d[&quot;y&quot;]
@@ -481,10 +524,10 @@ True
 {
     x: 2,
     y: 4,
-    _id: &quot;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&quot;,
+    _id: &quot;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&quot;,
     _ids: {
         x: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
-        y: &quot;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&quot;
+        y: &quot;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&quot;
     }
 }
 &gt;&gt;&gt; cache1 = {}
@@ -501,11 +544,11 @@ True
     x: 5,
     y: 7,
     z: λ(x y),
-    _id: &quot;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&quot;,
+    _id: &quot;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&quot;,
     _ids: {
         x: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
         y: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
-        z: &quot;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&quot;
+        z: &quot;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&quot;
     }
 }
 &gt;&gt;&gt; cache1, cache2
@@ -514,24 +557,36 @@ True
 Evaluated!
 35
 &gt;&gt;&gt; cache1, cache2, cache3
-({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}, 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}, {})
+({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj'}}, '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj': 35}, {})
 &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &quot;x y→z&quot;) &gt;&gt; [cache3, cache2]
 &gt;&gt;&gt; e.show(colored=False)
 {
     x: 5,
     y: 7,
     z: λ(x y),
-    _id: &quot;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&quot;,
+    _id: &quot;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&quot;,
     _ids: {
         x: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
         y: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
-        z: &quot;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&quot;
+        z: &quot;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&quot;
     }
 }
 &gt;&gt;&gt; e.z
 35
 &gt;&gt;&gt; cache3
-{'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}, 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}
+{'dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj'}}, '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj': 35}
+&gt;&gt;&gt; idict(&quot;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&quot;, cache1 | cache3).show(colored=False)
+{
+    x: 5,
+    y: 7,
+    z: 35,
+    _id: &quot;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&quot;,
+    _ids: {
+        x: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
+        y: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
+        z: &quot;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&quot;
+    }
+}
 </code></pre></div>
 <details class="source">
 <summary>
@@ -562,10 +617,10 @@ Evaluated!
     {
         x: 2,
         y: λ(x),
-        _id: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
+        _id: &#34;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&#34;,
         _ids: {
             x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            y: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
+            y: &#34;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&#34;
         }
     }
     &gt;&gt;&gt; d.y, d[&#34;y&#34;]
@@ -601,10 +656,10 @@ Evaluated!
     {
         x: 2,
         y: 4,
-        _id: &#34;FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI&#34;,
+        _id: &#34;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&#34;,
         _ids: {
             x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            y: &#34;C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg&#34;
+            y: &#34;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&#34;
         }
     }
     &gt;&gt;&gt; cache1 = {}
@@ -621,11 +676,11 @@ Evaluated!
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
+        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
+            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
         }
     }
     &gt;&gt;&gt; cache1, cache2
@@ -634,39 +689,74 @@ Evaluated!
     Evaluated!
     35
     &gt;&gt;&gt; cache1, cache2, cache3
-    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}, &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;}}, &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;: 35}, {})
     &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: &#34;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#34;,
+        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#34;
+            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
         }
     }
     &gt;&gt;&gt; e.z
     35
     &gt;&gt;&gt; cache3
-    {&#39;KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;}}, &#39;ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD&#39;: 35}
+    {&#39;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;}}, &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;: 35}
+    &gt;&gt;&gt; idict(&#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;, cache1 | cache3).show(colored=False)
+    {
+        x: 5,
+        y: 7,
+        z: 35,
+        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
+        _ids: {
+            x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
+            y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
+            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
+        }
+    }
     &#34;&#34;&#34;
 
     # noinspection PyMissingConstructor
     def __init__(self, /, _dictionary=None, _frozen=None, **kwargs):
         from hoshmap.frozenidict import FrozenIdict
 
-        self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
+        # Build idict from id+cache.
+        if isinstance(_dictionary, Hosh):
+            _dictionary = Hosh.id
+        if isinstance(_dictionary, str):
+            if len(_dictionary) != 40:
+                raise Exception(f&#34;id should have lenght of 40, not {len(_dictionary)}&#34;)
+            # TODO: checar for other types like Cache?
+            if not isinstance(_frozen, (dict, Shelf, list)) and str(_frozen.__class__) not in [&#34;&lt;class &#39;shelchemy.core.Cache&#39;&gt;&#34;]:  # pragma: no cover
+                raise Exception(&#34;An id argument was provided, but a dict-like cache (or list of caches) is missing as the second argument.&#34;)
+            if kwargs:  # pragma: no cover
+                raise Exception(&#34;Cannot pass more arguments when loading from cache (i.e., first argument is an id and the second argument is a dict-like cache).&#34;)
+            self.frozen = FrozenIdict.fromid(_dictionary, _frozen)
+        else:
+            self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
 
     def __setitem__(self, key, value):
-        self.frozen = self.frozen &gt;&gt; {key: value}
+        if callable(value):
+            if isinstance(key, tuple):
+                key = &#34;,&#34;.join(key)
+            if not key.startswith(&#34;→&#34;) or not key.startswith(&#34;-&gt;&#34;):
+                key = f&#34;→{key}&#34;
+            self.frozen = self.frozen &gt;&gt; (value, key)
+        else:
+            self.frozen = self.frozen &gt;&gt; {key: value}
 
     def __delitem__(self, key):
-        frozen = self.frozen.copy()
-        del frozen[key]
-        self.frozen = frozen
+        from hoshmap.frozenidict import FrozenIdict
+        data = self.frozen.data.copy()
+        del data[key]
+        del data[&#34;_id&#34;]
+        del data[&#34;_ids&#34;]
+        self.frozen = FrozenIdict(data)
 
     def __getitem__(self, item):
         return self.frozen[item]
@@ -692,26 +782,26 @@ Evaluated!
         &gt;&gt;&gt; d.show(colored=False)
         {
             x: λ(),
-            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
             _ids: {
-                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
             }
         }
         &gt;&gt;&gt; d.evaluate()
         &gt;&gt;&gt; d.show(colored=False)
         {
             x: 2,
-            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
             _ids: {
-                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
             }
         }
         &gt;&gt;&gt; d.evaluated.show(colored=False)
         {
             x: 2,
-            _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
             _ids: {
-                x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
             }
         }
         &#34;&#34;&#34;
@@ -834,13 +924,13 @@ Evaluated!
         return self.frozen.keys()
 
     def values(self, evaluate=True):
-        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        &#34;&#34;&#34;Generator of field values (keys that don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
         return self.frozen.values(evaluate)
 
     def items(self, evaluate=True):
         &#34;&#34;&#34;Generator over field-value pairs
 
-        Include ids and other items starting with &#39;_&#39;.
+        Exclude ids and other items starting with &#39;_&#39;.
 
         &gt;&gt;&gt; from hoshmap import idict
         &gt;&gt;&gt; from hoshmap.appearance import decolorize
@@ -1188,26 +1278,26 @@ y 2
 &gt;&gt;&gt; d.show(colored=False)
 {
     x: λ(),
-    _id: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
+    _id: &quot;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&quot;,
     _ids: {
-        x: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
+        x: &quot;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&quot;
     }
 }
 &gt;&gt;&gt; d.evaluate()
 &gt;&gt;&gt; d.show(colored=False)
 {
     x: 2,
-    _id: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
+    _id: &quot;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&quot;,
     _ids: {
-        x: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
+        x: &quot;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&quot;
     }
 }
 &gt;&gt;&gt; d.evaluated.show(colored=False)
 {
     x: 2,
-    _id: &quot;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&quot;,
+    _id: &quot;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&quot;,
     _ids: {
-        x: &quot;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&quot;
+        x: &quot;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&quot;
     }
 }
 </code></pre></div>
@@ -1222,26 +1312,26 @@ y 2
     &gt;&gt;&gt; d.show(colored=False)
     {
         x: λ(),
-        _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+        _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
         _ids: {
-            x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
         }
     }
     &gt;&gt;&gt; d.evaluate()
     &gt;&gt;&gt; d.show(colored=False)
     {
         x: 2,
-        _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+        _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
         _ids: {
-            x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
         }
     }
     &gt;&gt;&gt; d.evaluated.show(colored=False)
     {
         x: 2,
-        _id: &#34;c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz&#34;,
+        _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
         _ids: {
-            x: &#34;Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh&#34;
+            x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
         }
     }
     &#34;&#34;&#34;
@@ -1253,7 +1343,7 @@ y 2
 </code></dt>
 <dd>
 <div class="desc"><p>Generator over field-value pairs</p>
-<p>Include ids and other items starting with '_'.</p>
+<p>Exclude ids and other items starting with '_'.</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; from hoshmap import idict
 &gt;&gt;&gt; from hoshmap.appearance import decolorize
 &gt;&gt;&gt; for k, v in idict(x=1, y=2).items():
@@ -1268,7 +1358,7 @@ y 2
 <pre><code class="python">def items(self, evaluate=True):
     &#34;&#34;&#34;Generator over field-value pairs
 
-    Include ids and other items starting with &#39;_&#39;.
+    Exclude ids and other items starting with &#39;_&#39;.
 
     &gt;&gt;&gt; from hoshmap import idict
     &gt;&gt;&gt; from hoshmap.appearance import decolorize
@@ -1384,13 +1474,13 @@ y 2
 <span>def <span class="ident">values</span></span>(<span>self, evaluate=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Generator of field values (keys don't start with '_')</p></div>
+<div class="desc"><p>Generator of field values (keys that don't start with '_')</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def values(self, evaluate=True):
-    &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+    &#34;&#34;&#34;Generator of field values (keys that don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
     return self.frozen.values(evaluate)</code></pre>
 </details>
 </dd>

@@ -219,8 +219,20 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         if isinstance(other, FrozenIdict):  # merge
             other = other.data
         if isinstance(other, dict):  # merge
+            clone = self
+            data0 = {}
             for k, v in other.items():
-                data[k] = v
+                if callable(v):
+                    key = k
+                    if isinstance(key, tuple):
+                        key = &#34;,&#34;.join(key)
+                    if not key.startswith(&#34;→&#34;) or not key.startswith(&#34;-&gt;&#34;):
+                        key = f&#34;→{key}&#34;
+                    clone = clone &gt;&gt; (v, key)
+                else:
+                    data0[k] = v
+            data.update(clone.entries(evaluate=False))
+            data.update(data0)
             return FrozenIdict(data)
         # if not isinstance(other, list) and hasattr(other, &#34;__setitem__&#34;) and hasattr(other, &#34;__getitem__&#34;):
         #     other = [other]
@@ -232,7 +244,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     cache = cache[0]
                     strict.append(cache)
                 caches.append(cache)
-            for k, ival in self.entries(evaluate=False):
+            for key, ival in self.entries(evaluate=False):
                 if ival.isevaluated:
                     for cache in strict:
                         # TODO: esse IF evita gravar toda hora, mas impede que metafields sejam atualizados
@@ -244,9 +256,9 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                         if ival.id not in cache:
                             if isinstance(ival.value, FrozenIdict):
                                 ival.value &gt;&gt; [[cache]]
-                            cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
+                            cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() it they want.
                 else:
-                    data[k] = ival.withcaches(caches, self.id, self.ids)
+                    data[key] = ival.withcaches(caches, self.id, self.ids)
             return FrozenIdict(data)
 
         if isinstance(other, Let):
@@ -256,7 +268,9 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                 if fin_source in data:
                     val = data[fin_source]
                 elif fin_source in other.input_space:  # TODO: rnd
-                    val = other.rnd.choice(other.input_space[fin_source])
+                    # val = other.rnd.choice(other.input_space[fin_source])
+                    print(&#34;TODO: rnd&#34;)
+                    pass
                 elif fin_source in other.input_values:
                     val = other.input_values[fin_source]
                 else:  # pragma: no cover
@@ -273,7 +287,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     # REMINDER: only here &#39;val&#39; comes from a field (not from Let)
                     deps[fin_target] = val
                 elif str(type(val)) == &#34;&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;&#34;:
-                    data[fin_target], data[fin_target + &#34;_&#34;] = explode_df(v)
+                    data[fin_target], data[fin_target + &#34;_&#34;] = explode_df(val)
                     deps[fin_target] = data[fin_target]
                 else:
                     deps[fin_target] = StrictiVal(val)
@@ -312,7 +326,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         return (k for k in self.data if not k.startswith(&#34;_&#34;))
 
     def values(self, evaluate=True):
-        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        &#34;&#34;&#34;Generator of field values (keys that don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
         return ((v.value if evaluate else v) for k, v in self.data.items() if not k.startswith(&#34;_&#34;))
 
     def items(self, evaluate=True):
@@ -351,7 +365,35 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     @cached_property
     def metafields(self):
         &#34;&#34;&#34;List of keys which start with &#39;_&#39;&#34;&#34;&#34;
-        return [k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]]</code></pre>
+        return [k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]]
+
+    @staticmethod
+    def fromid(id, cache) -&gt; Union[&#34;FrozenIdict&#34;, None]:
+        return FrozenIdict.fetch(id, cache, isidict=True)
+
+    @staticmethod
+    def fetch(id, cache, isidict=False) -&gt; Union[&#34;FrozenIdict&#34;, None]:
+        caches = cache if isinstance(cache, list) else [cache]
+        while id not in (cache:=caches.pop(0)):
+            if not caches:
+                raise Exception(f&#34;id &#39;{id}&#39; not found in the provided cache {cache.keys()}.&#34;)
+
+        obj = cache[id]
+        if isinstance(obj, dict):
+            if &#34;_ids&#34; not in obj:
+                raise Exception(f&#34;Wrong content for idict under id {id}: missing &#39;_ids&#39; fields ({obj.keys()}).&#34;)
+            isidict = True
+        elif isidict:
+            raise Exception(f&#34;Wrong content for idict expected under id {id}: {type(obj)}.&#34;)
+
+        # TODO: adopt lazy fetch: CacheableiVal as &#39;return&#39; value
+        if isidict:
+            ids = obj[&#34;_ids&#34;]
+            data = {}
+            for k, v in ids.items():
+                data[k] = FrozenIdict.fetch(v, cache)
+            return FrozenIdict.fromdict(data, ids)
+        return obj</code></pre>
 </details>
 </section>
 <section>
@@ -553,8 +595,20 @@ True
         if isinstance(other, FrozenIdict):  # merge
             other = other.data
         if isinstance(other, dict):  # merge
+            clone = self
+            data0 = {}
             for k, v in other.items():
-                data[k] = v
+                if callable(v):
+                    key = k
+                    if isinstance(key, tuple):
+                        key = &#34;,&#34;.join(key)
+                    if not key.startswith(&#34;→&#34;) or not key.startswith(&#34;-&gt;&#34;):
+                        key = f&#34;→{key}&#34;
+                    clone = clone &gt;&gt; (v, key)
+                else:
+                    data0[k] = v
+            data.update(clone.entries(evaluate=False))
+            data.update(data0)
             return FrozenIdict(data)
         # if not isinstance(other, list) and hasattr(other, &#34;__setitem__&#34;) and hasattr(other, &#34;__getitem__&#34;):
         #     other = [other]
@@ -566,7 +620,7 @@ True
                     cache = cache[0]
                     strict.append(cache)
                 caches.append(cache)
-            for k, ival in self.entries(evaluate=False):
+            for key, ival in self.entries(evaluate=False):
                 if ival.isevaluated:
                     for cache in strict:
                         # TODO: esse IF evita gravar toda hora, mas impede que metafields sejam atualizados
@@ -578,9 +632,9 @@ True
                         if ival.id not in cache:
                             if isinstance(ival.value, FrozenIdict):
                                 ival.value &gt;&gt; [[cache]]
-                            cache[ival.id] = ival.value  # TODO: pack (pickle+lz4)
+                            cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() it they want.
                 else:
-                    data[k] = ival.withcaches(caches, self.id, self.ids)
+                    data[key] = ival.withcaches(caches, self.id, self.ids)
             return FrozenIdict(data)
 
         if isinstance(other, Let):
@@ -590,7 +644,9 @@ True
                 if fin_source in data:
                     val = data[fin_source]
                 elif fin_source in other.input_space:  # TODO: rnd
-                    val = other.rnd.choice(other.input_space[fin_source])
+                    # val = other.rnd.choice(other.input_space[fin_source])
+                    print(&#34;TODO: rnd&#34;)
+                    pass
                 elif fin_source in other.input_values:
                     val = other.input_values[fin_source]
                 else:  # pragma: no cover
@@ -607,7 +663,7 @@ True
                     # REMINDER: only here &#39;val&#39; comes from a field (not from Let)
                     deps[fin_target] = val
                 elif str(type(val)) == &#34;&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;&#34;:
-                    data[fin_target], data[fin_target + &#34;_&#34;] = explode_df(v)
+                    data[fin_target], data[fin_target + &#34;_&#34;] = explode_df(val)
                     deps[fin_target] = data[fin_target]
                 else:
                     deps[fin_target] = StrictiVal(val)
@@ -646,7 +702,7 @@ True
         return (k for k in self.data if not k.startswith(&#34;_&#34;))
 
     def values(self, evaluate=True):
-        &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+        &#34;&#34;&#34;Generator of field values (keys that don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
         return ((v.value if evaluate else v) for k, v in self.data.items() if not k.startswith(&#34;_&#34;))
 
     def items(self, evaluate=True):
@@ -685,7 +741,35 @@ True
     @cached_property
     def metafields(self):
         &#34;&#34;&#34;List of keys which start with &#39;_&#39;&#34;&#34;&#34;
-        return [k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]]</code></pre>
+        return [k for k in self.data if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]]
+
+    @staticmethod
+    def fromid(id, cache) -&gt; Union[&#34;FrozenIdict&#34;, None]:
+        return FrozenIdict.fetch(id, cache, isidict=True)
+
+    @staticmethod
+    def fetch(id, cache, isidict=False) -&gt; Union[&#34;FrozenIdict&#34;, None]:
+        caches = cache if isinstance(cache, list) else [cache]
+        while id not in (cache:=caches.pop(0)):
+            if not caches:
+                raise Exception(f&#34;id &#39;{id}&#39; not found in the provided cache {cache.keys()}.&#34;)
+
+        obj = cache[id]
+        if isinstance(obj, dict):
+            if &#34;_ids&#34; not in obj:
+                raise Exception(f&#34;Wrong content for idict under id {id}: missing &#39;_ids&#39; fields ({obj.keys()}).&#34;)
+            isidict = True
+        elif isidict:
+            raise Exception(f&#34;Wrong content for idict expected under id {id}: {type(obj)}.&#34;)
+
+        # TODO: adopt lazy fetch: CacheableiVal as &#39;return&#39; value
+        if isidict:
+            ids = obj[&#34;_ids&#34;]
+            data = {}
+            for k, v in ids.items():
+                data[k] = FrozenIdict.fetch(v, cache)
+            return FrozenIdict.fromdict(data, ids)
+        return obj</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -701,6 +785,40 @@ True
 </ul>
 <h3>Static methods</h3>
 <dl>
+<dt id="hoshmap.frozenidict.FrozenIdict.fetch"><code class="name flex">
+<span>def <span class="ident">fetch</span></span>(<span>id, cache, isidict=False) ‑> Optional[<a title="hoshmap.frozenidict.FrozenIdict" href="#hoshmap.frozenidict.FrozenIdict">FrozenIdict</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def fetch(id, cache, isidict=False) -&gt; Union[&#34;FrozenIdict&#34;, None]:
+    caches = cache if isinstance(cache, list) else [cache]
+    while id not in (cache:=caches.pop(0)):
+        if not caches:
+            raise Exception(f&#34;id &#39;{id}&#39; not found in the provided cache {cache.keys()}.&#34;)
+
+    obj = cache[id]
+    if isinstance(obj, dict):
+        if &#34;_ids&#34; not in obj:
+            raise Exception(f&#34;Wrong content for idict under id {id}: missing &#39;_ids&#39; fields ({obj.keys()}).&#34;)
+        isidict = True
+    elif isidict:
+        raise Exception(f&#34;Wrong content for idict expected under id {id}: {type(obj)}.&#34;)
+
+    # TODO: adopt lazy fetch: CacheableiVal as &#39;return&#39; value
+    if isidict:
+        ids = obj[&#34;_ids&#34;]
+        data = {}
+        for k, v in ids.items():
+            data[k] = FrozenIdict.fetch(v, cache)
+        return FrozenIdict.fromdict(data, ids)
+    return obj</code></pre>
+</details>
+</dd>
 <dt id="hoshmap.frozenidict.FrozenIdict.fromdict"><code class="name flex">
 <span>def <span class="ident">fromdict</span></span>(<span>dictionary, ids)</span>
 </code></dt>
@@ -722,6 +840,20 @@ def fromdict(dictionary, ids):
         else:
             data[k] = StrictiVal(v, ids[k])
     return FrozenIdict(data)</code></pre>
+</details>
+</dd>
+<dt id="hoshmap.frozenidict.FrozenIdict.fromid"><code class="name flex">
+<span>def <span class="ident">fromid</span></span>(<span>id, cache) ‑> Optional[<a title="hoshmap.frozenidict.FrozenIdict" href="#hoshmap.frozenidict.FrozenIdict">FrozenIdict</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def fromid(id, cache) -&gt; Union[&#34;FrozenIdict&#34;, None]:
+    return FrozenIdict.fetch(id, cache, isidict=True)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1152,13 +1284,13 @@ def unfrozen(self):
 <span>def <span class="ident">values</span></span>(<span>self, evaluate=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Generator of field values (keys don't start with '_')</p></div>
+<div class="desc"><p>Generator of field values (keys that don't start with '_')</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def values(self, evaluate=True):
-    &#34;&#34;&#34;Generator of field values (keys don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
+    &#34;&#34;&#34;Generator of field values (keys that don&#39;t start with &#39;_&#39;)&#34;&#34;&#34;
     return ((v.value if evaluate else v) for k, v in self.data.items() if not k.startswith(&#34;_&#34;))</code></pre>
 </details>
 </dd>
@@ -1192,8 +1324,10 @@ def unfrozen(self):
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.entries" href="#hoshmap.frozenidict.FrozenIdict.entries">entries</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.evaluate" href="#hoshmap.frozenidict.FrozenIdict.evaluate">evaluate</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.evaluated" href="#hoshmap.frozenidict.FrozenIdict.evaluated">evaluated</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.fetch" href="#hoshmap.frozenidict.FrozenIdict.fetch">fetch</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.fields" href="#hoshmap.frozenidict.FrozenIdict.fields">fields</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.fromdict" href="#hoshmap.frozenidict.FrozenIdict.fromdict">fromdict</a></code></li>
+<li><code><a title="hoshmap.frozenidict.FrozenIdict.fromid" href="#hoshmap.frozenidict.FrozenIdict.fromid">fromid</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.items" href="#hoshmap.frozenidict.FrozenIdict.items">items</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.keys" href="#hoshmap.frozenidict.FrozenIdict.keys">keys</a></code></li>
 <li><code><a title="hoshmap.frozenidict.FrozenIdict.metafields" href="#hoshmap.frozenidict.FrozenIdict.metafields">metafields</a></code></li>

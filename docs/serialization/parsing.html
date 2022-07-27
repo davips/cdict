@@ -47,18 +47,17 @@
 #  works or verbatim, obfuscated, compiled or rewritten versions of any
 #  part of this work is illegal and unethical regarding the effort and
 #  time spent here.
-
-
+import dis
 import pickle
+import re
 from inspect import signature
-from io import StringIO
 
-from decompyle3.main import decompile
-from decompyle3.semantics.parser_error import ParserError
 from hosh import Hosh
 
 
 def f2hosh(f: callable):
+    if hasattr(f, &#34;hosh&#34;):
+        return f.hosh
     fields_and_params = signature(f).parameters.values()
     fields_and_params = {v.name: None if v.default is v.empty else v.default for v in fields_and_params}
     # if not fields_and_params:
@@ -67,26 +66,25 @@ def f2hosh(f: callable):
     #     return None
 
     # Remove line numbers.
+    groups = [l for l in dis.Bytecode(f).dis().split(&#34;\n\n&#34;) if l]
+    clean_lines = [fields_and_params]
 
-    # REMINDER: memory address makes this nondeterministic
-    # groups = [l for l in dis.Bytecode(f).dis().split(&#34;\n\n&#34;) if l]
-    # clean_lines = [fields_and_params]
-    # for group in groups:
-    #     lines = [segment for segment in group.split(&#34; &#34;) if segment][1:]
-    #     clean_lines.append(lines)
-
-    clean_lines = f2code(f)
+    for group in groups:
+        # Replace memory addresses and file names by just the object name.
+        group = re.sub(r&#39;&lt;code object (.+) at 0x[0-f]+, file &#34;.+&#34;, line \d+&gt;&#39;,  r&#34;\1&#34;, group)
+        lines = [segment for segment in group.split(&#34; &#34;)][1:]
+        clean_lines.append(lines)
     return Hosh(pickle.dumps([fields_and_params, clean_lines], protocol=5))
 
-
-def f2code(f: callable):
-    out = StringIO()
-    try:
-        decompile(bytecode_version=(3, 8, 10), co=f.__code__, out=out)
-    except ParserError:
-        raise Exception(&#34;Could not extract function code.&#34;)
-    code = [line for line in out.getvalue().split(&#34;\n&#34;) if not line.startswith(&#34;#&#34;)]
-    return code</code></pre>
+# def f2code(f: callable):
+#     out = StringIO()
+#     try:
+#         decompile(bytecode_version=(3, 8), co=f.__code__, out=out)
+#     except ParserError as e:
+#         print(e)
+#         raise Exception(&#34;Could not extract function code.&#34;)
+#     code = [line for line in out.getvalue().split(&#34;\n&#34;) if not line.startswith(&#34;#&#34;)]
+#     return code</code></pre>
 </details>
 </section>
 <section>
@@ -96,25 +94,6 @@ def f2code(f: callable):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="hoshmap.serialization.parsing.f2code"><code class="name flex">
-<span>def <span class="ident">f2code</span></span>(<span>f: <built-in function callable>)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def f2code(f: callable):
-    out = StringIO()
-    try:
-        decompile(bytecode_version=(3, 8, 10), co=f.__code__, out=out)
-    except ParserError:
-        raise Exception(&#34;Could not extract function code.&#34;)
-    code = [line for line in out.getvalue().split(&#34;\n&#34;) if not line.startswith(&#34;#&#34;)]
-    return code</code></pre>
-</details>
-</dd>
 <dt id="hoshmap.serialization.parsing.f2hosh"><code class="name flex">
 <span>def <span class="ident">f2hosh</span></span>(<span>f: <built-in function callable>)</span>
 </code></dt>
@@ -125,6 +104,8 @@ def f2code(f: callable):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def f2hosh(f: callable):
+    if hasattr(f, &#34;hosh&#34;):
+        return f.hosh
     fields_and_params = signature(f).parameters.values()
     fields_and_params = {v.name: None if v.default is v.empty else v.default for v in fields_and_params}
     # if not fields_and_params:
@@ -133,15 +114,14 @@ def f2code(f: callable):
     #     return None
 
     # Remove line numbers.
+    groups = [l for l in dis.Bytecode(f).dis().split(&#34;\n\n&#34;) if l]
+    clean_lines = [fields_and_params]
 
-    # REMINDER: memory address makes this nondeterministic
-    # groups = [l for l in dis.Bytecode(f).dis().split(&#34;\n\n&#34;) if l]
-    # clean_lines = [fields_and_params]
-    # for group in groups:
-    #     lines = [segment for segment in group.split(&#34; &#34;) if segment][1:]
-    #     clean_lines.append(lines)
-
-    clean_lines = f2code(f)
+    for group in groups:
+        # Replace memory addresses and file names by just the object name.
+        group = re.sub(r&#39;&lt;code object (.+) at 0x[0-f]+, file &#34;.+&#34;, line \d+&gt;&#39;,  r&#34;\1&#34;, group)
+        lines = [segment for segment in group.split(&#34; &#34;)][1:]
+        clean_lines.append(lines)
     return Hosh(pickle.dumps([fields_and_params, clean_lines], protocol=5))</code></pre>
 </details>
 </dd>
@@ -163,7 +143,6 @@ def f2code(f: callable):
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="hoshmap.serialization.parsing.f2code" href="#hoshmap.serialization.parsing.f2code">f2code</a></code></li>
 <li><code><a title="hoshmap.serialization.parsing.f2hosh" href="#hoshmap.serialization.parsing.f2hosh">f2hosh</a></code></li>
 </ul>
 </li>
