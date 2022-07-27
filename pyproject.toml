@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hoshmap"
-version = "0.220725.0"
+version = "0.220727.0"
 description = "Hosh-based cacheable lazy dict with deterministic predictable universally unique identifiers"
 authors = ["davips <dpsabc@gmail.com>"]
 license = "GPL"
@@ -9,18 +9,14 @@ packages = [
     { include = "hoshmap", from = "src" }
 ]
 
-# To add dependencies for remote data persistence: poetry install -E sqla
+# To add dependencies for remote data persistence: poetry install -E cache
 [tool.poetry.extras]
-sqla = ["sqlalchemy"]
+cache = ["shelchemy"]
 
 [tool.poetry.dependencies]
 python = "^3.10,<4.0"
-sqlalchemy = { version = "^1.4.23", optional = true }
+shelchemy = { version = "^0.220726.6", optional = true }
 hosh = "^1.211228.2"
-lz4 = "^4.0.0"
-dill = "^0.3.4"
-orjson = "^3.6.7"
-bson = "^0.5.10"
 
 [tool.poetry.dev-dependencies]
 autoreadme = "^0.2102.20"

@@ -189,7 +189,7 @@ class LazyiVal(CacheableiVal):
                             cache[id] = {"_ids": res.ids}
                         res >> [[cache]]
                     elif id not in cache:
-                        cache[id] = res  # TODO: pack (pickle+lz4)
+                        cache[id] = res
 
     def traverse(self, id, cache, outdated_caches):
         if id not in cache:
