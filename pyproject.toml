@@ -3,7 +3,7 @@ name = "hoshmap"
 version = "0.220727.2"
 description = "Hosh-based cacheable lazy dict with deterministic predictable universally unique identifiers"
 authors = ["davips <dpsabc@gmail.com>"]
-license = "GPL"
+license = "GPLv3"
 readme = 'README.md'
 packages = [
     { include = "hoshmap", from = "src" }
