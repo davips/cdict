@@ -37,6 +37,7 @@ class LazyiVal(CacheableiVal):
 
     Threefold lazy: It is calculated only when needed, only once and it is cached.
 
+    >>> from hoshmap.value import LazyiVal
     >>> cache = {}
     >>> from hoshmap.value.strictival import StrictiVal
     >>> deps = {"x": StrictiVal(2)}
@@ -60,9 +61,9 @@ class LazyiVal(CacheableiVal):
     >>> lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     >>> lvz2.id
-    'WgrpQORjCn0iZsyxLPO6YZKKVJ-kJvYhFfwPKX34'
+    'DnEpPaV2RgSFqbiyUvIgF-yM-PRv-ZS5M55oY9D5'
     >>> lvw.id
-    'PIEs62X24oKHoPgjaXgxKkl1wmBicYCmoTgr3CGL'
+    'tZhpXFv5YPuwH-2cFvPO2WsTKpwWui2gGHetySo-'
     >>> lvz2.hosh * lvw.hosh == lvz.hosh * lvw.fhosh
     True
     """

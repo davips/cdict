@@ -43,10 +43,10 @@ class Idict(Dict[str, VT]):
     {
         x: 2,
         y: λ(x),
-        _id: "FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI",
+        _id: "stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL",
         _ids: {
             x: "k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29",
-            y: "C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg"
+            y: "n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk"
         }
     }
     >>> d.y, d["y"]
@@ -82,10 +82,10 @@ class Idict(Dict[str, VT]):
     {
         x: 2,
         y: 4,
-        _id: "FLGX7sHyzdwUh90DM.s41YTHOk4vz0Ie5kn6f9iI",
+        _id: "stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL",
         _ids: {
             x: "k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29",
-            y: "C4Y.SrjZPIH3rapdaSc-1BPQqyFHMHSVHqdbfCFg"
+            y: "n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk"
         }
     }
     >>> cache1 = {}
@@ -102,11 +102,11 @@ class Idict(Dict[str, VT]):
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: "KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF",
+        _id: "dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl",
         _ids: {
             x: "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
             y: "eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf",
-            z: "ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD"
+            z: ".YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj"
         }
     }
     >>> cache1, cache2
@@ -115,34 +115,34 @@ class Idict(Dict[str, VT]):
     Evaluated!
     35
     >>> cache1, cache2, cache3
-    ({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}, 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}, {})
+    ({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj'}}, '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj': 35}, {})
     >>> e = idict(x=5, y=7) >> [cache1] >> (f, "x y→z") >> [cache3, cache2]
     >>> e.show(colored=False)
     {
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: "KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF",
+        _id: "dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl",
         _ids: {
             x: "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
             y: "eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf",
-            z: "ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD"
+            z: ".YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj"
         }
     }
     >>> e.z
     35
     >>> cache3
-    {'KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD'}}, 'ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD': 35}
-    >>> idict('KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF', cache1 | cache3).show(colored=False)
+    {'dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj'}}, '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj': 35}
+    >>> idict("dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl", cache1 | cache3).show(colored=False)
     {
         x: 5,
         y: 7,
         z: 35,
-        _id: "KwLLDoyUJUh7atfP.6Ipy.WsFtAxjv6AecLRKZbF",
+        _id: "dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl",
         _ids: {
             x: "ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2",
             y: "eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf",
-            z: "ogZMm1I1npQj9FEidwVLX-2r4Tv5gqaVwDEgBTlD"
+            z: ".YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj"
         }
     }
     """
@@ -208,26 +208,26 @@ class Idict(Dict[str, VT]):
         >>> d.show(colored=False)
         {
             x: λ(),
-            _id: "c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz",
+            _id: "Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw",
             _ids: {
-                x: "Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh"
+                x: "IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe"
             }
         }
         >>> d.evaluate()
         >>> d.show(colored=False)
         {
             x: 2,
-            _id: "c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz",
+            _id: "Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw",
             _ids: {
-                x: "Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh"
+                x: "IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe"
             }
         }
         >>> d.evaluated.show(colored=False)
         {
             x: 2,
-            _id: "c26ifwYEjehRzg1eVGtB55BWIaCnYGmFF-R1WAaz",
+            _id: "Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw",
             _ids: {
-                x: "Uz80K1b-lTtVTq2axnaTpD3mD7PJAvlN4a49KXvh"
+                x: "IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe"
             }
         }
         """
