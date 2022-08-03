@@ -97,16 +97,16 @@ class LazyiVal(CacheableiVal):
     &#34;&#34;&#34;
 
     def __init__(
-            self,
-            f: callable,
-            i: int,
-            n: int,
-            deps: dict,
-            results: dict,
-            fid: Union[str, Hosh] = None,
-            caches=None,
-            did=None,
-            dids=None,
+        self,
+        f: callable,
+        i: int,
+        n: int,
+        deps: dict,
+        results: dict,
+        fid: Union[str, Hosh] = None,
+        caches=None,
+        did=None,
+        dids=None,
     ):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
@@ -332,16 +332,16 @@ True
     &#34;&#34;&#34;
 
     def __init__(
-            self,
-            f: callable,
-            i: int,
-            n: int,
-            deps: dict,
-            results: dict,
-            fid: Union[str, Hosh] = None,
-            caches=None,
-            did=None,
-            dids=None,
+        self,
+        f: callable,
+        i: int,
+        n: int,
+        deps: dict,
+        results: dict,
+        fid: Union[str, Hosh] = None,
+        caches=None,
+        did=None,
+        dids=None,
     ):
         # if i &gt;= len(result):  # pragma: no cover
         #     raise Exception(f&#34;Index {i} inconsistent with current expected result size {len(result)}.&#34;)
@@ -661,7 +661,6 @@ def value(self):
 <li><code><b><a title="hoshmap.value.cacheableival.CacheableiVal" href="cacheableival.html#hoshmap.value.cacheableival.CacheableiVal">CacheableiVal</a></b></code>:
 <ul class="hlist">
 <li><code><a title="hoshmap.value.cacheableival.CacheableiVal.handle_id" href="ival.html#hoshmap.value.ival.iVal.handle_id">handle_id</a></code></li>
-<li><code><a title="hoshmap.value.cacheableival.CacheableiVal.withcaches" href="cacheableival.html#hoshmap.value.cacheableival.CacheableiVal.withcaches">withcaches</a></code></li>
 </ul>
 </li>
 </ul>

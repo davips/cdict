@@ -346,7 +346,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     @staticmethod
     def fetch(id, cache, isidict=False) -> Union["FrozenIdict", None]:
         caches = cache if isinstance(cache, list) else [cache]
-        while id not in (cache:=caches.pop(0)):
+        while id not in (cache := caches.pop(0)):
             if not caches:
                 raise Exception(f"id '{id}' not found in the provided cache {cache.keys()}.")
 

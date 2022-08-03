@@ -39,9 +39,10 @@ class CacheableiVal(iVal):
         self.dids = dids
 
     def withcaches(self, caches, did, dids):
-        &#34;&#34;&#34;Only set cache on cacheless CacheableiVal objects&#34;&#34;&#34;
-        if self.caches is None:
-            return self.replace(caches=caches, did=did, dids=dids)
+        # Only set cache on cacheless CacheableiVal objects
+        if self.caches is not None:
+            caches = []
+        return self.replace(caches=caches, did=did, dids=dids)
 
     def __repr__(self):
         if not self.isevaluated:
@@ -79,9 +80,10 @@ class CacheableiVal(iVal):
         self.dids = dids
 
     def withcaches(self, caches, did, dids):
-        &#34;&#34;&#34;Only set cache on cacheless CacheableiVal objects&#34;&#34;&#34;
-        if self.caches is None:
-            return self.replace(caches=caches, did=did, dids=dids)
+        # Only set cache on cacheless CacheableiVal objects
+        if self.caches is not None:
+            caches = []
+        return self.replace(caches=caches, did=did, dids=dids)
 
     def __repr__(self):
         if not self.isevaluated:
@@ -115,15 +117,16 @@ class CacheableiVal(iVal):
 <span>def <span class="ident">withcaches</span></span>(<span>self, caches, did, dids)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Only set cache on cacheless CacheableiVal objects</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def withcaches(self, caches, did, dids):
-    &#34;&#34;&#34;Only set cache on cacheless CacheableiVal objects&#34;&#34;&#34;
-    if self.caches is None:
-        return self.replace(caches=caches, did=did, dids=dids)</code></pre>
+    # Only set cache on cacheless CacheableiVal objects
+    if self.caches is not None:
+        caches = []
+    return self.replace(caches=caches, did=did, dids=dids)</code></pre>
 </details>
 </dd>
 </dl>

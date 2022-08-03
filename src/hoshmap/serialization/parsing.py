@@ -43,10 +43,11 @@ def f2hosh(f: callable):
 
     for group in groups:
         # Replace memory addresses and file names by just the object name.
-        group = re.sub(r'<code object (.+) at 0x[0-f]+, file ".+", line \d+>',  r"\1", group)
+        group = re.sub(r'<code object (.+) at 0x[0-f]+, file ".+", line \d+>', r"\1", group)
         lines = [segment for segment in group.split(" ")][1:]
         clean_lines.append(lines)
     return Hosh(pickle.dumps([fields_and_params, clean_lines], protocol=5))
+
 
 # def f2code(f: callable):
 #     out = StringIO()

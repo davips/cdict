@@ -186,10 +186,16 @@ class Idict(Dict[str, VT]):
             if len(_dictionary) != 40:
                 raise Exception(f&#34;id should have lenght of 40, not {len(_dictionary)}&#34;)
             # TODO: checar for other types like Cache?
-            if not isinstance(_frozen, (dict, Shelf, list)) and str(_frozen.__class__) not in [&#34;&lt;class &#39;shelchemy.core.Cache&#39;&gt;&#34;]:  # pragma: no cover
-                raise Exception(&#34;An id argument was provided, but a dict-like cache (or list of caches) is missing as the second argument.&#34;)
+            if not isinstance(_frozen, (dict, Shelf, list)) and str(_frozen.__class__) not in [
+                &#34;&lt;class &#39;shelchemy.core.Cache&#39;&gt;&#34;
+            ]:  # pragma: no cover
+                raise Exception(
+                    &#34;An id argument was provided, but a dict-like cache (or list of caches) is missing as the second argument.&#34;
+                )
             if kwargs:  # pragma: no cover
-                raise Exception(&#34;Cannot pass more arguments when loading from cache (i.e., first argument is an id and the second argument is a dict-like cache).&#34;)
+                raise Exception(
+                    &#34;Cannot pass more arguments when loading from cache (i.e., first argument is an id and the second argument is a dict-like cache).&#34;
+                )
             self.frozen = FrozenIdict.fromid(_dictionary, _frozen)
         else:
             self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
@@ -206,6 +212,7 @@ class Idict(Dict[str, VT]):
 
     def __delitem__(self, key):
         from hoshmap.frozenidict import FrozenIdict
+
         data = self.frozen.data.copy()
         del data[key]
         del data[&#34;_id&#34;]
@@ -732,10 +739,16 @@ Evaluated!
             if len(_dictionary) != 40:
                 raise Exception(f&#34;id should have lenght of 40, not {len(_dictionary)}&#34;)
             # TODO: checar for other types like Cache?
-            if not isinstance(_frozen, (dict, Shelf, list)) and str(_frozen.__class__) not in [&#34;&lt;class &#39;shelchemy.core.Cache&#39;&gt;&#34;]:  # pragma: no cover
-                raise Exception(&#34;An id argument was provided, but a dict-like cache (or list of caches) is missing as the second argument.&#34;)
+            if not isinstance(_frozen, (dict, Shelf, list)) and str(_frozen.__class__) not in [
+                &#34;&lt;class &#39;shelchemy.core.Cache&#39;&gt;&#34;
+            ]:  # pragma: no cover
+                raise Exception(
+                    &#34;An id argument was provided, but a dict-like cache (or list of caches) is missing as the second argument.&#34;
+                )
             if kwargs:  # pragma: no cover
-                raise Exception(&#34;Cannot pass more arguments when loading from cache (i.e., first argument is an id and the second argument is a dict-like cache).&#34;)
+                raise Exception(
+                    &#34;Cannot pass more arguments when loading from cache (i.e., first argument is an id and the second argument is a dict-like cache).&#34;
+                )
             self.frozen = FrozenIdict.fromid(_dictionary, _frozen)
         else:
             self.frozen = _frozen or FrozenIdict(_dictionary, **kwargs)
@@ -752,6 +765,7 @@ Evaluated!
 
     def __delitem__(self, key):
         from hoshmap.frozenidict import FrozenIdict
+
         data = self.frozen.data.copy()
         del data[key]
         del data[&#34;_id&#34;]

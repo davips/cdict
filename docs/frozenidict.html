@@ -256,7 +256,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                         if ival.id not in cache:
                             if isinstance(ival.value, FrozenIdict):
                                 ival.value &gt;&gt; [[cache]]
-                            cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() it they want.
+                            cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() the value if it wants.
                 else:
                     data[key] = ival.withcaches(caches, self.id, self.ids)
             return FrozenIdict(data)
@@ -374,7 +374,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     @staticmethod
     def fetch(id, cache, isidict=False) -&gt; Union[&#34;FrozenIdict&#34;, None]:
         caches = cache if isinstance(cache, list) else [cache]
-        while id not in (cache:=caches.pop(0)):
+        while id not in (cache := caches.pop(0)):
             if not caches:
                 raise Exception(f&#34;id &#39;{id}&#39; not found in the provided cache {cache.keys()}.&#34;)
 
@@ -632,7 +632,7 @@ True
                         if ival.id not in cache:
                             if isinstance(ival.value, FrozenIdict):
                                 ival.value &gt;&gt; [[cache]]
-                            cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() it they want.
+                            cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() the value if it wants.
                 else:
                     data[key] = ival.withcaches(caches, self.id, self.ids)
             return FrozenIdict(data)
@@ -750,7 +750,7 @@ True
     @staticmethod
     def fetch(id, cache, isidict=False) -&gt; Union[&#34;FrozenIdict&#34;, None]:
         caches = cache if isinstance(cache, list) else [cache]
-        while id not in (cache:=caches.pop(0)):
+        while id not in (cache := caches.pop(0)):
             if not caches:
                 raise Exception(f&#34;id &#39;{id}&#39; not found in the provided cache {cache.keys()}.&#34;)
 
@@ -797,7 +797,7 @@ True
 <pre><code class="python">@staticmethod
 def fetch(id, cache, isidict=False) -&gt; Union[&#34;FrozenIdict&#34;, None]:
     caches = cache if isinstance(cache, list) else [cache]
-    while id not in (cache:=caches.pop(0)):
+    while id not in (cache := caches.pop(0)):
         if not caches:
             raise Exception(f&#34;id &#39;{id}&#39; not found in the provided cache {cache.keys()}.&#34;)
 
