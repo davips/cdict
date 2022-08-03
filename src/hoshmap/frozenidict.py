@@ -228,7 +228,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                         if ival.id not in cache:
                             if isinstance(ival.value, FrozenIdict):
                                 ival.value >> [[cache]]
-                            cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() it they want.
+                            cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() the value if it wants.
                 else:
                     data[key] = ival.withcaches(caches, self.id, self.ids)
             return FrozenIdict(data)

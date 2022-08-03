@@ -11,9 +11,10 @@ class CacheableiVal(iVal):
         self.dids = dids
 
     def withcaches(self, caches, did, dids):
-        """Only set cache on cacheless CacheableiVal objects"""
-        if self.caches is None:
-            return self.replace(caches=caches, did=did, dids=dids)
+        # Only set cache on cacheless CacheableiVal objects
+        if self.caches is not None:
+            caches = []
+        return self.replace(caches=caches, did=did, dids=dids)
 
     def __repr__(self):
         if not self.isevaluated:

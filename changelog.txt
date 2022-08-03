@@ -1,2 +1,2 @@
-Revert to using 'dis' to avoid breaking hashing of functions due to python versions
-    Remove dependence on decompyle3
+Fix wrong condition "Only set cache on cacheless CacheableiVal objects"
+Update optional deps
