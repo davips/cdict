@@ -71,10 +71,10 @@ class Idict(Dict[str, VT]):
     {
         x: 2,
         y: λ(x),
-        _id: &#34;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&#34;,
+        _id: &#34;opLgZ6Mu0zROyHw0mTZDfo4CjPOPWDNj06Tjf5xY&#34;,
         _ids: {
             x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            y: &#34;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&#34;
+            y: &#34;FjLVN7qyJJN08OCOJyy-eMgxtm5J9jY-C8JofyUw&#34;
         }
     }
     &gt;&gt;&gt; d.y, d[&#34;y&#34;]
@@ -110,10 +110,10 @@ class Idict(Dict[str, VT]):
     {
         x: 2,
         y: 4,
-        _id: &#34;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&#34;,
+        _id: &#34;opLgZ6Mu0zROyHw0mTZDfo4CjPOPWDNj06Tjf5xY&#34;,
         _ids: {
             x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            y: &#34;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&#34;
+            y: &#34;FjLVN7qyJJN08OCOJyy-eMgxtm5J9jY-C8JofyUw&#34;
         }
     }
     &gt;&gt;&gt; cache1 = {}
@@ -130,11 +130,11 @@ class Idict(Dict[str, VT]):
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
+        _id: &#34;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
+            z: &#34;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#34;
         }
     }
     &gt;&gt;&gt; cache1, cache2
@@ -143,34 +143,34 @@ class Idict(Dict[str, VT]):
     Evaluated!
     35
     &gt;&gt;&gt; cache1, cache2, cache3
-    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;}}, &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;: 35}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#39;}}, &#39;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#39;: 35}, {})
     &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
+        _id: &#34;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
+            z: &#34;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#34;
         }
     }
     &gt;&gt;&gt; e.z
     35
     &gt;&gt;&gt; cache3
-    {&#39;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;}}, &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;: 35}
-    &gt;&gt;&gt; idict(&#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;, cache1 | cache3).show(colored=False)
+    {&#39;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#39;}}, &#39;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#39;: 35}
+    &gt;&gt;&gt; idict(&#34;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#34;, cache1 | cache3).show(colored=False)
     {
         x: 5,
         y: 7,
         z: 35,
-        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
+        _id: &#34;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
+            z: &#34;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#34;
         }
     }
     &#34;&#34;&#34;
@@ -243,26 +243,26 @@ class Idict(Dict[str, VT]):
         &gt;&gt;&gt; d.show(colored=False)
         {
             x: λ(),
-            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
+            _id: &#34;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&#34;,
             _ids: {
-                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
+                x: &#34;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&#34;
             }
         }
         &gt;&gt;&gt; d.evaluate()
         &gt;&gt;&gt; d.show(colored=False)
         {
             x: 2,
-            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
+            _id: &#34;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&#34;,
             _ids: {
-                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
+                x: &#34;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&#34;
             }
         }
         &gt;&gt;&gt; d.evaluated.show(colored=False)
         {
             x: 2,
-            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
+            _id: &#34;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&#34;,
             _ids: {
-                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
+                x: &#34;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&#34;
             }
         }
         &#34;&#34;&#34;
@@ -492,10 +492,10 @@ True
 {
     x: 2,
     y: λ(x),
-    _id: &quot;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&quot;,
+    _id: &quot;opLgZ6Mu0zROyHw0mTZDfo4CjPOPWDNj06Tjf5xY&quot;,
     _ids: {
         x: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
-        y: &quot;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&quot;
+        y: &quot;FjLVN7qyJJN08OCOJyy-eMgxtm5J9jY-C8JofyUw&quot;
     }
 }
 &gt;&gt;&gt; d.y, d[&quot;y&quot;]
@@ -531,10 +531,10 @@ True
 {
     x: 2,
     y: 4,
-    _id: &quot;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&quot;,
+    _id: &quot;opLgZ6Mu0zROyHw0mTZDfo4CjPOPWDNj06Tjf5xY&quot;,
     _ids: {
         x: &quot;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&quot;,
-        y: &quot;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&quot;
+        y: &quot;FjLVN7qyJJN08OCOJyy-eMgxtm5J9jY-C8JofyUw&quot;
     }
 }
 &gt;&gt;&gt; cache1 = {}
@@ -551,11 +551,11 @@ True
     x: 5,
     y: 7,
     z: λ(x y),
-    _id: &quot;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&quot;,
+    _id: &quot;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&quot;,
     _ids: {
         x: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
         y: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
-        z: &quot;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&quot;
+        z: &quot;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&quot;
     }
 }
 &gt;&gt;&gt; cache1, cache2
@@ -564,34 +564,34 @@ True
 Evaluated!
 35
 &gt;&gt;&gt; cache1, cache2, cache3
-({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj'}}, '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj': 35}, {})
+({'A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf'}}, 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2': 5, 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf': 7}, {'1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF'}}, 'M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF': 35}, {})
 &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &quot;x y→z&quot;) &gt;&gt; [cache3, cache2]
 &gt;&gt;&gt; e.show(colored=False)
 {
     x: 5,
     y: 7,
     z: λ(x y),
-    _id: &quot;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&quot;,
+    _id: &quot;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&quot;,
     _ids: {
         x: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
         y: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
-        z: &quot;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&quot;
+        z: &quot;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&quot;
     }
 }
 &gt;&gt;&gt; e.z
 35
 &gt;&gt;&gt; cache3
-{'dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj'}}, '.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj': 35}
-&gt;&gt;&gt; idict(&quot;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&quot;, cache1 | cache3).show(colored=False)
+{'1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H': {'_ids': {'x': 'ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2', 'y': 'eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf', 'z': 'M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF'}}, 'M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF': 35}
+&gt;&gt;&gt; idict(&quot;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&quot;, cache1 | cache3).show(colored=False)
 {
     x: 5,
     y: 7,
     z: 35,
-    _id: &quot;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&quot;,
+    _id: &quot;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&quot;,
     _ids: {
         x: &quot;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&quot;,
         y: &quot;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&quot;,
-        z: &quot;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&quot;
+        z: &quot;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&quot;
     }
 }
 </code></pre></div>
@@ -624,10 +624,10 @@ Evaluated!
     {
         x: 2,
         y: λ(x),
-        _id: &#34;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&#34;,
+        _id: &#34;opLgZ6Mu0zROyHw0mTZDfo4CjPOPWDNj06Tjf5xY&#34;,
         _ids: {
             x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            y: &#34;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&#34;
+            y: &#34;FjLVN7qyJJN08OCOJyy-eMgxtm5J9jY-C8JofyUw&#34;
         }
     }
     &gt;&gt;&gt; d.y, d[&#34;y&#34;]
@@ -663,10 +663,10 @@ Evaluated!
     {
         x: 2,
         y: 4,
-        _id: &#34;stDn95Qq126JcNg15c1tLdK2aUGIL8lP0DppMEPL&#34;,
+        _id: &#34;opLgZ6Mu0zROyHw0mTZDfo4CjPOPWDNj06Tjf5xY&#34;,
         _ids: {
             x: &#34;k3PWYRxIEc0lEvD1f6rbnk.36RAD5AyfROy1aT29&#34;,
-            y: &#34;n3d0SAn-pRv1Zq00tuAygrscPUVB-PvuDFfuM5bk&#34;
+            y: &#34;FjLVN7qyJJN08OCOJyy-eMgxtm5J9jY-C8JofyUw&#34;
         }
     }
     &gt;&gt;&gt; cache1 = {}
@@ -683,11 +683,11 @@ Evaluated!
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
+        _id: &#34;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
+            z: &#34;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#34;
         }
     }
     &gt;&gt;&gt; cache1, cache2
@@ -696,34 +696,34 @@ Evaluated!
     Evaluated!
     35
     &gt;&gt;&gt; cache1, cache2, cache3
-    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;}}, &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;: 35}, {})
+    ({&#39;A0G3Y7KNMLihDvpSJ3tB.zxshc6u1CbbiiYjCAAA&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;}}, &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;: 5, &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;: 7}, {&#39;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#39;}}, &#39;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#39;: 35}, {})
     &gt;&gt;&gt; e = idict(x=5, y=7) &gt;&gt; [cache1] &gt;&gt; (f, &#34;x y→z&#34;) &gt;&gt; [cache3, cache2]
     &gt;&gt;&gt; e.show(colored=False)
     {
         x: 5,
         y: 7,
         z: λ(x y),
-        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
+        _id: &#34;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
+            z: &#34;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#34;
         }
     }
     &gt;&gt;&gt; e.z
     35
     &gt;&gt;&gt; cache3
-    {&#39;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;}}, &#39;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#39;: 35}
-    &gt;&gt;&gt; idict(&#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;, cache1 | cache3).show(colored=False)
+    {&#39;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#39;: {&#39;_ids&#39;: {&#39;x&#39;: &#39;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#39;, &#39;y&#39;: &#39;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#39;, &#39;z&#39;: &#39;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#39;}}, &#39;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#39;: 35}
+    &gt;&gt;&gt; idict(&#34;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#34;, cache1 | cache3).show(colored=False)
     {
         x: 5,
         y: 7,
         z: 35,
-        _id: &#34;dZsOkclTUoi7JfaHrPRwH0o40q2k9V5lem6cBfcl&#34;,
+        _id: &#34;1NrtWDN0QkFVOEGowa3cGm80n3djXL-WVeXrud0H&#34;,
         _ids: {
             x: &#34;ecvgo-CBPi7wRWIxNzuo1HgHQCbdvR058xi6zmr2&#34;,
             y: &#34;eJCW9jGsdZTD6-AD9opKwjPIOWZ4R.T0CG2kdyzf&#34;,
-            z: &#34;.YA2wGBbHWhYdeeQyHJTwP21KX3b4Q9GwR.Cr9mj&#34;
+            z: &#34;M-AbWXN6CXu4l2x31pFJHrif80iaSG2gcKQSk7aF&#34;
         }
     }
     &#34;&#34;&#34;
@@ -796,26 +796,26 @@ Evaluated!
         &gt;&gt;&gt; d.show(colored=False)
         {
             x: λ(),
-            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
+            _id: &#34;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&#34;,
             _ids: {
-                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
+                x: &#34;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&#34;
             }
         }
         &gt;&gt;&gt; d.evaluate()
         &gt;&gt;&gt; d.show(colored=False)
         {
             x: 2,
-            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
+            _id: &#34;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&#34;,
             _ids: {
-                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
+                x: &#34;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&#34;
             }
         }
         &gt;&gt;&gt; d.evaluated.show(colored=False)
         {
             x: 2,
-            _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
+            _id: &#34;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&#34;,
             _ids: {
-                x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
+                x: &#34;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&#34;
             }
         }
         &#34;&#34;&#34;
@@ -1292,26 +1292,26 @@ y 2
 &gt;&gt;&gt; d.show(colored=False)
 {
     x: λ(),
-    _id: &quot;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&quot;,
+    _id: &quot;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&quot;,
     _ids: {
-        x: &quot;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&quot;
+        x: &quot;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&quot;
     }
 }
 &gt;&gt;&gt; d.evaluate()
 &gt;&gt;&gt; d.show(colored=False)
 {
     x: 2,
-    _id: &quot;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&quot;,
+    _id: &quot;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&quot;,
     _ids: {
-        x: &quot;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&quot;
+        x: &quot;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&quot;
     }
 }
 &gt;&gt;&gt; d.evaluated.show(colored=False)
 {
     x: 2,
-    _id: &quot;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&quot;,
+    _id: &quot;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&quot;,
     _ids: {
-        x: &quot;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&quot;
+        x: &quot;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&quot;
     }
 }
 </code></pre></div>
@@ -1326,26 +1326,26 @@ y 2
     &gt;&gt;&gt; d.show(colored=False)
     {
         x: λ(),
-        _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
+        _id: &#34;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&#34;,
         _ids: {
-            x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
+            x: &#34;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&#34;
         }
     }
     &gt;&gt;&gt; d.evaluate()
     &gt;&gt;&gt; d.show(colored=False)
     {
         x: 2,
-        _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
+        _id: &#34;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&#34;,
         _ids: {
-            x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
+            x: &#34;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&#34;
         }
     }
     &gt;&gt;&gt; d.evaluated.show(colored=False)
     {
         x: 2,
-        _id: &#34;Zj1bv.i7gTXWfHc.SJbNY4c0Y.dZ-ru5dLjcuAgw&#34;,
+        _id: &#34;ZGyJ22eP09N82Ry37mo4ZoZ.NDOaNQAY-4J6XYsM&#34;,
         _ids: {
-            x: &#34;IXg2cW8oqLneiuEW0wn2kXBABBtCBgtdE-xjiXBe&#34;
+            x: &#34;B2DtWpFOLuSo46tXiP1jsfO7wH0xpFz4qgXdLjOu&#34;
         }
     }
     &#34;&#34;&#34;

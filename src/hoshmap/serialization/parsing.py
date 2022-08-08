@@ -43,8 +43,8 @@ def f2hosh(f: callable):
 
     for group in groups:
         # Replace memory addresses and file names by just the object name.
-        group = re.sub(r'<code object (.+) at 0x[0-f]+, file ".+", line \d+>',  r"\1", group)
-        lines = [re.sub(r'^[\d ]+', "", segment) for segment in re.split(' +', group)][1:]
+        group = re.sub(r'<code object (.+) at 0x[0-f]+, file ".+", line \d+>', r"\1", group)
+        lines = [re.sub(r"^[\d ]+", "", segment) for segment in re.split(" +", group)][1:]
         clean_lines.append(lines)
     code = [fields_and_params, clean_lines]
     return Hosh(pickle.dumps(code, protocol=5))

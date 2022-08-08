@@ -61,9 +61,9 @@ class LazyiVal(CacheableiVal):
     >>> lvx.value, lvy.value, lvz2.value, lvw.value
     (4, 7, 729, 59049)
     >>> lvz2.id
-    'DnEpPaV2RgSFqbiyUvIgF-yM-PRv-ZS5M55oY9D5'
+    'Vi2uj31Ge.Qq5HvyosBKEteuKD.ia1T.smNcT1ue'
     >>> lvw.id
-    'tZhpXFv5YPuwH-2cFvPO2WsTKpwWui2gGHetySo-'
+    '-.wMmh0A9lujq3.ILKbU0gbeCUjGZsgRgPjtpaI-'
     >>> lvz2.hosh * lvw.hosh == lvz.hosh * lvw.fhosh
     True
     """

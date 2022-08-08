@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hoshmap"
-version = "0.220727.3"
+version = "0.220808.0"
 description = "Hosh-based cacheable lazy dict with deterministic predictable universally unique identifiers"
 authors = ["davips <dpsabc@gmail.com>"]
 license = "GPLv3"

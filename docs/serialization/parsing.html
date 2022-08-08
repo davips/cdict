@@ -72,20 +72,10 @@ def f2hosh(f: callable):
     for group in groups:
         # Replace memory addresses and file names by just the object name.
         group = re.sub(r&#39;&lt;code object (.+) at 0x[0-f]+, file &#34;.+&#34;, line \d+&gt;&#39;, r&#34;\1&#34;, group)
-        lines = [segment for segment in group.split(&#34; &#34;)][1:]
+        lines = [re.sub(r&#34;^[\d ]+&#34;, &#34;&#34;, segment) for segment in re.split(&#34; +&#34;, group)][1:]
         clean_lines.append(lines)
-    return Hosh(pickle.dumps([fields_and_params, clean_lines], protocol=5))
-
-
-# def f2code(f: callable):
-#     out = StringIO()
-#     try:
-#         decompile(bytecode_version=(3, 8), co=f.__code__, out=out)
-#     except ParserError as e:
-#         print(e)
-#         raise Exception(&#34;Could not extract function code.&#34;)
-#     code = [line for line in out.getvalue().split(&#34;\n&#34;) if not line.startswith(&#34;#&#34;)]
-#     return code</code></pre>
+    code = [fields_and_params, clean_lines]
+    return Hosh(pickle.dumps(code, protocol=5))</code></pre>
 </details>
 </section>
 <section>
@@ -121,9 +111,10 @@ def f2hosh(f: callable):
     for group in groups:
         # Replace memory addresses and file names by just the object name.
         group = re.sub(r&#39;&lt;code object (.+) at 0x[0-f]+, file &#34;.+&#34;, line \d+&gt;&#39;, r&#34;\1&#34;, group)
-        lines = [segment for segment in group.split(&#34; &#34;)][1:]
+        lines = [re.sub(r&#34;^[\d ]+&#34;, &#34;&#34;, segment) for segment in re.split(&#34; +&#34;, group)][1:]
         clean_lines.append(lines)
-    return Hosh(pickle.dumps([fields_and_params, clean_lines], protocol=5))</code></pre>
+    code = [fields_and_params, clean_lines]
+    return Hosh(pickle.dumps(code, protocol=5))</code></pre>
 </details>
 </dd>
 </dl>
