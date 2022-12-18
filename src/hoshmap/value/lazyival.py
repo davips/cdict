@@ -100,27 +100,40 @@ class LazyiVal(CacheableiVal):
     @property
     def value(self):
         if not self.isevaluated:
-            if (fetched := self.fetch()) is not None:
+            if (fetched := self.fetch()) is not LookupError:
                 return fetched
+            print(1111111111111111, "lazyval:", self, self.caches is None)
+            # if self.caches is None:
+            #     raise Exception
             self.calculate()
             self.store()
         return self.results[self.id]
 
+    # noinspection PyUnboundLocalVariable
     def fetch(self):
         if self.caches is not None:
             from hoshmap import FrozenIdict
 
-            outdated_caches = []
+            outdated_caches, found = [], False
             for cache in self.caches:
-                if self.id in cache:
-                    for outdated_cache in outdated_caches:
-                        outdated_cache[self.did] = {"_ids": self.dids}
-                    val = self.traverse(self.id, cache, outdated_caches)
-                    # TODO: receber iVal de dentro do cache, nao value
-                    # TODO: passar cache pra ele quando for CacheableiVal
-                    self.results[self.id] = val
-                    return val
-                outdated_caches.append(cache)
+                if found:
+                    if cache.ismirror and self.id not in cache:
+                        cache[self.did] = {"_ids": self.dids}
+                        cache[self.id] = val
+                else:
+                    if self.id in cache:
+                        for outdated_cache in outdated_caches:
+                            outdated_cache[self.did] = {"_ids": self.dids}
+                        val = self.traverse(self.id, cache, outdated_caches)
+                        # TODO: receber iVal de dentro do cache, nao value
+                        # TODO: passar cache pra ele quando for CacheableiVal
+                        self.results[self.id] = val
+                        found = True
+                    else:
+                        outdated_caches.append(cache)
+            if found:
+                return val
+        return LookupError
 
     def calculate(self):
         from hoshmap import idict
@@ -129,17 +142,18 @@ class LazyiVal(CacheableiVal):
         kwargs = {}
         iterable_sources = {}
         for field, ival in self.deps.items():
+            print(1111111111111111, "dep:", field)
             if isinstance(field, int):  # quando usa isso???
                 argidxs.append(field)
             else:
                 if len(split := field.split(":*")) == 2:
                     iterable_sources[split[1]] = iter(self.deps[field].value)
                 else:
+                    print(1111111111111111, "value")
                     kwargs[field] = ival.value
         if iterable_sources:
             result = []
-            loop = True
-            while loop:
+            while True:
                 i = None
                 try:
                     for i, (target, it) in enumerate(iterable_sources.items()):
@@ -151,7 +165,7 @@ class LazyiVal(CacheableiVal):
                 except StopIteration:
                     if i not in [0, len(iterable_sources)]:
                         raise ValueError("All iterable fields (e.g., 'xs:*x') should have the same length.")
-                    loop = False
+                    break
         else:
             result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
             if isinstance(result, idict):
@@ -172,6 +186,7 @@ class LazyiVal(CacheableiVal):
             from hoshmap import FrozenIdict
 
             for id, res in self.results.items():
+                print(1111111111111111, id)
                 for cache in self.caches:
                     if self.did not in cache:
                         cache[self.did] = {"_ids": self.dids}

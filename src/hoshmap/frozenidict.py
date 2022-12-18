@@ -217,6 +217,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     strict.append(cache)
                 caches.append(cache)
             for key, ival in self.entries(evaluate=False):
+                print("1111111111111111, kkkkkkkkkkkkkkkkk", key)
                 if ival.isevaluated:
                     for cache in strict:
                         # TODO: esse IF evita gravar toda hora, mas impede que metafields sejam atualizados
@@ -231,6 +232,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                             cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() the value if it wants.
                 else:
                     data[key] = ival.withcaches(caches, self.id, self.ids)
+                    print(1111111111111111, key, "::::::::::::::", data[key].caches)
             return FrozenIdict(data)
 
         if isinstance(other, Let):
