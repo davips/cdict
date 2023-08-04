@@ -23,6 +23,6 @@ A cacheable lazy dict with universally unique deterministic identifiers and tran
 ---
 
 
-This library is the successor of the package [idict](https://pypi.org/project/idict)
+This library was the successor of the package [idict](https://pypi.org/project/idict)
 
 Most of the _idict_ documentation still applies to _hoshmap_'s _idict_.
