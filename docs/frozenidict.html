@@ -48,6 +48,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     Frozen version of Idict
 
     Nested idicts become frozen for consistent identities.
+    Immutable values don&#39;t mess with their respective identifiers.
 
     &gt;&gt;&gt; &#34;x&#34; in FrozenIdict(x=2)
     True
@@ -63,7 +64,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         data.update(kwargs)
         if &#34;_id&#34; in data.keys() or &#34;_ids&#34; in data.keys():  # pragma: no cover
             raise Exception(f&#34;Cannot have a field named &#39;_id&#39;/&#39;_ids&#39;: {data.keys()}&#34;)
-        self.data: Dict[str, Union[iVal, str, dict]] = {}
+        self.data: Dict[str, iVal] = {}
         self.hosh = self.mhosh = ø
         self.ids = {}
         self.mids = {}
@@ -77,15 +78,17 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     self.data[k], self.data[k + &#34;_&#34;] = explode_df(v)
                 else:
                     self.data[k] = StrictiVal(v)
-            # pq msm aceita nao strs como key?
-            if isinstance(k, str):
-                if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]:
-                    pass
-                    # raise NotImplementedError
-                    # self.mhosh += self.data[k].hosh * k.encode()
-                    # self.mids[k] = self.data[k].hosh.id
-                else:
-                    self.hosh += self.data[k].hosh * k.encode()
+            if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                pass
+                # TODO: add mehosh (for metafields)?
+                # TODO: add mihosh (for mirrorfields)?
+                # TODO: specify new type of field: mirrorfield, e.g.: &#39;df_&#39; is a mirror/derived from &#39;df&#39;
+                # self.mhosh += self.data[k].hosh * k.encode()
+                # self.mids[k] = self.data[k].hosh.id
+            else:
+                self.hosh += self.data[k].hosh * k.encode()
+                # PAPER9: remember to state in the paper that hash(identifier) must be different from hash(value), for any identifier and value. E.g.: hash(X) != hash(&#34;X&#34;)
+                #   Here the difference always happen because values are pickled, while identifiers are just encoded().
             self.ids[k] = self.data[k].hosh.id  # TODO: separate mids from ids?
         # noinspection PyTypeChecker
         self.data[&#34;_id&#34;] = self.id = self.hosh.id
@@ -411,7 +414,8 @@ class FrozenIdict(UserDict, Dict[str, VT]):
 </code></dt>
 <dd>
 <div class="desc"><p>Frozen version of Idict</p>
-<p>Nested idicts become frozen for consistent identities.</p>
+<p>Nested idicts become frozen for consistent identities.
+Immutable values don't mess with their respective identifiers.</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; &quot;x&quot; in FrozenIdict(x=2)
 True
 </code></pre></div>
@@ -424,6 +428,7 @@ True
     Frozen version of Idict
 
     Nested idicts become frozen for consistent identities.
+    Immutable values don&#39;t mess with their respective identifiers.
 
     &gt;&gt;&gt; &#34;x&#34; in FrozenIdict(x=2)
     True
@@ -439,7 +444,7 @@ True
         data.update(kwargs)
         if &#34;_id&#34; in data.keys() or &#34;_ids&#34; in data.keys():  # pragma: no cover
             raise Exception(f&#34;Cannot have a field named &#39;_id&#39;/&#39;_ids&#39;: {data.keys()}&#34;)
-        self.data: Dict[str, Union[iVal, str, dict]] = {}
+        self.data: Dict[str, iVal] = {}
         self.hosh = self.mhosh = ø
         self.ids = {}
         self.mids = {}
@@ -453,15 +458,17 @@ True
                     self.data[k], self.data[k + &#34;_&#34;] = explode_df(v)
                 else:
                     self.data[k] = StrictiVal(v)
-            # pq msm aceita nao strs como key?
-            if isinstance(k, str):
-                if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]:
-                    pass
-                    # raise NotImplementedError
-                    # self.mhosh += self.data[k].hosh * k.encode()
-                    # self.mids[k] = self.data[k].hosh.id
-                else:
-                    self.hosh += self.data[k].hosh * k.encode()
+            if k.startswith(&#34;_&#34;) and k not in [&#34;_id&#34;, &#34;_ids&#34;]:
+                pass
+                # TODO: add mehosh (for metafields)?
+                # TODO: add mihosh (for mirrorfields)?
+                # TODO: specify new type of field: mirrorfield, e.g.: &#39;df_&#39; is a mirror/derived from &#39;df&#39;
+                # self.mhosh += self.data[k].hosh * k.encode()
+                # self.mids[k] = self.data[k].hosh.id
+            else:
+                self.hosh += self.data[k].hosh * k.encode()
+                # PAPER9: remember to state in the paper that hash(identifier) must be different from hash(value), for any identifier and value. E.g.: hash(X) != hash(&#34;X&#34;)
+                #   Here the difference always happen because values are pickled, while identifiers are just encoded().
             self.ids[k] = self.data[k].hosh.id  # TODO: separate mids from ids?
         # noinspection PyTypeChecker
         self.data[&#34;_id&#34;] = self.id = self.hosh.id

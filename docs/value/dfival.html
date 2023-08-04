@@ -95,16 +95,23 @@ def explode_df(df):
     &gt;&gt;&gt; from hoshmap import idict
     &gt;&gt;&gt; df = DataFrame({&#34;x&#34;: [1,2,3], &#34;y&#34;: [5,6,7]}, index=[&#34;a&#34;, &#34;b&#34;, &#34;c&#34;])
     &gt;&gt;&gt; d = idict(df=df)
-    &gt;&gt;&gt; d.df_.show(colored=False)
+    &gt;&gt;&gt; d.show(colored=False)
     {
-        index: &#34;«{&#39;a&#39;: &#39;a&#39;, &#39;b&#39;: &#39;b&#39;, &#39;c&#39;: &#39;c&#39;}»&#34;,
-        x: &#34;«{&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3}»&#34;,
-        y: &#34;«{&#39;a&#39;: 5, &#39;b&#39;: 6, &#39;c&#39;: 7}»&#34;,
-        _id: &#34;CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC&#34;,
+        df: &#34;«{&#39;x&#39;: {&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3}, &#39;y&#39;: {&#39;a&#39;: 5, &#39;b&#39;: 6, &#39;c&#39;: 7}}»&#34;,
+        df_: {
+            index: &#34;«{&#39;a&#39;: &#39;a&#39;, &#39;b&#39;: &#39;b&#39;, &#39;c&#39;: &#39;c&#39;}»&#34;,
+            x: &#34;«{&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3}»&#34;,
+            y: &#34;«{&#39;a&#39;: 5, &#39;b&#39;: 6, &#39;c&#39;: 7}»&#34;,
+            _id: &#34;CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC&#34;,
+            _ids: {
+                index: &#34;HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt&#34;,
+                x: &#34;3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j&#34;,
+                y: &#34;bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t&#34;
+            }
+        },
+        _id: &#34;qMP.-f8p3zIrmTuOOqBLCVurT6uIIfihnR3rZne4&#34;,
         _ids: {
-            index: &#34;HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt&#34;,
-            x: &#34;3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j&#34;,
-            y: &#34;bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t&#34;
+            df: &#34;CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC&#34;
         }
     }
     &gt;&gt;&gt; d.df
@@ -137,16 +144,23 @@ def explode_df(df):
 &gt;&gt;&gt; from hoshmap import idict
 &gt;&gt;&gt; df = DataFrame({&quot;x&quot;: [1,2,3], &quot;y&quot;: [5,6,7]}, index=[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;])
 &gt;&gt;&gt; d = idict(df=df)
-&gt;&gt;&gt; d.df_.show(colored=False)
+&gt;&gt;&gt; d.show(colored=False)
 {
-    index: &quot;«{'a': 'a', 'b': 'b', 'c': 'c'}»&quot;,
-    x: &quot;«{'a': 1, 'b': 2, 'c': 3}»&quot;,
-    y: &quot;«{'a': 5, 'b': 6, 'c': 7}»&quot;,
-    _id: &quot;CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC&quot;,
+    df: &quot;«{'x': {'a': 1, 'b': 2, 'c': 3}, 'y': {'a': 5, 'b': 6, 'c': 7}}»&quot;,
+    df_: {
+        index: &quot;«{'a': 'a', 'b': 'b', 'c': 'c'}»&quot;,
+        x: &quot;«{'a': 1, 'b': 2, 'c': 3}»&quot;,
+        y: &quot;«{'a': 5, 'b': 6, 'c': 7}»&quot;,
+        _id: &quot;CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC&quot;,
+        _ids: {
+            index: &quot;HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt&quot;,
+            x: &quot;3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j&quot;,
+            y: &quot;bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t&quot;
+        }
+    },
+    _id: &quot;qMP.-f8p3zIrmTuOOqBLCVurT6uIIfihnR3rZne4&quot;,
     _ids: {
-        index: &quot;HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt&quot;,
-        x: &quot;3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j&quot;,
-        y: &quot;bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t&quot;
+        df: &quot;CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC&quot;
     }
 }
 &gt;&gt;&gt; d.df
@@ -165,16 +179,23 @@ c  3  7
     &gt;&gt;&gt; from hoshmap import idict
     &gt;&gt;&gt; df = DataFrame({&#34;x&#34;: [1,2,3], &#34;y&#34;: [5,6,7]}, index=[&#34;a&#34;, &#34;b&#34;, &#34;c&#34;])
     &gt;&gt;&gt; d = idict(df=df)
-    &gt;&gt;&gt; d.df_.show(colored=False)
+    &gt;&gt;&gt; d.show(colored=False)
     {
-        index: &#34;«{&#39;a&#39;: &#39;a&#39;, &#39;b&#39;: &#39;b&#39;, &#39;c&#39;: &#39;c&#39;}»&#34;,
-        x: &#34;«{&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3}»&#34;,
-        y: &#34;«{&#39;a&#39;: 5, &#39;b&#39;: 6, &#39;c&#39;: 7}»&#34;,
-        _id: &#34;CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC&#34;,
+        df: &#34;«{&#39;x&#39;: {&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3}, &#39;y&#39;: {&#39;a&#39;: 5, &#39;b&#39;: 6, &#39;c&#39;: 7}}»&#34;,
+        df_: {
+            index: &#34;«{&#39;a&#39;: &#39;a&#39;, &#39;b&#39;: &#39;b&#39;, &#39;c&#39;: &#39;c&#39;}»&#34;,
+            x: &#34;«{&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3}»&#34;,
+            y: &#34;«{&#39;a&#39;: 5, &#39;b&#39;: 6, &#39;c&#39;: 7}»&#34;,
+            _id: &#34;CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC&#34;,
+            _ids: {
+                index: &#34;HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt&#34;,
+                x: &#34;3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j&#34;,
+                y: &#34;bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t&#34;
+            }
+        },
+        _id: &#34;qMP.-f8p3zIrmTuOOqBLCVurT6uIIfihnR3rZne4&#34;,
         _ids: {
-            index: &#34;HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt&#34;,
-            x: &#34;3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j&#34;,
-            y: &#34;bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t&#34;
+            df: &#34;CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC&#34;
         }
     }
     &gt;&gt;&gt; d.df

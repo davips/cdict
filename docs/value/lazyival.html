@@ -128,27 +128,39 @@ class LazyiVal(CacheableiVal):
     @property
     def value(self):
         if not self.isevaluated:
-            if (fetched := self.fetch()) is not None:
+            if (fetched := self.fetch()) is not LookupError:
                 return fetched
+            # if self.caches is None:
+            #     raise Exception
             self.calculate()
             self.store()
         return self.results[self.id]
 
+    # noinspection PyUnboundLocalVariable
     def fetch(self):
         if self.caches is not None:
             from hoshmap import FrozenIdict
 
-            outdated_caches = []
+            outdated_caches, found = [], False
             for cache in self.caches:
-                if self.id in cache:
-                    for outdated_cache in outdated_caches:
-                        outdated_cache[self.did] = {&#34;_ids&#34;: self.dids}
-                    val = self.traverse(self.id, cache, outdated_caches)
-                    # TODO: receber iVal de dentro do cache, nao value
-                    # TODO: passar cache pra ele quando for CacheableiVal
-                    self.results[self.id] = val
-                    return val
-                outdated_caches.append(cache)
+                if found:
+                    if cache.ismirror and self.id not in cache:
+                        cache[self.did] = {&#34;_ids&#34;: self.dids}
+                        cache[self.id] = val
+                else:
+                    if self.id in cache:
+                        for outdated_cache in outdated_caches:
+                            outdated_cache[self.did] = {&#34;_ids&#34;: self.dids}
+                        val = self.traverse(self.id, cache, outdated_caches)
+                        # TODO: receber iVal de dentro do cache, nao value
+                        # TODO: passar cache pra ele quando for CacheableiVal
+                        self.results[self.id] = val
+                        found = True
+                    else:
+                        outdated_caches.append(cache)
+            if found:
+                return val
+        return LookupError
 
     def calculate(self):
         from hoshmap import idict
@@ -166,8 +178,7 @@ class LazyiVal(CacheableiVal):
                     kwargs[field] = ival.value
         if iterable_sources:
             result = []
-            loop = True
-            while loop:
+            while True:
                 i = None
                 try:
                     for i, (target, it) in enumerate(iterable_sources.items()):
@@ -179,7 +190,7 @@ class LazyiVal(CacheableiVal):
                 except StopIteration:
                     if i not in [0, len(iterable_sources)]:
                         raise ValueError(&#34;All iterable fields (e.g., &#39;xs:*x&#39;) should have the same length.&#34;)
-                    loop = False
+                    break
         else:
             result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
             if isinstance(result, idict):
@@ -235,6 +246,14 @@ class LazyiVal(CacheableiVal):
                 data[k] = self.traverse(v, cache, outdated_caches)
             return FrozenIdict.fromdict(data, ids)
         return val
+
+    def __reduce__(self):
+        # TODO: pickling idicts shouldn&#39;t be necessary after cache[id]=DFiVal is implemented
+        raise NotImplementedError
+        dic = self.data.copy()
+        ids = dic.pop(&#34;_ids&#34;).copy()
+        del dic[&#34;_id&#34;]
+        return self.fromdict, (dic, ids)
 
 
 class Unevaluated:
@@ -363,27 +382,39 @@ True
     @property
     def value(self):
         if not self.isevaluated:
-            if (fetched := self.fetch()) is not None:
+            if (fetched := self.fetch()) is not LookupError:
                 return fetched
+            # if self.caches is None:
+            #     raise Exception
             self.calculate()
             self.store()
         return self.results[self.id]
 
+    # noinspection PyUnboundLocalVariable
     def fetch(self):
         if self.caches is not None:
             from hoshmap import FrozenIdict
 
-            outdated_caches = []
+            outdated_caches, found = [], False
             for cache in self.caches:
-                if self.id in cache:
-                    for outdated_cache in outdated_caches:
-                        outdated_cache[self.did] = {&#34;_ids&#34;: self.dids}
-                    val = self.traverse(self.id, cache, outdated_caches)
-                    # TODO: receber iVal de dentro do cache, nao value
-                    # TODO: passar cache pra ele quando for CacheableiVal
-                    self.results[self.id] = val
-                    return val
-                outdated_caches.append(cache)
+                if found:
+                    if cache.ismirror and self.id not in cache:
+                        cache[self.did] = {&#34;_ids&#34;: self.dids}
+                        cache[self.id] = val
+                else:
+                    if self.id in cache:
+                        for outdated_cache in outdated_caches:
+                            outdated_cache[self.did] = {&#34;_ids&#34;: self.dids}
+                        val = self.traverse(self.id, cache, outdated_caches)
+                        # TODO: receber iVal de dentro do cache, nao value
+                        # TODO: passar cache pra ele quando for CacheableiVal
+                        self.results[self.id] = val
+                        found = True
+                    else:
+                        outdated_caches.append(cache)
+            if found:
+                return val
+        return LookupError
 
     def calculate(self):
         from hoshmap import idict
@@ -401,8 +432,7 @@ True
                     kwargs[field] = ival.value
         if iterable_sources:
             result = []
-            loop = True
-            while loop:
+            while True:
                 i = None
                 try:
                     for i, (target, it) in enumerate(iterable_sources.items()):
@@ -414,7 +444,7 @@ True
                 except StopIteration:
                     if i not in [0, len(iterable_sources)]:
                         raise ValueError(&#34;All iterable fields (e.g., &#39;xs:*x&#39;) should have the same length.&#34;)
-                    loop = False
+                    break
         else:
             result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
             if isinstance(result, idict):
@@ -469,7 +499,15 @@ True
             for k, v in ids.items():
                 data[k] = self.traverse(v, cache, outdated_caches)
             return FrozenIdict.fromdict(data, ids)
-        return val</code></pre>
+        return val
+
+    def __reduce__(self):
+        # TODO: pickling idicts shouldn&#39;t be necessary after cache[id]=DFiVal is implemented
+        raise NotImplementedError
+        dic = self.data.copy()
+        ids = dic.pop(&#34;_ids&#34;).copy()
+        del dic[&#34;_id&#34;]
+        return self.fromdict, (dic, ids)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -488,8 +526,10 @@ True
 <pre><code class="python">@property
 def value(self):
     if not self.isevaluated:
-        if (fetched := self.fetch()) is not None:
+        if (fetched := self.fetch()) is not LookupError:
             return fetched
+        # if self.caches is None:
+        #     raise Exception
         self.calculate()
         self.store()
     return self.results[self.id]</code></pre>
@@ -523,8 +563,7 @@ def value(self):
                 kwargs[field] = ival.value
     if iterable_sources:
         result = []
-        loop = True
-        while loop:
+        while True:
             i = None
             try:
                 for i, (target, it) in enumerate(iterable_sources.items()):
@@ -536,7 +575,7 @@ def value(self):
             except StopIteration:
                 if i not in [0, len(iterable_sources)]:
                     raise ValueError(&#34;All iterable fields (e.g., &#39;xs:*x&#39;) should have the same length.&#34;)
-                loop = False
+                break
     else:
         result = self.f(*(self.deps[idx] for idx in sorted(argidxs)), **kwargs)
         if isinstance(result, idict):
@@ -566,17 +605,26 @@ def value(self):
     if self.caches is not None:
         from hoshmap import FrozenIdict
 
-        outdated_caches = []
+        outdated_caches, found = [], False
         for cache in self.caches:
-            if self.id in cache:
-                for outdated_cache in outdated_caches:
-                    outdated_cache[self.did] = {&#34;_ids&#34;: self.dids}
-                val = self.traverse(self.id, cache, outdated_caches)
-                # TODO: receber iVal de dentro do cache, nao value
-                # TODO: passar cache pra ele quando for CacheableiVal
-                self.results[self.id] = val
-                return val
-            outdated_caches.append(cache)</code></pre>
+            if found:
+                if cache.ismirror and self.id not in cache:
+                    cache[self.did] = {&#34;_ids&#34;: self.dids}
+                    cache[self.id] = val
+            else:
+                if self.id in cache:
+                    for outdated_cache in outdated_caches:
+                        outdated_cache[self.did] = {&#34;_ids&#34;: self.dids}
+                    val = self.traverse(self.id, cache, outdated_caches)
+                    # TODO: receber iVal de dentro do cache, nao value
+                    # TODO: passar cache pra ele quando for CacheableiVal
+                    self.results[self.id] = val
+                    found = True
+                else:
+                    outdated_caches.append(cache)
+        if found:
+            return val
+    return LookupError</code></pre>
 </details>
 </dd>
 <dt id="hoshmap.value.lazyival.LazyiVal.replace"><code class="name flex">
