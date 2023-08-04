@@ -67,16 +67,23 @@ def explode_df(df):
     >>> from hoshmap import idict
     >>> df = DataFrame({"x": [1,2,3], "y": [5,6,7]}, index=["a", "b", "c"])
     >>> d = idict(df=df)
-    >>> d.df_.show(colored=False)
+    >>> d.show(colored=False)
     {
-        index: "«{'a': 'a', 'b': 'b', 'c': 'c'}»",
-        x: "«{'a': 1, 'b': 2, 'c': 3}»",
-        y: "«{'a': 5, 'b': 6, 'c': 7}»",
-        _id: "CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC",
+        df: "«{'x': {'a': 1, 'b': 2, 'c': 3}, 'y': {'a': 5, 'b': 6, 'c': 7}}»",
+        df_: {
+            index: "«{'a': 'a', 'b': 'b', 'c': 'c'}»",
+            x: "«{'a': 1, 'b': 2, 'c': 3}»",
+            y: "«{'a': 5, 'b': 6, 'c': 7}»",
+            _id: "CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC",
+            _ids: {
+                index: "HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt",
+                x: "3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j",
+                y: "bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t"
+            }
+        },
+        _id: "qMP.-f8p3zIrmTuOOqBLCVurT6uIIfihnR3rZne4",
         _ids: {
-            index: "HBNoEs58wCDhsdWWisp0sjMwsWmNMXuwaGFE9UAt",
-            x: "3F.7UkfLr2tpB-FxATaRJYIpbYpg9oa1r5M31M0j",
-            y: "bqYjHGDn-brebdANtxtNo4OkpOXfDwwVYejlzo4t"
+            df: "CO3m4w1vqM.etZXkoHQoNxA.PS.kQI-LomW.H6VC"
         }
     }
     >>> d.df

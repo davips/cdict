@@ -20,6 +20,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
     Frozen version of Idict
 
     Nested idicts become frozen for consistent identities.
+    Immutable values don't mess with their respective identifiers.
 
     >>> "x" in FrozenIdict(x=2)
     True
@@ -35,7 +36,7 @@ class FrozenIdict(UserDict, Dict[str, VT]):
         data.update(kwargs)
         if "_id" in data.keys() or "_ids" in data.keys():  # pragma: no cover
             raise Exception(f"Cannot have a field named '_id'/'_ids': {data.keys()}")
-        self.data: Dict[str, Union[iVal, str, dict]] = {}
+        self.data: Dict[str, iVal] = {}
         self.hosh = self.mhosh = ø
         self.ids = {}
         self.mids = {}
@@ -49,15 +50,17 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     self.data[k], self.data[k + "_"] = explode_df(v)
                 else:
                     self.data[k] = StrictiVal(v)
-            # pq msm aceita nao strs como key?
-            if isinstance(k, str):
-                if k.startswith("_") and k not in ["_id", "_ids"]:
-                    pass
-                    # raise NotImplementedError
-                    # self.mhosh += self.data[k].hosh * k.encode()
-                    # self.mids[k] = self.data[k].hosh.id
-                else:
-                    self.hosh += self.data[k].hosh * k.encode()
+            if k.startswith("_") and k not in ["_id", "_ids"]:
+                pass
+                # TODO: add mehosh (for metafields)?
+                # TODO: add mihosh (for mirrorfields)?
+                # TODO: specify new type of field: mirrorfield, e.g.: 'df_' is a mirror/derived from 'df'
+                # self.mhosh += self.data[k].hosh * k.encode()
+                # self.mids[k] = self.data[k].hosh.id
+            else:
+                self.hosh += self.data[k].hosh * k.encode()
+                # PAPER9: remember to state in the paper that hash(identifier) must be different from hash(value), for any identifier and value. E.g.: hash(X) != hash("X")
+                #   Here the difference always happen because values are pickled, while identifiers are just encoded().
             self.ids[k] = self.data[k].hosh.id  # TODO: separate mids from ids?
         # noinspection PyTypeChecker
         self.data["_id"] = self.id = self.hosh.id
@@ -217,7 +220,6 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                     strict.append(cache)
                 caches.append(cache)
             for key, ival in self.entries(evaluate=False):
-                print("1111111111111111, kkkkkkkkkkkkkkkkk", key)
                 if ival.isevaluated:
                     for cache in strict:
                         # TODO: esse IF evita gravar toda hora, mas impede que metafields sejam atualizados
@@ -232,7 +234,6 @@ class FrozenIdict(UserDict, Dict[str, VT]):
                             cache[ival.id] = ival.value  # REMINDER: the dict-like cache should pack() the value if it wants.
                 else:
                     data[key] = ival.withcaches(caches, self.id, self.ids)
-                    print(1111111111111111, key, "::::::::::::::", data[key].caches)
             return FrozenIdict(data)
 
         if isinstance(other, Let):

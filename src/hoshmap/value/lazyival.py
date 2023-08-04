@@ -102,7 +102,6 @@ class LazyiVal(CacheableiVal):
         if not self.isevaluated:
             if (fetched := self.fetch()) is not LookupError:
                 return fetched
-            print(1111111111111111, "lazyval:", self, self.caches is None)
             # if self.caches is None:
             #     raise Exception
             self.calculate()
@@ -142,14 +141,12 @@ class LazyiVal(CacheableiVal):
         kwargs = {}
         iterable_sources = {}
         for field, ival in self.deps.items():
-            print(1111111111111111, "dep:", field)
             if isinstance(field, int):  # quando usa isso???
                 argidxs.append(field)
             else:
                 if len(split := field.split(":*")) == 2:
                     iterable_sources[split[1]] = iter(self.deps[field].value)
                 else:
-                    print(1111111111111111, "value")
                     kwargs[field] = ival.value
         if iterable_sources:
             result = []
@@ -186,7 +183,6 @@ class LazyiVal(CacheableiVal):
             from hoshmap import FrozenIdict
 
             for id, res in self.results.items():
-                print(1111111111111111, id)
                 for cache in self.caches:
                     if self.did not in cache:
                         cache[self.did] = {"_ids": self.dids}
@@ -222,6 +218,14 @@ class LazyiVal(CacheableiVal):
                 data[k] = self.traverse(v, cache, outdated_caches)
             return FrozenIdict.fromdict(data, ids)
         return val
+
+    def __reduce__(self):
+        # TODO: pickling idicts shouldn't be necessary after cache[id]=DFiVal is implemented
+        raise NotImplementedError
+        dic = self.data.copy()
+        ids = dic.pop("_ids").copy()
+        del dic["_id"]
+        return self.fromdict, (dic, ids)
 
 
 class Unevaluated:
