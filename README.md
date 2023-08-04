@@ -15,5 +15,14 @@
 # hoshmap
 A cacheable lazy dict with universally unique deterministic identifiers and transparent agnostic persistence.
 
-## This library is the successor of the package [idict](https://pypi.org/project/idict)
+### **This project was succeeded by [hdict](https://pypi.org/project/hdict).**
+
+---
+---
+---
+---
+
+
+This library was the successor of the package [idict](https://pypi.org/project/idict)
+
 Most of the _idict_ documentation still applies to _hoshmap_'s _idict_.
